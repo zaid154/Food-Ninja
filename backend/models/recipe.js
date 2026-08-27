@@ -1,0 +1,23 @@
+const mongoose = require("mongoose");
+
+const recipeSchema = new mongoose.Schema(
+  {
+    id: { type: Number, required: true, unique: true },
+    name: { type: String, required: true, trim: true },
+    category: { type: String, default: "Fast Food", trim: true },
+    price: { type: Number, required: true, default: 199 },
+    image: { type: String, required: true },
+    isVeg: { type: Boolean, default: true },
+    rating: { type: Number, default: 4.5 },
+    reviewCount: { type: Number, default: 120 },
+    deliveryTime: { type: String, default: "25-30 mins" },
+    cuisine: { type: String, default: "Indian" },
+    caloriesPerServing: { type: Number, default: 350 },
+    description: { type: String, default: "Delicious and freshly prepared restaurant dish." },
+    ingredients: { type: [String], default: [] },
+    instructions: { type: [String], default: [] },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Recipe", recipeSchema);

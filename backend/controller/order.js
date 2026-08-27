@@ -1,0 +1,64 @@
+const Order = require("../models/order");
+
+// Get all orders (for Admin or user)
+const getOrders = async (req, res) => {
+  try {
+    const { email } = req.query;
+    let query = {};
+    if (email && email !== "all") {
+      query.userEmail = email;
+    }
+    const orders = await Order.find(query).sort({ createdAt: -1 });
+    return res.status(200).json({ orders });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to fetch orders", error: error.message });
+  }
+};
+
+// Create new customer order
+const createOrder = async (req, res) => {
+  try {
+    const { id, userEmail, customerName, phone, address, payment, items, total, date } = req.body;
+    
+    if (!customerName || !phone || !address || !items || !total) {
+      return res.status(400).json({ message: "Missing required order details." });
+    }
+
+    const orderId = id || Date.now();
+    const newOrder = new Order({
+      id: orderId,
+      userEmail: userEmail || "guest",
+      customerName,
+      phone,
+      address,
+      payment: payment || "Cash on Delivery",
+      items,
+      total,
+      status: "Placed",
+      date: date || new Date().toLocaleString()
+    });
+
+    await newOrder.save();
+    return res.status(201).json({ message: "Order placed successfully!", order: newOrder });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to create order", error: error.message });
+  }
+};
+
+// Admin: Update order status
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const order = await Order.findOneAndUpdate(
+      { id: Number(req.params.id) },
+      { status },
+      { new: true }
+    );
+    if (!order) return res.status(404).json({ message: "Order not found." });
+    return res.status(200).json({ message: "Order status updated!", order });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to update order status", error: error.message });
+  }
+};
+
+module.exports = { getOrders, createOrder, updateOrderStatus };
