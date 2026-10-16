@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LOGO } from "../utils/Constants";
+import { LOGO, API_BASE_URL } from "../utils/Constants";
 
 const Register = () => {
     const [name, setName] = useState("");
@@ -30,7 +30,7 @@ const Register = () => {
             setSubmitting(true);
             setError("");
 
-            const res = await fetch("http://localhost:5000/api/users/register", {
+            const res = await fetch(`${API_BASE_URL}/users/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -44,7 +44,7 @@ const Register = () => {
             const data = await res.json();
 
             if (res.ok) {
-                alert("🎉 Account created successfully! Please login with your credentials.");
+                alert("Account created successfully! Please login with your credentials.");
                 navigate("/login");
             } else {
                 setError(data.message || "Registration failed. Please try a different email.");
@@ -67,7 +67,7 @@ const Register = () => {
                     </div>
                     <h1 className="text-2xl font-black text-slate-900">Create an Account</h1>
                     <p className="mt-1 text-xs text-slate-500">
-                        Sign up to start ordering fresh food and groceries.
+                        Sign up to start ordering fresh food.
                     </p>
                 </div>
 

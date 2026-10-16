@@ -17,7 +17,7 @@ const Footer = () => {
             </span>
           </Link>
           <p className="text-slate-400 leading-relaxed">
-            Order restaurant dishes and daily grocery essentials online. Fast delivery and fresh quality guaranteed.
+            Order chef-crafted restaurant dishes online. Fast delivery and fresh quality guaranteed.
           </p>
           <p className="text-slate-500 pt-1">
             © 2026 Food Ninja Technologies Pvt Ltd.
@@ -29,7 +29,6 @@ const Footer = () => {
           <h4 className="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Explore</h4>
           <ul className="space-y-2">
             <li><Link to="/" className="hover:text-emerald-400 transition-colors">Food Menu</Link></li>
-            <li><Link to="/grocery" className="hover:text-emerald-400 transition-colors">Grocery Store</Link></li>
             <li><Link to="/orders" className="hover:text-emerald-400 transition-colors">My Orders</Link></li>
             <li><Link to="/wishlist" className="hover:text-emerald-400 transition-colors">Wishlist</Link></li>
             <li><Link to="/cart" className="hover:text-emerald-400 transition-colors">Shopping Cart</Link></li>

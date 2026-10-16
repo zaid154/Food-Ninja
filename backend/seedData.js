@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const fs = require("fs");
 const Recipe = require("./models/recipe");
-const Grocery = require("./models/grocery");
 const User = require("./models/user");
 
 const path = require("path");
@@ -217,192 +216,17 @@ const loadAllFoods = () => {
   return combined;
 };
 
-// Hand-Crafted Grocery Essentials
-const ourSignatureGroceries = [
-  {
-    title: "Amul Taaza Homogenised Toned Milk",
-    category: "Dairy & Milk",
-    price: 54,
-    unit: "1 Litre",
-    stock: 50,
-    rating: 4.9,
-    availabilityStatus: "In Stock",
-    thumbnail: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600&auto=format&fit=crop&q=80",
-    description: "Pasteurised toned milk with wholesome nutrition, untouched by hand."
-  },
-  {
-    title: "Harvest Gold 100% Whole Wheat Bread",
-    category: "Bakery",
-    price: 45,
-    unit: "400 g",
-    stock: 35,
-    rating: 4.7,
-    availabilityStatus: "In Stock",
-    thumbnail: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80",
-    description: "Soft whole wheat brown bread baked fresh daily for a healthy breakfast."
-  },
-  {
-    title: "Amul Salted Butter",
-    category: "Dairy & Milk",
-    price: 58,
-    unit: "100 g",
-    stock: 60,
-    rating: 4.9,
-    availabilityStatus: "In Stock",
-    thumbnail: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=600&auto=format&fit=crop&q=80",
-    description: "Pure creamery butter that makes everything taste better."
-  },
-  {
-    title: "Fortune Sunlite Refined Sunflower Oil",
-    category: "Daily Essentials",
-    price: 145,
-    unit: "1 Litre",
-    stock: 25,
-    rating: 4.6,
-    availabilityStatus: "In Stock",
-    thumbnail: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=600&auto=format&fit=crop&q=80",
-    description: "Light and healthy cooking oil enriched with vitamins."
-  },
-  {
-    title: "Farm Fresh Large Brown Eggs",
-    category: "Dairy & Milk",
-    price: 75,
-    unit: "Pack of 6",
-    stock: 40,
-    rating: 4.8,
-    availabilityStatus: "In Stock",
-    thumbnail: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=600&auto=format&fit=crop&q=80",
-    description: "Protein-rich healthy country eggs cleaned and packed hygienically."
-  },
-  {
-    title: "Lays India's Magic Masala Chips",
-    category: "Snacks & Drinks",
-    price: 20,
-    unit: "50 g",
-    stock: 100,
-    rating: 4.9,
-    availabilityStatus: "In Stock",
-    thumbnail: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=600&auto=format&fit=crop&q=80",
-    description: "Crunchy potato chips tossed in rich Indian spices."
-  },
-  {
-    title: "Fresh Farm Red Tomatoes",
-    category: "Fruits & Vegetables",
-    price: 40,
-    unit: "1 kg",
-    stock: 50,
-    rating: 4.6,
-    availabilityStatus: "In Stock",
-    thumbnail: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80",
-    description: "Naturally ripened juicy and firm farm-fresh tomatoes."
-  }
-];
-
-const loadAllGroceries = () => {
-  const desktopFilePath = "C:\\Users\\user\\Desktop\\grocery.txt";
-  let rawProducts = [];
-
-  if (fs.existsSync(desktopFilePath)) {
-    const rawData = fs.readFileSync(desktopFilePath, "utf8");
-    const parsed = JSON.parse(rawData);
-    rawProducts = parsed.products || [];
-  }
-
-  const pureGroceries = rawProducts.filter((p) => {
-    if (p.category !== "groceries") return false;
-    const titleLower = p.title.toLowerCase();
-    if (titleLower.includes("cat food") || titleLower.includes("dog food")) return false;
-    return true;
-  });
-
-  const getCategory = (item) => {
-    const title = item.title.toLowerCase();
-    const tags = (item.tags || []).join(" ").toLowerCase();
-    if (title.includes("apple") || title.includes("kiwi") || tags.includes("fruit")) return "Fruits & Vegetables";
-    if (title.includes("cucumber") || title.includes("pepper") || tags.includes("vegetables")) return "Fruits & Vegetables";
-    if (title.includes("egg") || title.includes("milk") || title.includes("butter") || tags.includes("dairy")) return "Dairy & Milk";
-    if (title.includes("chicken") || title.includes("beef") || title.includes("fish") || tags.includes("meat") || tags.includes("seafood")) return "Meat & Seafood";
-    if (title.includes("juice") || title.includes("shake") || tags.includes("beverages")) return "Snacks & Drinks";
-    if (title.includes("ice cream") || tags.includes("desserts")) return "Snacks & Drinks";
-    return "Daily Essentials";
-  };
-
-  const getUnit = (item) => {
-    const title = item.title.toLowerCase();
-    if (title.includes("apple") || title.includes("cucumber") || title.includes("kiwi") || title.includes("pepper")) return "1 kg";
-    if (title.includes("chicken") || title.includes("beef") || title.includes("fish")) return "500 g";
-    if (title.includes("oil") || title.includes("juice") || title.includes("milk")) return "1 Litre";
-    if (title.includes("egg")) return "Pack of 6";
-    if (title.includes("honey")) return "500 g Jar";
-    if (title.includes("ice cream")) return "500 ml Tub";
-    return "1 Unit";
-  };
-
-  const getRupeePrice = (item) => {
-    const title = item.title.toLowerCase();
-    if (title.includes("green chili")) return 30;
-    if (title.includes("cucumber") || title.includes("green bell")) return 45;
-    if (title.includes("apple") || title.includes("kiwi")) return 130;
-    if (title.includes("egg")) return 75;
-    if (title.includes("cooking oil")) return 145;
-    if (title.includes("honey")) return 180;
-    if (title.includes("juice")) return 95;
-    if (title.includes("ice cream")) return 160;
-    if (title.includes("chicken")) return 190;
-    if (title.includes("fish")) return 240;
-    if (title.includes("beef")) return 260;
-    return Math.round(item.price * 20);
-  };
-
-  let idCounter = 1;
-  const combined = [];
-
-  // 1. Add our Signature Essentials first
-  ourSignatureGroceries.forEach((g) => {
-    combined.push({
-      id: idCounter++,
-      ...g,
-      images: [g.thumbnail]
-    });
-  });
-
-  // 2. Add pure grocery products from grocery.txt
-  pureGroceries.forEach((p) => {
-    // avoid duplicate titles if already added
-    if (!combined.some(c => c.title.toLowerCase() === p.title.toLowerCase())) {
-      combined.push({
-        id: idCounter++,
-        title: p.title,
-        category: getCategory(p),
-        price: getRupeePrice(p),
-        unit: getUnit(p),
-        stock: p.stock || 40,
-        rating: p.rating || 4.7,
-        availabilityStatus: "In Stock",
-        thumbnail: p.thumbnail || p.images?.[0],
-        images: p.images || [p.thumbnail],
-        description: p.description || `Fresh ${p.title} sourced directly from verified farm suppliers.`
-      });
-    }
-  });
-
-  return combined;
-};
-
 const seed = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB Atlas successfully");
 
     const allFoods = loadAllFoods();
-    const allGroceries = loadAllGroceries();
 
     console.log(`Loaded TOTAL ${allFoods.length} Food Dishes (8 Signature + 30 File Recipes)`);
-    console.log(`Loaded TOTAL ${allGroceries.length} Grocery Items (Signature Essentials + File Groceries)`);
 
     await User.deleteMany({});
     await Recipe.deleteMany({});
-    await Grocery.deleteMany({});
 
     await User.insertMany(realisticUsers);
     console.log("Inserted Users:", realisticUsers.length);
@@ -410,10 +234,7 @@ const seed = async () => {
     await Recipe.insertMany(allFoods);
     console.log(`Inserted ${allFoods.length} Food Dishes into MongoDB Atlas!`);
 
-    await Grocery.insertMany(allGroceries);
-    console.log(`Inserted ${allGroceries.length} Grocery Items into MongoDB Atlas!`);
-
-    console.log("Seeding finished successfully with ALL data preserved!");
+    console.log("Seeding finished successfully with ALL food data preserved!");
     process.exit(0);
   } catch (error) {
     console.error("Error seeding data:", error);

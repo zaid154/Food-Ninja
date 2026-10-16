@@ -1,4 +1,4 @@
-import React, { Suspense, useState, useEffect, lazy } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import "./App.css";
 
@@ -10,7 +10,6 @@ import About from "./src/Component/About";
 import Contact from "./src/Component/Contact";
 import Error from "./src/Component/Error";
 import ProductView from "./src/Component/ProductView";
-import Shimmer from "./src/Component/Shimmer";
 import UseContext from "./src/Component/Usercontext";
 import Login from "./src/Component/Login";
 import Register from "./src/Component/Register";
@@ -23,8 +22,6 @@ import Admin from "./src/Component/Admin";
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
 import appStore from "./src/utils/Store";
-
-const Grocery = lazy(() => import("./src/Component/Grocery"));
 
 const App = () => {
   const [user, setUser] = useState(() => {
@@ -78,15 +75,7 @@ const appRouter = createBrowserRouter([
       },
       { path: "/orders", element: <Orders /> },
       { path: "/admin", element: <Admin /> },
-      { path: "/restaurant/:id", element: <ProductView /> },
-      {
-        path: "/grocery",
-        element: (
-          <Suspense fallback={<Shimmer />}>
-            <Grocery />
-          </Suspense>
-        )
-      }
+      { path: "/restaurant/:id", element: <ProductView /> }
     ]
   }
 ]);

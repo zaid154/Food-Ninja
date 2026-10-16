@@ -3,7 +3,7 @@ import AdminLogin from "./admin/AdminLogin";
 import AdminOverview from "./admin/AdminOverview";
 import AdminOrders from "./admin/AdminOrders";
 import AdminFoods from "./admin/AdminFoods";
-import AdminGroceries from "./admin/AdminGroceries";
+import { API_BASE_URL } from "../utils/Constants";
 
 const Admin = () => {
   const [isAdminAuth, setIsAdminAuth] = useState(() => sessionStorage.getItem("adminAuth") === "true");
@@ -11,10 +11,9 @@ const Admin = () => {
   const [adminPassword, setAdminPassword] = useState("");
   const [authError, setAuthError] = useState("");
 
-  const [activeTab, setActiveTab] = useState("overview"); // 'overview' | 'orders' | 'foods' | 'groceries'
+  const [activeTab, setActiveTab] = useState("overview"); // 'overview' | 'orders' | 'foods'
   const [orders, setOrders] = useState([]);
   const [foods, setFoods] = useState([]);
-  const [groceries, setGroceries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
@@ -42,14 +41,12 @@ const Admin = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [ordRes, foodRes, grocRes] = await Promise.all([
-        fetch("http://localhost:5000/api/orders").then((r) => r.json()),
-        fetch("http://localhost:5000/api/recipes").then((r) => r.json()),
-        fetch("http://localhost:5000/api/groceries").then((r) => r.json()),
+      const [ordRes, foodRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/orders`).then((r) => r.json()),
+        fetch(`${API_BASE_URL}/recipes`).then((r) => r.json()),
       ]);
       setOrders(ordRes.orders || []);
       setFoods(foodRes.recipes || []);
-      setGroceries(grocRes.products || []);
     } catch (err) {
       console.error("Admin data fetch error:", err);
     } finally {
@@ -63,7 +60,7 @@ const Admin = () => {
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      const res = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -115,15 +112,6 @@ const Admin = () => {
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      )
-    },
-    {
-      id: "groceries",
-      label: `Grocery Items (${groceries.length})`,
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       )
     },
@@ -194,7 +182,6 @@ const Admin = () => {
             <AdminOverview
               orders={orders}
               foods={foods}
-              groceries={groceries}
               onNavigateToOrders={() => setActiveTab("orders")}
             />
           )}
@@ -209,14 +196,6 @@ const Admin = () => {
           {activeTab === "foods" && (
             <AdminFoods
               foods={foods}
-              onRefresh={fetchData}
-              showToast={showToast}
-            />
-          )}
-
-          {activeTab === "groceries" && (
-            <AdminGroceries
-              groceries={groceries}
               onRefresh={fetchData}
               showToast={showToast}
             />

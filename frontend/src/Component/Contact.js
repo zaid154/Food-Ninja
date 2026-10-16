@@ -46,7 +46,7 @@ const Contact = () => {
                                 Contact & Support
                             </h1>
                             <p className="mt-1.5 text-xs text-slate-300 leading-relaxed">
-                                Questions about food delivery, fresh groceries, or store inquiries? Drop us a note anytime.
+                                Questions about food delivery or menu inquiries? Drop us a note anytime.
                             </p>
 
                             {/* Mohd Zaid Profile Card */}
@@ -78,16 +78,16 @@ const Contact = () => {
 
                             <div className="mt-5 space-y-2 text-xs text-slate-300">
                                 <p className="flex items-center gap-2">
-                                    <span>📧</span>
-                                    <span>zaidm1323@gmail.com</span>
+                                    <span className="text-slate-400 font-semibold">Email:</span>
+                                    <span className="text-white">zaidm1323@gmail.com</span>
                                 </p>
                                 <p className="flex items-center gap-2">
-                                    <span>📍</span>
-                                    <span>New Delhi, India</span>
+                                    <span className="text-slate-400 font-semibold">Location:</span>
+                                    <span className="text-white">New Delhi, India</span>
                                 </p>
                                 <p className="flex items-center gap-2">
-                                    <span>⚡</span>
-                                    <span>Food Ninja Delivery Platform</span>
+                                    <span className="text-slate-400 font-semibold">Platform:</span>
+                                    <span className="text-white">Food Ninja Delivery</span>
                                 </p>
                             </div>
                         </div>

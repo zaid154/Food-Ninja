@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../utils/cartSlice";
 import { addOrder } from "../utils/ordersSlice";
 import UserContext from "./Usercontext";
+import { API_BASE_URL } from "../utils/Constants";
 
 const Checkout = () => {
     const cartItems = useSelector((store) => store.cart.item);
@@ -65,7 +66,7 @@ const Checkout = () => {
         try {
             setSubmitting(true);
             // Save to Backend MongoDB Atlas
-            await fetch("http://localhost:5000/api/orders", {
+            await fetch(`${API_BASE_URL}/orders`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newOrder),
@@ -78,7 +79,7 @@ const Checkout = () => {
                 dispatch(clearCart());
             }
 
-            alert("🎉 Order placed successfully! Track your order status in 'My Orders'.");
+            alert("Order placed successfully! Track your order status in 'My Orders'.");
             navigate("/orders");
         } catch (err) {
             console.error("Order error:", err);
@@ -99,7 +100,7 @@ const Checkout = () => {
                         Your Cart is Empty
                     </h1>
                     <p className="mt-2 text-sm text-slate-600">
-                        Add some delicious food dishes or daily groceries before checkout.
+                        Add some delicious food dishes before checkout.
                     </p>
                 </div>
             </section>
@@ -169,7 +170,7 @@ const Checkout = () => {
                                     <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-xs text-white font-bold">✓</span>
                                     <div>
                                         <p className="text-xs font-bold text-slate-900">Cash on Delivery</p>
-                                        <p className="text-[11px] text-slate-500">Pay with cash/UPI when your food & groceries arrive</p>
+                                        <p className="text-[11px] text-slate-500">Pay with cash/UPI when your food arrives</p>
                                     </div>
                                 </div>
                                 <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">Only Available</span>

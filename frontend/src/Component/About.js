@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const stats = [
-  { label: "Recipes", value: "300+" },
-  { label: "Cuisines", value: "25+" },
-  { label: "Avg rating", value: "4.8" },
-  { label: "Delivery time", value: "25 min" }
+  { label: "Dishes", value: "38" },
+  { label: "Cuisines", value: "10+" },
+  { label: "Delivery Time", value: "25-30 min" },
+  { label: "Coverage", value: "Delhi NCR" }
 ];
 
 const About = () => {
@@ -20,10 +20,10 @@ const About = () => {
               About Food Ninja
             </p>
             <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 md:text-4xl">
-              Fresh Food & Groceries — Delivered Ninja Fast.
+              Fresh Restaurant Food — Delivered Ninja Fast.
             </h1>
             <p className="mt-4 text-base leading-7 text-gray-600">
-              Food Ninja is designed to provide quick, delicious meals and fresh grocery essentials at lightning speed. We partner with top-rated local kitchens and fresh markets to make sure every order arrives fresh, healthy, and on time.
+              Food Ninja is designed to provide quick, delicious meals at lightning speed. We partner with top-rated local kitchens and restaurants to make sure every order arrives fresh, hot, and on time.
             </p>
 
             <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -46,9 +46,9 @@ const About = () => {
               </Link>
               <button
                 onClick={() => setLikes((l) => l + 1)}
-                className="inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
               >
-                ❤ Like ({likes})
+                Like ({likes})
               </button>
             </div>
           </div>
@@ -66,7 +66,7 @@ const About = () => {
                   Our Mission
                 </p>
                 <p className="mt-1 text-sm text-slate-600">
-                  Delivering delicious recipes and daily grocery essentials effortlessly with speed and quality.
+                  Delivering chef-crafted recipes effortlessly with speed and quality.
                 </p>
               </div>
             </div>
@@ -75,7 +75,7 @@ const About = () => {
 
         <div className="mt-14 grid gap-4 md:grid-cols-3">
           {[
-            { title: "Quality & Hygiene", body: "Every recipe and grocery item is carefully selected and quality tested." },
+            { title: "Quality & Hygiene", body: "Every recipe is prepared with fresh ingredients and quality tested." },
             { title: "Ninja Speed Delivery", body: "Lightning fast delivery from your local neighborhood favorites." },
             { title: "Transparent Pricing", body: "No hidden charges. Clear, fair, and budget-friendly pricing." }
           ].map((v) => (

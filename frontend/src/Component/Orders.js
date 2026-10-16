@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { cancelOrder } from "../utils/ordersSlice";
 import UserContext from "./Usercontext";
+import { API_BASE_URL } from "../utils/Constants";
 
 const statusStyle = (status) => {
     switch (status) {
@@ -30,7 +31,7 @@ const Orders = () => {
         try {
             setLoading(true);
             const userEmailParam = user && user.email ? user.email : "guest@foodninja.com";
-            const res = await fetch(`http://localhost:5000/api/orders?email=${userEmailParam}`);
+            const res = await fetch(`${API_BASE_URL}/orders?email=${userEmailParam}`);
             const data = await res.json();
             if (data.orders && data.orders.length > 0) {
                 setOrders(data.orders);
@@ -51,7 +52,7 @@ const Orders = () => {
     const handleCancel = async (id) => {
         if (!window.confirm("Do you want to cancel this order?")) return;
         try {
-            await fetch(`http://localhost:5000/api/orders/${id}/status`, {
+            await fetch(`${API_BASE_URL}/orders/${id}/status`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: "Cancelled" }),
@@ -86,7 +87,7 @@ const Orders = () => {
                     </div>
                     <h1 className="text-2xl font-black text-slate-900">No Orders Placed Yet</h1>
                     <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-                        Explore our delicious restaurant dishes or daily grocery store and place your first order.
+                        Explore our delicious restaurant dishes and place your first order.
                     </p>
                     <Link
                         to="/"
@@ -106,14 +107,14 @@ const Orders = () => {
                     <div>
                         <h1 className="text-2xl font-black text-slate-900">My Orders</h1>
                         <p className="mt-0.5 text-xs text-slate-500">
-                            Track live status of your food and grocery deliveries.
+                            Track live status of your food deliveries.
                         </p>
                     </div>
                     <button
                         onClick={fetchOrders}
-                        className="text-xs font-bold text-emerald-700 hover:underline bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm"
+                        className="text-xs font-semibold text-emerald-700 hover:underline bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm"
                     >
-                        ↻ Refresh Status
+                        Refresh Status
                     </button>
                 </div>
 

@@ -27,21 +27,15 @@ const Cart = () => {
           </div>
           <h1 className="mt-2 text-xl font-black text-slate-900">Your Cart is Empty</h1>
           <p className="mt-1 text-xs text-slate-500">
-            Looks like you haven't added any delicious food or groceries yet.
+            Looks like you haven't added any delicious food dishes yet.
           </p>
 
-          <div className="mt-6 flex justify-center gap-3">
+          <div className="mt-6 flex justify-center">
             <Link
               to="/"
-              className="rounded-lg bg-emerald-600 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-emerald-700 shadow-sm"
+              className="rounded-lg bg-emerald-600 px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-emerald-700 shadow-sm"
             >
               Explore Food Menu
-            </Link>
-            <Link
-              to="/grocery"
-              className="rounded-lg border border-slate-300 px-5 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
-            >
-              Grocery Store
             </Link>
           </div>
         </div>

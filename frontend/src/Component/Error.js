@@ -9,8 +9,10 @@ const Error = () => {
   return (
     <section className="flex min-h-[75vh] items-center justify-center bg-slate-50 px-4 py-12">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-sm border border-slate-200">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 text-2xl font-black mb-4">
-          ⚠️
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 mb-4">
+          <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
         </div>
         <p className="text-5xl font-black tracking-tight text-emerald-600">{status}</p>
         <h1 className="mt-2 text-xl font-bold text-slate-900">{statusText}</h1>

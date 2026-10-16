@@ -1,13 +1,18 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../utils/Constants";
 
 let useResipe = () => {
     const [data, setData] = useState(null);
 
     useEffect(() => {
         const feachData = async () => {
-            const res = await fetch("http://localhost:5000/api/recipes");
-            const apiData = await res.json();
-            setData(apiData);
+            try {
+                const res = await fetch(`${API_BASE_URL}/recipes`);
+                const apiData = await res.json();
+                setData(apiData);
+            } catch (err) {
+                console.error("Failed to fetch recipes:", err);
+            }
         };
         feachData();
     }, []);

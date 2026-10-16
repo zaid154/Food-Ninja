@@ -6,7 +6,7 @@ const connectDb = require("./config/connectionDb");
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5005;
 
 // Connect to Database
 connectDb();
@@ -17,7 +17,6 @@ app.use(express.json());
 
 // Routes
 app.use("/api/recipes", require("./routes/recipe"));
-app.use("/api/groceries", require("./routes/grocery"));
 app.use("/api/orders", require("./routes/order"));
 app.use("/api/users", require("./routes/user"));
 

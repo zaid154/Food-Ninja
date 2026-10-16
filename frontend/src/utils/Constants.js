@@ -7,6 +7,6 @@ try {
 
 export const LOGO = logoUrl;
 
-export const MY_API = process.env.GEMINI_API_KEY || "";
+export const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5005/api";
 
 export const FORMSPREE_ENDPOINT = process.env.FORMSPREE_ENDPOINT || "";

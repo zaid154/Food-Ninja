@@ -1,12 +1,12 @@
 import React from "react";
 
-const AdminOverview = ({ orders, foods, groceries, onNavigateToOrders }) => {
+const AdminOverview = ({ orders, foods, onNavigateToOrders }) => {
   const totalRevenue = orders.reduce((sum, o) => sum + (o.status !== "Cancelled" ? o.total || 0 : 0), 0);
 
   return (
     <div className="space-y-6">
       {/* Metric Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 text-xs">
+      <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-3 text-xs">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Total Revenue</p>
           <p className="mt-1 text-2xl font-black text-emerald-600">₹{totalRevenue}</p>
@@ -21,11 +21,6 @@ const AdminOverview = ({ orders, foods, groceries, onNavigateToOrders }) => {
           <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Food Menu Items</p>
           <p className="mt-1 text-2xl font-black text-slate-900">{foods.length}</p>
           <p className="mt-1 text-[11px] text-slate-500">Active restaurant dishes</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Grocery Products</p>
-          <p className="mt-1 text-2xl font-black text-slate-900">{groceries.length}</p>
-          <p className="mt-1 text-[11px] text-slate-500">Active daily essentials</p>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../../utils/Constants";
 
 export const FOOD_CATEGORIES = [
   "Biryani",
@@ -67,12 +68,11 @@ const AdminFoods = ({ foods, onRefresh, showToast }) => {
       image: foodForm.image.trim(),
       description: foodForm.description.trim() || `Authentic ${foodForm.name} prepared fresh with aromatic ingredients.`,
       ingredients: ingArray.length > 0 ? ingArray : ["Fresh Ingredients", "Spices", "Chef Special Blend"],
-      rating: 4.8,
-      reviewCount: 45
+      rating: 4.8
     };
 
     try {
-      const url = editingFoodId ? `http://localhost:5000/api/recipes/${editingFoodId}` : "http://localhost:5000/api/recipes";
+      const url = editingFoodId ? `${API_BASE_URL}/recipes/${editingFoodId}` : `${API_BASE_URL}/recipes`;
       const res = await fetch(url, {
         method: editingFoodId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -95,7 +95,7 @@ const AdminFoods = ({ foods, onRefresh, showToast }) => {
   const handleDeleteFood = async (id) => {
     if (!window.confirm("Are you sure you want to delete this dish from the menu?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/recipes/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API_BASE_URL}/recipes/${id}`, { method: "DELETE" });
       if (res.ok) {
         showToast("Dish removed from menu");
         onRefresh();

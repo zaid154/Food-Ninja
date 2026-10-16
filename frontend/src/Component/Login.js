@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import UserContext from "./Usercontext";
-import { LOGO } from "../utils/Constants";
+import { LOGO, API_BASE_URL } from "../utils/Constants";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -25,7 +25,7 @@ const Login = () => {
             setSubmitting(true);
             setError("");
 
-            const res = await fetch("http://localhost:5000/api/users/login", {
+            const res = await fetch(`${API_BASE_URL}/users/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: email.trim(), password }),

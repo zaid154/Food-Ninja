@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "@babel/preset-react": "^7.28.5",
-    "@google/genai": "^2.10.0",
     "@reduxjs/toolkit": "^2.11.2",
     "@tailwindcss/postcss": "^4.2.1",
     "lucide-react": "^1.11.0",
