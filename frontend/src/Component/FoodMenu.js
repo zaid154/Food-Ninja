@@ -39,7 +39,7 @@ const FoodMenu = () => {
     });
   }, [data, search, selectedCategory, vegOnly]);
 
-  if (!data) return <Shimmer />;
+  const isLoading = !data;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
@@ -105,11 +105,13 @@ const FoodMenu = () => {
               {selectedCategory === "All" ? "Popular Dishes" : `${selectedCategory}`}
             </h2>
             <span className="text-xs text-gray-500 font-medium">
-              {filteredFoods.length} items
+              {isLoading ? "Loading menu..." : `${filteredFoods.length} items`}
             </span>
           </div>
 
-          {filteredFoods.length === 0 ? (
+          {isLoading ? (
+            <Shimmer />
+          ) : filteredFoods.length === 0 ? (
             <div className="rounded-xl border border-gray-200 bg-white p-12 text-center">
               <p className="text-sm font-semibold text-gray-700">No dishes found matching your search.</p>
               <button
