@@ -7,6 +7,7 @@ try {
 
 export const LOGO = logoUrl;
 
-export const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5005/api";
+const rawApiUrl = process.env.REACT_APP_API_URL || process.env.API_URL || "http://localhost:5005/api";
+export const API_BASE_URL = rawApiUrl.endsWith("/api") ? rawApiUrl : `${rawApiUrl.replace(/\/$/, "")}/api`;
 
 export const FORMSPREE_ENDPOINT = process.env.FORMSPREE_ENDPOINT || "";

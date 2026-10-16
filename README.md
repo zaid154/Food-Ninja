@@ -174,6 +174,37 @@ npm start
 
 ---
 
+## 🌐 Production Deployment Guide
+
+### A. Deploy Backend on Render (Web Service)
+1. Go to [render.com](https://render.com/) and click **New +** ➔ **Web Service**.
+2. Connect your GitHub repository (`Food-Ninja`).
+3. Set the following configuration:
+   - **Name**: `food-ninja-backend`
+   - **Root Directory**: `backend`
+   - **Environment**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+4. Add **Environment Variables**:
+   - `MONGO_URI` = `mongodb+srv://<username>:<password>@cluster0.mongodb.net/food_ninja?retryWrites=true&w=majority`
+5. Click **Deploy Web Service**.
+6. Copy your live backend URL (e.g., `https://food-ninja-backend.onrender.com`).
+
+### B. Deploy Frontend on Vercel
+1. Go to [vercel.com](https://vercel.com/) and click **Add New** ➔ **Project**.
+2. Import the `Food-Ninja` repository.
+3. In **Project Configuration**:
+   - **Root Directory**: Click edit and select `frontend`.
+   - **Framework Preset**: `Other` (or auto-detected Parcel)
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. Add **Environment Variable**:
+   - `REACT_APP_API_URL` = `https://<your-render-backend-url>/api`
+5. Click **Deploy**.
+6. Your Food Ninja web application is now 100% live and globally accessible!
+
+---
+
 ## 📄 License
 
 Engineered and maintained by **Mohd Zaid**. Released under the [MIT License](LICENSE).

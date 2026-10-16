@@ -1,18 +1,18 @@
 {
-  "name": "git_abc",
+  "name": "food-ninja-frontend",
   "version": "1.0.0",
-  "description": "Hello",
+  "description": "Food Ninja Frontend Web Application",
   "scripts": {
     "postinstall": "node scripts/fix-native-dll.cjs",
-    "start": "npx parcel index.html",
-    "dev": "npx parcel index.html",
-    "build": "npx parcel build index.html",
+    "start": "parcel index.html",
+    "dev": "parcel index.html",
+    "build": "parcel build index.html --dist-dir dist",
     "test": "jest",
     "watch-jest": "jest --watch"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zaid154/React.git"
+    "url": "git+https://github.com/zaid154/Food-Ninja.git"
   },
   "author": "zaid",
   "license": "ISC",
