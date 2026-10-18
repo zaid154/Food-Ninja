@@ -132,3 +132,13 @@ body.dark .skeleton::after {
     animation: none;
   }
 }
+
+/* Hide scrollbar for category pills on Chrome/Safari/Firefox */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

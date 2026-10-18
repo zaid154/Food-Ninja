@@ -3,27 +3,23 @@ import Shimmer from "./Shimmer";
 import useResipe from "./useRecipes";
 import FoodCard from "./food/FoodCard";
 
-const CATEGORIES = [
-  "All",
-  "Biryani",
-  "North Indian",
-  "South Indian",
-  "Chinese & Noodles",
-  "Pizza",
-  "Burgers",
-  "Rolls & Wraps",
-  "Momos & Dimsum",
-  "Mughlai & Kebabs",
-  "Pasta & Italian",
-  "Desserts & Bakery",
-  "Beverages & Shakes"
-];
-
 const FoodMenu = () => {
   const data = useResipe();
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [vegOnly, setVegOnly] = useState(false);
+
+  // Dynamically extract active categories from database recipes so every pill has dishes!
+  const categories = useMemo(() => {
+    if (!data || !data.recipes) {
+      return ["All", "Biryani", "North Indian", "Pizza", "Burgers", "Chinese", "Rolls", "Momos", "Beverages", "Desserts", "Italian"];
+    }
+    const catSet = new Set();
+    data.recipes.forEach((item) => {
+      if (item.category) catSet.add(item.category);
+    });
+    return ["All", ...Array.from(catSet)];
+  }, [data]);
 
   const filteredFoods = useMemo(() => {
     if (!data || !data.recipes) return [];
@@ -32,8 +28,13 @@ const FoodMenu = () => {
         item.name.toLowerCase().includes(search.toLowerCase()) ||
         item.category.toLowerCase().includes(search.toLowerCase()) ||
         (item.cuisine && item.cuisine.toLowerCase().includes(search.toLowerCase()));
+
       const matchCategory =
-        selectedCategory === "All" || item.category.toLowerCase() === selectedCategory.toLowerCase();
+        selectedCategory === "All" ||
+        (item.category && item.category.toLowerCase() === selectedCategory.toLowerCase()) ||
+        (item.category && item.category.toLowerCase().includes(selectedCategory.toLowerCase())) ||
+        (item.cuisine && item.cuisine.toLowerCase().includes(selectedCategory.toLowerCase()));
+
       const matchVeg = vegOnly ? item.isVeg === true : true;
       return matchSearch && matchCategory && matchVeg;
     });
@@ -64,16 +65,35 @@ const FoodMenu = () => {
 
       {/* Main Catalog */}
       <main className="mx-auto max-w-7xl px-4 pt-6">
-        {/* Filters & Categories */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-gray-200">
-          <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto">
-            {CATEGORIES.map((c) => (
+        {/* Sleek Single-Row Filter & Category Bar */}
+        <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+          {/* Pinned Pure Veg Quick Filter */}
+          <button
+            onClick={() => setVegOnly(!vegOnly)}
+            className={`flex items-center gap-1.5 shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold transition shadow-xs ${
+              vegOnly
+                ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            <div className={`flex items-center justify-center h-3 w-3 rounded-sm border ${vegOnly ? 'border-emerald-600' : 'border-gray-400'} p-[1px]`}>
+              <div className={`h-1.5 w-1.5 rounded-full ${vegOnly ? 'bg-emerald-600' : 'bg-gray-400'}`} />
+            </div>
+            <span>Pure Veg</span>
+          </button>
+
+          {/* Vertical Divider */}
+          <div className="h-5 w-[1px] bg-gray-200 shrink-0" />
+
+          {/* Smooth Horizontal Scroll Category Pills (Single Row - No Wrapping) */}
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1 scroll-smooth">
+            {categories.map((c) => (
               <button
                 key={c}
                 onClick={() => setSelectedCategory(c)}
-                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+                className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition ${
                   selectedCategory === c
-                    ? "bg-gray-900 text-white shadow-sm"
+                    ? "bg-slate-900 text-white shadow-sm"
                     : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-100"
                 }`}
               >
@@ -81,21 +101,6 @@ const FoodMenu = () => {
               </button>
             ))}
           </div>
-
-          {/* Pure Veg Filter */}
-          <button
-            onClick={() => setVegOnly(!vegOnly)}
-            className={`flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
-              vegOnly
-                ? "border-green-600 bg-green-50 text-green-700 font-bold"
-                : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            <div className={`flex items-center justify-center h-3 w-3 rounded-sm border ${vegOnly ? 'border-green-600' : 'border-gray-400'} p-[1px]`}>
-              <div className={`h-1.5 w-1.5 rounded-full ${vegOnly ? 'bg-green-600' : 'bg-gray-400'}`} />
-            </div>
-            Pure Veg
-          </button>
         </div>
 
         {/* Dishes Grid */}
