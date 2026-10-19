@@ -105,7 +105,13 @@ const Cart = () => {
                           </span>
                           <button
                             onClick={() => dispatch(addCart(item))}
-                            className="h-6 w-6 text-sm font-bold text-emerald-700 hover:bg-emerald-100 rounded"
+                            disabled={(item.quantity || 1) >= 10}
+                            className={`h-6 w-6 text-sm font-bold rounded ${
+                              (item.quantity || 1) >= 10
+                                ? "text-gray-300 cursor-not-allowed"
+                                : "text-emerald-700 hover:bg-emerald-100"
+                            }`}
+                            title={(item.quantity || 1) >= 10 ? "Maximum 10 per dish" : "Add one more"}
                           >
                             +
                           </button>

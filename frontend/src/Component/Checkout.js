@@ -27,6 +27,7 @@ const Checkout = () => {
     const [payment, setPayment] = useState("Cash on Delivery");
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
+    const [confirmedOrder, setConfirmedOrder] = useState(null);
 
     const totalItems = items.reduce((n, i) => n + (i.quantity || 1), 0);
     const subtotal = items.reduce(
@@ -79,18 +80,104 @@ const Checkout = () => {
                 dispatch(clearCart());
             }
 
-            alert("Order placed successfully! Track your order status in 'My Orders'.");
-            navigate("/orders");
+            setConfirmedOrder(newOrder);
         } catch (err) {
             console.error("Order error:", err);
             // Even if offline, proceed with local state
             dispatch(addOrder(newOrder));
             if (!isBuyNow) dispatch(clearCart());
-            navigate("/orders");
+            setConfirmedOrder(newOrder);
         } finally {
             setSubmitting(false);
         }
     };
+
+    // Professional In-App Order Confirmation Screen
+    if (confirmedOrder) {
+        return (
+            <section className="min-h-[85vh] bg-slate-50 px-4 py-12 flex items-center justify-center">
+                <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xl text-center">
+                    {/* Animated Checkmark */}
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mb-4 ring-8 ring-emerald-50">
+                        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+
+                    <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-800">
+                        Order Confirmed
+                    </span>
+
+                    <h1 className="mt-3 text-2xl font-black text-slate-900">
+                        Thank You, {confirmedOrder.customerName}!
+                    </h1>
+                    <p className="mt-1 text-xs text-slate-500">
+                        Your delicious meal has been booked and sent to the kitchen.
+                    </p>
+
+                    {/* Order Details Card */}
+                    <div className="mt-6 rounded-xl border border-slate-100 bg-slate-50 p-4 text-left text-xs space-y-2.5">
+                        <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                            <span className="text-slate-500 font-medium">Order ID</span>
+                            <span className="font-mono font-bold text-slate-900">#{confirmedOrder.id}</span>
+                        </div>
+
+                        <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                            <span className="text-slate-500 font-medium">Estimated Delivery</span>
+                            <span className="font-bold text-emerald-700 flex items-center gap-1">
+                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                                25–30 mins
+                            </span>
+                        </div>
+
+                        <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                            <span className="text-slate-500 font-medium">Payment Mode</span>
+                            <span className="font-bold text-slate-800">{confirmedOrder.payment}</span>
+                        </div>
+
+                        <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                            <span className="text-slate-500 font-medium">Items Ordered</span>
+                            <span className="font-bold text-slate-800">
+                                {confirmedOrder.items.length} {confirmedOrder.items.length === 1 ? "dish" : "dishes"}
+                            </span>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1">
+                            <span className="text-slate-800 font-bold">Total Paid</span>
+                            <span className="text-base font-black text-emerald-700">₹{confirmedOrder.total}</span>
+                        </div>
+
+                        <div className="mt-2 pt-2 border-t border-slate-200/60 text-[11px] text-slate-500">
+                            <span className="font-medium text-slate-700">Delivering to: </span>
+                            {confirmedOrder.address}
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                        <button
+                            type="button"
+                            onClick={() => navigate("/orders")}
+                            className="flex-1 rounded-xl bg-emerald-600 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-emerald-700 active:scale-95 flex items-center justify-center gap-1.5"
+                        >
+                            <span>Track in My Orders</span>
+                            <span>→</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate("/")}
+                            className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
+                        >
+                            Food Menu
+                        </button>
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     if (items.length === 0) {
         return (

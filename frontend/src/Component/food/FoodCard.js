@@ -118,7 +118,13 @@ const FoodCard = ({ data }) => {
               </span>
               <button
                 onClick={handleAddToCart}
-                className="h-6 w-6 text-sm font-bold text-emerald-700 hover:bg-emerald-100 rounded"
+                disabled={cartQty >= 10}
+                className={`h-6 w-6 text-sm font-bold rounded ${
+                  cartQty >= 10
+                    ? "text-gray-300 cursor-not-allowed"
+                    : "text-emerald-700 hover:bg-emerald-100"
+                }`}
+                title={cartQty >= 10 ? "Maximum 10 per dish" : "Add one more"}
               >
                 +
               </button>

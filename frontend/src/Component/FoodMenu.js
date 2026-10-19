@@ -17,6 +17,8 @@ const CORE_CATEGORIES = [
   "Italian",
 ];
 
+const ITEMS_PER_PAGE = 8;
+
 const FoodMenu = () => {
   const data = useResipe();
   const [search, setSearch] = useState("");
@@ -26,8 +28,14 @@ const FoodMenu = () => {
   const [under200Only, setUnder200Only] = useState(false);
   const [sortBy, setSortBy] = useState("default");
   const [sortOpen, setSortOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const sortRef = useRef(null);
+
+  // Reset to first page whenever search, category, or filter criteria changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, selectedCategory, vegOnly, topRatedOnly, under200Only, sortBy]);
 
   // Close custom sort dropdown when clicking outside
   useEffect(() => {
@@ -120,6 +128,17 @@ const FoodMenu = () => {
     setUnder200Only(false);
     setSortBy("default");
     setSortOpen(false);
+    setCurrentPage(1);
+  };
+
+  const totalPages = Math.ceil(filteredFoods.length / ITEMS_PER_PAGE) || 1;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedFoods = filteredFoods.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    window.scrollTo({ top: 380, behavior: "smooth" });
   };
 
   const sortOptions = [
@@ -298,7 +317,11 @@ const FoodMenu = () => {
             {selectedCategory === "All" ? "Popular Dishes" : `${selectedCategory}`}
           </h2>
           <span className="text-xs text-gray-500 font-medium">
-            {isLoading ? "Loading menu..." : `${filteredFoods.length} dishes`}
+            {isLoading
+              ? "Loading menu..."
+              : `${filteredFoods.length} dishes ${
+                  totalPages > 1 ? `• Page ${currentPage} of ${totalPages}` : ""
+                }`}
           </span>
         </div>
 
@@ -316,11 +339,65 @@ const FoodMenu = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredFoods.map((food) => (
-              <FoodCard key={food.id} data={food} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {paginatedFoods.map((food) => (
+                <FoodCard key={food.id} data={food} />
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 pt-6">
+                <p className="text-xs font-medium text-gray-500">
+                  Showing <span className="font-bold text-gray-800">{startIndex + 1}</span>–
+                  <span className="font-bold text-gray-800">
+                    {Math.min(startIndex + ITEMS_PER_PAGE, filteredFoods.length)}
+                  </span>{" "}
+                  of <span className="font-bold text-gray-800">{filteredFoods.length}</span> dishes
+                </p>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-xs transition hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <span>←</span>
+                    <span className="hidden sm:inline">Previous</span>
+                  </button>
+
+                  <div className="flex items-center gap-1 px-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`h-8 w-8 rounded-lg text-xs font-bold transition ${
+                          currentPage === pageNum
+                            ? "bg-emerald-600 text-white shadow-sm"
+                            : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-xs transition hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <span>→</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>

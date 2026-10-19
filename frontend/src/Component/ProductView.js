@@ -227,8 +227,14 @@ const ProductView = () => {
                                                 <button
                                                     type="button"
                                                     onClick={handleAddToCart}
+                                                    disabled={cartQty >= 10}
                                                     aria-label="Increase quantity"
-                                                    className="flex h-7 w-7 items-center justify-center rounded text-emerald-700 hover:bg-emerald-100 transition font-bold"
+                                                    className={`flex h-7 w-7 items-center justify-center rounded transition font-bold ${
+                                                        cartQty >= 10
+                                                            ? "text-gray-300 cursor-not-allowed"
+                                                            : "text-emerald-700 hover:bg-emerald-100"
+                                                    }`}
+                                                    title={cartQty >= 10 ? "Maximum 10 per dish" : "Add one more"}
                                                 >
                                                     +
                                                 </button>
