@@ -87,8 +87,8 @@ const AdminOrders = (props) => {
           <table className="w-full text-left text-xs min-w-[700px]">
             <thead>
               <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px]">
-                <th className="pb-3 min-w-[140px]">Order & Date</th>
-                <th className="pb-3 min-w-[180px]">Customer Information</th>
+                <th className="pb-3 min-w-[130px]">Order & Date</th>
+                <th className="pb-3 min-w-[240px]">Customer & Delivery Address</th>
                 <th className="pb-3 min-w-[180px]">Ordered Items</th>
                 <th className="pb-3 min-w-[110px]">Total & Payment</th>
                 <th className="pb-3 text-right min-w-[150px] pr-2">Update Live Status</th>
@@ -109,10 +109,10 @@ const AdminOrders = (props) => {
                     </a>
                     <p className="text-[11px] text-slate-400 mt-0.5">{o.date}</p>
                   </td>
-                  <td className="py-3.5 align-top">
+                  <td className="py-3.5 align-top max-w-[280px]">
                     <p className="font-bold text-slate-900">{o.customerName}</p>
-                    <p className="text-[11px] text-slate-500 font-mono">{o.phone}</p>
-                    <p className="text-[11px] text-slate-400 max-w-[220px] truncate" title={o.address}>
+                    <p className="text-[11px] text-slate-500 font-mono">+91 {o.phone}</p>
+                    <p className="text-[11px] text-slate-700 mt-1 leading-relaxed break-words font-medium">
                       {o.address}
                     </p>
                   </td>
