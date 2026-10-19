@@ -27,18 +27,38 @@ const getStepIndex = (status) => {
     }
 };
 
-const statusBadge = (status) => {
+const getStatusConfig = (status) => {
     switch (status) {
         case "Delivered":
-            return "bg-emerald-50 text-emerald-800 border-emerald-200";
+            return {
+                badge: "bg-emerald-50 text-emerald-800 border-emerald-200",
+                dot: "bg-emerald-600",
+                label: "Delivered",
+            };
         case "Out for Delivery":
-            return "bg-sky-50 text-sky-800 border-sky-200";
+            return {
+                badge: "bg-sky-50 text-sky-800 border-sky-200",
+                dot: "bg-sky-600",
+                label: "On the Way",
+            };
         case "Preparing":
-            return "bg-amber-50 text-amber-800 border-amber-200";
+            return {
+                badge: "bg-amber-50 text-amber-800 border-amber-200",
+                dot: "bg-amber-600",
+                label: "Preparing in Kitchen",
+            };
         case "Cancelled":
-            return "bg-red-50 text-red-800 border-red-200";
+            return {
+                badge: "bg-rose-50 text-rose-800 border-rose-200",
+                dot: "bg-rose-600",
+                label: "Cancelled",
+            };
         default:
-            return "bg-indigo-50 text-indigo-800 border-indigo-200";
+            return {
+                badge: "bg-slate-100 text-slate-800 border-slate-200",
+                dot: "bg-slate-600",
+                label: "Order Placed",
+            };
     }
 };
 
@@ -201,9 +221,15 @@ const OrderDetail = () => {
                                 <h1 className="text-xl font-black text-slate-900">
                                     Order #{order.id}
                                 </h1>
-                                <span className={`rounded-full border px-2.5 py-0.5 text-xs font-bold ${statusBadge(order.status)}`}>
-                                    ● {order.status}
-                                </span>
+                                {(() => {
+                                    const s = getStatusConfig(order.status);
+                                    return (
+                                        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${s.badge}`}>
+                                            <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
+                                            <span>{s.label}</span>
+                                        </span>
+                                    );
+                                })()}
                             </div>
                             <p className="mt-1 text-xs text-slate-500">
                                 Placed on {order.date || "Today"}
