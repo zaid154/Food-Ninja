@@ -45,7 +45,6 @@ const Orders = () => {
     const localOrders = useSelector((store) => store.orders.list);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filterStatus, setFilterStatus] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -95,14 +94,6 @@ const Orders = () => {
     };
 
     const filteredOrders = orders.filter((o) => {
-        if (filterStatus === "active") {
-            if (o.status === "Delivered" || o.status === "Cancelled") return false;
-        } else if (filterStatus === "delivered") {
-            if (o.status !== "Delivered") return false;
-        } else if (filterStatus === "cancelled") {
-            if (o.status !== "Cancelled") return false;
-        }
-
         if (searchQuery.trim()) {
             const q = searchQuery.toLowerCase();
             const idMatch = String(o.id).toLowerCase().includes(q);
@@ -172,51 +163,29 @@ const Orders = () => {
                         </p>
                     </div>
 
-                    <button
-                        onClick={fetchOrders}
-                        className="flex items-center gap-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs hover:bg-slate-50 transition"
-                    >
-                        <svg className="h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        <span>Refresh</span>
-                    </button>
-                </div>
+                    <div className="flex items-center gap-2.5">
+                        <div className="relative w-44 sm:w-60">
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search order ID or dish..."
+                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 pl-8 text-xs outline-none focus:border-slate-400 transition"
+                            />
+                            <svg className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
 
-                {/* Filters and Search Bar - Clean Segmented Control */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="inline-flex rounded-lg bg-slate-200/70 p-1 text-xs font-medium">
-                        {[
-                            { key: "all", label: "All Orders" },
-                            { key: "active", label: "Active" },
-                            { key: "delivered", label: "Delivered" },
-                            { key: "cancelled", label: "Cancelled" },
-                        ].map((tab) => (
-                            <button
-                                key={tab.key}
-                                onClick={() => setFilterStatus(tab.key)}
-                                className={`rounded-md px-3 py-1.5 transition ${
-                                    filterStatus === tab.key
-                                        ? "bg-white text-slate-900 font-bold shadow-2xs"
-                                        : "text-slate-600 hover:text-slate-900"
-                                }`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="relative w-full sm:w-64">
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search order ID or dish..."
-                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 pl-8 text-xs outline-none focus:border-slate-400 transition"
-                        />
-                        <svg className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+                        <button
+                            onClick={fetchOrders}
+                            className="flex items-center gap-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs hover:bg-slate-50 transition"
+                        >
+                            <svg className="h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Refresh</span>
+                        </button>
                     </div>
                 </div>
 
