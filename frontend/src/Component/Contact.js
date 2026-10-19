@@ -6,6 +6,7 @@ const Contact = () => {
     const [form, setForm] = useState({
         name: "",
         email: "",
+        phone: "",
         subject: "",
         message: ""
     });
@@ -172,15 +173,27 @@ const Contact = () => {
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="block font-bold text-slate-700 mb-1">Subject</label>
-                                    <input
-                                        type="text"
-                                        value={form.subject}
-                                        onChange={handleChange("subject")}
-                                        placeholder="Order enquiry, feedback, etc."
-                                        className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500"
-                                    />
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                    <div>
+                                        <label className="block font-bold text-slate-700 mb-1">Phone Number (Optional)</label>
+                                        <input
+                                            type="tel"
+                                            value={form.phone || ""}
+                                            onChange={handleChange("phone")}
+                                            placeholder="+91 98765 43210"
+                                            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block font-bold text-slate-700 mb-1">Subject</label>
+                                        <input
+                                            type="text"
+                                            value={form.subject}
+                                            onChange={handleChange("subject")}
+                                            placeholder="Order enquiry, feedback, etc."
+                                            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div>

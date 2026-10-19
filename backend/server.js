@@ -25,7 +25,7 @@ const Inquiry = require("./models/inquiry");
 
 app.post("/api/contact", async (req, res) => {
   try {
-    const { name, email, subject, message } = req.body;
+    const { name, email, phone, subject, message } = req.body;
     if (!name || !email || !message) {
       return res.status(400).json({ success: false, message: "Please provide your name, email, and message." });
     }
@@ -35,6 +35,7 @@ app.post("/api/contact", async (req, res) => {
       savedInquiry = await Inquiry.create({
         name,
         email,
+        phone: phone || "",
         subject: subject || "General Inquiry",
         message
       });
