@@ -7,6 +7,8 @@ const inquirySchema = new mongoose.Schema(
     subject: { type: String, default: "General Inquiry" },
     message: { type: String, required: true },
     status: { type: String, enum: ["New", "Replied", "Archived"], default: "New" },
+    replyMessage: { type: String, default: "" },
+    repliedAt: { type: Date },
   },
   { timestamps: true }
 );

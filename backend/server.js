@@ -73,6 +73,32 @@ app.delete("/api/contact/:id", async (req, res) => {
   }
 });
 
+// Admin: Reply to an inquiry
+app.put("/api/contact/:id/reply", async (req, res) => {
+  try {
+    const { replyMessage } = req.body;
+    if (!replyMessage || !replyMessage.trim()) {
+      return res.status(400).json({ success: false, message: "Reply message cannot be empty." });
+    }
+    const updated = await Inquiry.findByIdAndUpdate(
+      req.params.id,
+      {
+        status: "Replied",
+        replyMessage: replyMessage.trim(),
+        repliedAt: new Date()
+      },
+      { new: true }
+    );
+    if (!updated) {
+      return res.status(404).json({ success: false, message: "Inquiry not found." });
+    }
+    console.log(`[Inquiry Replied] ID: ${req.params.id} | To: ${updated.email}`);
+    res.json({ success: true, message: "Reply recorded successfully", inquiry: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // Database diagnostic and health check
 app.get("/api/db-status", (req, res) => {
   const mongoose = require("mongoose");

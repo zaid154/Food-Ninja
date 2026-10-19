@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import AdminLogin from "./admin/AdminLogin";
+import Header from "./Header";
+import Footer from "./Footer";
 import { API_BASE_URL, LOGO } from "../utils/Constants";
 
 const Admin = () => {
@@ -37,7 +39,7 @@ const Admin = () => {
   const handleAdminLogout = () => {
     sessionStorage.removeItem("adminAuth");
     setIsAdminAuth(false);
-    navigate("/admin");
+    navigate("/");
   };
 
   const fetchData = async () => {
@@ -91,16 +93,51 @@ const Admin = () => {
     }
   };
 
+  const handleReplyInquiry = async (id, replyMessage) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/contact/${id}/reply`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ replyMessage }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast("Reply sent & recorded successfully!");
+        setInquiries((prev) =>
+          prev.map((i) =>
+            (i._id || i.id) === id
+              ? { ...i, status: "Replied", replyMessage, repliedAt: new Date().toISOString() }
+              : i
+          )
+        );
+        return true;
+      } else {
+        alert(data.message || "Failed to record reply.");
+        return false;
+      }
+    } catch (err) {
+      console.error("Error replying to inquiry:", err);
+      alert("Error connecting to server to send reply.");
+      return false;
+    }
+  };
+
   if (!isAdminAuth) {
     return (
-      <AdminLogin
-        adminEmail={adminEmail}
-        setAdminEmail={setAdminEmail}
-        adminPassword={adminPassword}
-        setAdminPassword={setAdminPassword}
-        authError={authError}
-        onLogin={handleAdminLogin}
-      />
+      <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+        <Header />
+        <main className="flex-1">
+          <AdminLogin
+            adminEmail={adminEmail}
+            setAdminEmail={setAdminEmail}
+            adminPassword={adminPassword}
+            setAdminPassword={setAdminPassword}
+            authError={authError}
+            onLogin={handleAdminLogin}
+          />
+        </main>
+        <Footer />
+      </div>
     );
   }
 
@@ -272,6 +309,7 @@ const Admin = () => {
             showToast,
             handleUpdateOrderStatus,
             handleDeleteInquiry,
+            handleReplyInquiry,
           }}
         />
       </main>
