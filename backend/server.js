@@ -20,6 +20,20 @@ app.use("/api/recipes", require("./routes/recipe"));
 app.use("/api/orders", require("./routes/order"));
 app.use("/api/users", require("./routes/user"));
 
+// Contact Form Endpoint
+app.post("/api/contact", (req, res) => {
+  const { name, email, subject, message } = req.body;
+  if (!name || !email || !message) {
+    return res.status(400).json({ success: false, message: "Please provide your name, email, and message." });
+  }
+  console.log(`[Contact Form Received] From: ${name} <${email}> | Subject: ${subject || "General Inquiry"}`);
+  res.json({
+    success: true,
+    message: "Thank you for reaching out! Your message has been received, and our team will get back to you shortly.",
+    data: { name, email, subject, receivedAt: new Date().toISOString() }
+  });
+});
+
 // Database diagnostic and health check
 app.get("/api/db-status", (req, res) => {
   const mongoose = require("mongoose");

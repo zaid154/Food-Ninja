@@ -1,92 +1,69 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { removeWishlist, clearWishlist } from "../utils/wishlistSlice";
-import { addCart } from "../utils/cartSlice";
+import { clearWishlist } from "../utils/wishlistSlice";
+import FoodCard from "./food/FoodCard";
 
 const Wishlist = () => {
     const wishlistItems = useSelector((store) => store.wishlist.item);
     const dispatch = useDispatch();
 
-    // empty state when nothing is liked
+    // Beautiful empty state when nothing is in wishlist
     if (wishlistItems.length === 0) {
         return (
-            <section className="flex min-h-[60vh] items-center justify-center bg-gray-50 px-4">
-                <div className="max-w-md rounded-lg bg-white p-8 text-center shadow">
-                    <h1 className="text-2xl font-bold text-slate-900">
-                        No favorites yet
+            <section className="flex min-h-[70vh] items-center justify-center bg-gray-50 px-4 py-12">
+                <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 mb-4">
+                        <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z" />
+                        </svg>
+                    </div>
+                    <h1 className="text-xl font-black text-gray-900">
+                        Your Wishlist is Empty
                     </h1>
-                    <p className="mt-2 text-sm text-slate-600">
-                        Tap the heart on any recipe to save it here.
+                    <p className="mt-2 text-xs leading-relaxed text-gray-500">
+                        Explore our delicious menu and tap the heart icon on any dish to save it to your favorites.
                     </p>
-                    <Link
-                        to="/"
-                        className="mt-5 inline-block rounded-md bg-teal-600 px-5 py-2 text-sm font-semibold text-white"
-                    >
-                        Browse recipes
-                    </Link>
+                    <div className="mt-6 flex justify-center">
+                        <Link
+                            to="/"
+                            className="rounded-lg bg-emerald-600 px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-emerald-700"
+                        >
+                            Explore Food Menu
+                        </Link>
+                    </div>
                 </div>
             </section>
         );
     }
 
     return (
-        <section className="bg-gray-50 px-4 py-10">
-            <div className="mx-auto max-w-6xl">
-                <div className="flex items-center justify-between">
+        <section className="min-h-[85vh] bg-gray-50 px-4 py-8 md:px-6">
+            <div className="mx-auto max-w-7xl">
+                {/* Header Row */}
+                <div className="mb-6 flex items-center justify-between pb-4 border-b border-gray-200">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">
+                        <h1 className="text-2xl font-black text-gray-900">
                             My Favorites
                         </h1>
-                        <p className="mt-1 text-sm text-slate-600">
-                            {wishlistItems.length} recipe{wishlistItems.length > 1 ? "s" : ""} saved
+                        <p className="mt-0.5 text-xs text-gray-500">
+                            {wishlistItems.length} {wishlistItems.length === 1 ? "dish" : "dishes"} saved in your wishlist
                         </p>
                     </div>
 
                     <button
+                        type="button"
                         onClick={() => dispatch(clearWishlist())}
-                        className="rounded-sm border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-teal-600 hover:bg-teal-50"
+                        className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50 hover:border-red-200 shadow-xs"
                     >
-                        Clear all
+                        Clear All
                     </button>
                 </div>
 
-                <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Uniform Responsive Dishes Grid reusing standard FoodCard */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {wishlistItems.map((item) => (
-                        <div
-                            key={item.id}
-                            className="overflow-hidden rounded-lg bg-white shadow"
-                        >
-                            <img
-                                src={item.image}
-                                alt={item.name}
-                                className="h-44 w-full object-cover"
-                            />
-
-                            <div className="p-4">
-                                <h3 className="text-base font-bold text-slate-900">
-                                    {item.name}
-                                </h3>
-                                <p className="mt-1 text-xs text-slate-500">
-                                    {item.cuisine} • ₹{item.caloriesPerServing}
-                                </p>
-
-                                <div className="mt-4 flex gap-2">
-                                    <button
-                                        onClick={() => dispatch(addCart(item))}
-                                        className="flex-1 rounded-md bg-teal-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700"
-                                    >
-                                        Add to cart
-                                    </button>
-                                    <button
-                                        onClick={() => dispatch(removeWishlist(item.id))}
-                                        className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-teal-600 hover:bg-teal-50"
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <FoodCard key={item.id} data={item} />
                     ))}
                 </div>
             </div>

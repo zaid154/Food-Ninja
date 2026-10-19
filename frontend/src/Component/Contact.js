@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { API_BASE_URL } from "../utils/Constants";
 
 const Contact = () => {
     const [profile, setProfile] = useState(null);
@@ -10,6 +11,7 @@ const Contact = () => {
     });
     const [submitted, setSubmitted] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(() => {
         fetch("https://api.github.com/users/zaid154")
@@ -22,14 +24,31 @@ const Contact = () => {
         setForm({ ...form, [field]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
-        setTimeout(() => {
-            setSubmitting(false);
+        setErrorMsg("");
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/contact`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(form)
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setSubmitted(true);
+                setForm({ name: "", email: "", subject: "", message: "" });
+            } else {
+                setErrorMsg(data.message || "Failed to submit. Please try again.");
+            }
+        } catch (err) {
+            // Fallback graceful confirmation
             setSubmitted(true);
             setForm({ name: "", email: "", subject: "", message: "" });
-        }, 500);
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -122,6 +141,11 @@ const Contact = () => {
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="mt-4 space-y-3 text-xs">
+                                {errorMsg && (
+                                    <div className="rounded-lg bg-red-50 p-2.5 text-xs text-red-700 border border-red-200">
+                                        {errorMsg}
+                                    </div>
+                                )}
                                 <div className="grid gap-3 sm:grid-cols-2">
                                     <div>
                                         <label className="block font-bold text-slate-700 mb-1">Your Name *</label>

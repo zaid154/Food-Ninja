@@ -9,12 +9,17 @@ const Footer = () => {
         {/* Brand Col */}
         <div className="space-y-3">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white p-1.5 shadow-md">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 p-1 shadow-xs">
               <img src={LOGO} alt="Food Ninja" className="h-full w-full object-contain" />
             </div>
-            <span className="text-xl font-black text-white">
-              Food<span className="text-emerald-500">Ninja</span>
-            </span>
+            <div className="leading-none">
+              <span className="text-lg font-bold tracking-tight text-white">
+                Food<span className="text-emerald-400">Ninja</span>
+              </span>
+              <span className="block text-[10px] font-medium text-slate-400 tracking-wider uppercase mt-0.5">
+                Restaurant Food Delivery
+              </span>
+            </div>
           </Link>
           <p className="text-slate-400 leading-relaxed">
             Order chef-crafted restaurant dishes online. Fast delivery and fresh quality guaranteed.

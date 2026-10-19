@@ -1,87 +1,112 @@
-import { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
-const stats = [
-  { label: "Dishes", value: "38" },
-  { label: "Cuisines", value: "10+" },
-  { label: "Delivery Time", value: "25-30 min" },
-  { label: "Coverage", value: "Delhi NCR" }
-];
-
 const About = () => {
-  const [likes, setLikes] = useState(0);
-
   return (
-    <section className="bg-gray-50">
-      <div className="mx-auto max-w-6xl px-4 py-10 md:py-16">
+    <section className="bg-gray-50 min-h-[85vh]">
+      <div className="mx-auto max-w-6xl px-4 py-12 md:py-16">
+        {/* Hero Section */}
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div>
-            <p className="text-sm font-bold uppercase tracking-wider text-emerald-600">
+            <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-700">
               About Food Ninja
-            </p>
-            <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 md:text-4xl">
+            </span>
+            <h1 className="mt-3 text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">
               Fresh Restaurant Food — Delivered Ninja Fast.
             </h1>
-            <p className="mt-4 text-base leading-7 text-gray-600">
-              Food Ninja is designed to provide quick, delicious meals at lightning speed. We partner with top-rated local kitchens and restaurants to make sure every order arrives fresh, hot, and on time.
+            <p className="mt-4 text-sm sm:text-base leading-relaxed text-gray-600">
+              Food Ninja is designed to provide quick, chef-crafted meals at lightning speed. We partner with top-rated local kitchens and restaurants to ensure every order arrives fresh, piping hot, and right on time.
             </p>
 
-            <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {stats.map((s) => (
-                <div key={s.label} className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-200">
-                  <p className="text-2xl font-extrabold text-slate-900">{s.value}</p>
-                  <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    {s.label}
-                  </p>
-                </div>
-              ))}
+            {/* Redesigned Modern Stats Grid */}
+            <div className="mt-7 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm text-center sm:text-left">
+                <p className="text-2xl font-black text-emerald-600">38+</p>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Dishes
+                </p>
+              </div>
+              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm text-center sm:text-left">
+                <p className="text-2xl font-black text-emerald-600">10+</p>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Cuisines
+                </p>
+              </div>
+              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm text-center sm:text-left">
+                <p className="text-2xl font-black text-emerald-600">25–30m</p>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Delivery
+                </p>
+              </div>
+              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm text-center sm:text-left">
+                <p className="text-2xl font-black text-emerald-600">Delhi NCR</p>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                  Coverage
+                </p>
+              </div>
             </div>
 
+            {/* Action Buttons */}
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link
                 to="/"
-                className="rounded-md bg-emerald-600 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-emerald-700 shadow-sm"
+                className="rounded-lg bg-emerald-600 px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-emerald-700"
               >
-                Browse Menu
+                Browse Food Menu
               </Link>
-              <button
-                onClick={() => setLikes((l) => l + 1)}
-                className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              <Link
+                to="/contact"
+                className="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-xs font-bold text-gray-700 shadow-sm transition hover:bg-gray-50 hover:text-gray-900"
               >
-                Like ({likes})
-              </button>
+                Contact Support
+              </Link>
             </div>
           </div>
 
+          {/* Right Image Card */}
           <div className="relative">
-            <div className="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
+            <div className="overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-200">
               <img
                 src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=70"
                 alt="Plated meal"
-                className="h-72 w-full object-cover md:h-96"
+                className="h-72 w-full object-cover md:h-88"
                 loading="lazy"
               />
               <div className="p-5">
                 <p className="text-xs font-bold uppercase tracking-wider text-emerald-600">
                   Our Mission
                 </p>
-                <p className="mt-1 text-sm text-slate-600">
-                  Delivering chef-crafted recipes effortlessly with speed and quality.
+                <p className="mt-1 text-sm text-gray-600 leading-relaxed">
+                  Delivering chef-crafted recipes effortlessly with exceptional speed, authentic hygiene, and premium quality.
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-14 grid gap-4 md:grid-cols-3">
+        {/* Values Section */}
+        <div className="mt-12 grid gap-5 md:grid-cols-3">
           {[
-            { title: "Quality & Hygiene", body: "Every recipe is prepared with fresh ingredients and quality tested." },
-            { title: "Ninja Speed Delivery", body: "Lightning fast delivery from your local neighborhood favorites." },
-            { title: "Transparent Pricing", body: "No hidden charges. Clear, fair, and budget-friendly pricing." }
+            {
+              title: "Quality & Hygiene",
+              body: "Every recipe is prepared with fresh ingredients, authentic spices, and inspected for highest safety standards.",
+              icon: "🛡️"
+            },
+            {
+              title: "Ninja Speed Delivery",
+              body: "State-of-the-art delivery routing gets your food from kitchen to doorstep in 25–30 minutes flat.",
+              icon: "⚡"
+            },
+            {
+              title: "Transparent Pricing",
+              body: "Zero hidden charges. Clear, fair pricing with live order tracking and instant order support.",
+              icon: "🏷️"
+            }
           ].map((v) => (
-            <div key={v.title} className="rounded-lg bg-white p-5 ring-1 ring-slate-200 shadow-sm">
-              <p className="text-base font-bold text-slate-900">{v.title}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{v.body}</p>
+            <div key={v.title} className="rounded-2xl bg-white p-6 border border-gray-200 shadow-sm">
+              <div className="text-2xl mb-2">{v.icon}</div>
+              <p className="text-base font-bold text-gray-900">{v.title}</p>
+              <p className="mt-2 text-xs leading-relaxed text-gray-600">{v.body}</p>
             </div>
           ))}
         </div>

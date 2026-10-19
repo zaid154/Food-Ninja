@@ -68,8 +68,54 @@ const Orders = () => {
 
     if (loading) {
         return (
-            <section className="flex min-h-[60vh] items-center justify-center bg-slate-50">
-                <p className="text-sm font-semibold text-slate-500">Loading your orders...</p>
+            <section className="bg-slate-50 px-4 py-10 min-h-[85vh]">
+                <div className="mx-auto max-w-4xl">
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                        <div>
+                            <div className="skeleton h-7 w-32 rounded" />
+                            <div className="skeleton mt-1 h-3.5 w-52 rounded" />
+                        </div>
+                    </div>
+
+                    <div className="mt-6 space-y-5">
+                        {[1, 2].map((n) => (
+                            <div key={n} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                                    <div className="space-y-1.5">
+                                        <div className="skeleton h-4 w-32 rounded" />
+                                        <div className="skeleton h-3 w-40 rounded" />
+                                    </div>
+                                    <div className="skeleton h-6 w-24 rounded-full" />
+                                </div>
+
+                                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                                    <div className="skeleton h-3.5 w-48 rounded" />
+                                    <div className="skeleton h-3.5 w-60 rounded" />
+                                    <div className="skeleton h-3.5 w-36 rounded" />
+                                </div>
+
+                                <div className="mt-4 space-y-2 border-t border-slate-100 pt-3">
+                                    <div className="flex justify-between">
+                                        <div className="skeleton h-3.5 w-44 rounded" />
+                                        <div className="skeleton h-3.5 w-16 rounded" />
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <div className="skeleton h-3.5 w-36 rounded" />
+                                        <div className="skeleton h-3.5 w-16 rounded" />
+                                    </div>
+                                </div>
+
+                                <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+                                    <div>
+                                        <div className="skeleton h-3 w-16 rounded mb-1" />
+                                        <div className="skeleton h-6 w-20 rounded" />
+                                    </div>
+                                    <div className="skeleton h-8 w-28 rounded-lg" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </section>
         );
     }
