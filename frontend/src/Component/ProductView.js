@@ -104,14 +104,23 @@ const ProductView = () => {
                                 loading="eager"
                             />
 
-                            {/* Small Vegetarian / Non-Vegetarian Indicator */}
+                            {/* Dietary Indicator: Veg / Non-Veg / Vegan */}
                             <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded bg-white/95 px-2 py-1 shadow-sm border border-slate-200/60 backdrop-blur-sm">
-                                <div className={`flex items-center justify-center h-3.5 w-3.5 rounded-[2px] border ${product.isVeg ? 'border-emerald-600' : 'border-rose-600'} p-[2px]`}>
-                                    <div className={`h-1.5 w-1.5 rounded-full ${product.isVeg ? 'bg-emerald-600' : 'bg-rose-600'}`} />
-                                </div>
-                                <span className="text-[11px] font-medium text-slate-700">
-                                    {product.isVeg ? "Veg" : "Non-Veg"}
-                                </span>
+                                {product.dietary === "Vegan" ? (
+                                    <>
+                                        <span className="text-xs">🌱</span>
+                                        <span className="text-[11px] font-bold text-emerald-800">Vegan</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className={`flex items-center justify-center h-3.5 w-3.5 rounded-[2px] border ${product.isVeg ? 'border-emerald-600' : 'border-rose-600'} p-[2px]`}>
+                                            <div className={`h-1.5 w-1.5 rounded-full ${product.isVeg ? 'bg-emerald-600' : 'bg-rose-600'}`} />
+                                        </div>
+                                        <span className="text-[11px] font-medium text-slate-700">
+                                            {product.isVeg ? "Veg" : "Non-Veg"}
+                                        </span>
+                                    </>
+                                )}
                             </div>
 
                             {/* Subtle Wishlist Button */}

@@ -6,32 +6,35 @@ export const FOOD_CATEGORIES = [
   "Biryani",
   "North Indian",
   "South Indian",
-  "Chinese & Noodles",
+  "Chinese",
   "Pizza",
   "Burgers",
   "Rolls & Wraps",
   "Momos & Dimsum",
-  "Mughlai & Kebabs",
   "Pasta & Italian",
   "Sandwiches & Snacks",
-  "Desserts & Bakery",
-  "Beverages & Shakes"
+  "Mughlai & Kebabs",
+  "Desserts & Sweets",
+  "Beverages & Drinks",
+  "Salads & Healthy Bowls",
+  "Street Food"
 ];
 
 export const FOOD_CUISINES = [
   "Indian",
-  "Hyderabadi",
   "North Indian",
   "South Indian",
+  "Hyderabadi",
   "Mughlai",
   "Indo-Chinese",
   "Italian",
   "American",
   "Mexican",
-  "Lebanese",
+  "Continental",
+  "Pan-Asian",
   "Tibetan",
-  "Asian",
-  "Continental"
+  "Middle Eastern",
+  "Thai"
 ];
 
 const AdminFoods = ({ foods, onRefresh, showToast }) => {
@@ -42,6 +45,7 @@ const AdminFoods = ({ foods, onRefresh, showToast }) => {
     price: "",
     caloriesPerServing: "",
     deliveryTime: "25-30 mins",
+    dietary: "Veg",
     isVeg: true,
     image: "",
     description: "",
@@ -57,6 +61,8 @@ const AdminFoods = ({ foods, onRefresh, showToast }) => {
       ? foodForm.ingredients.split(",").map((i) => i.trim()).filter(Boolean)
       : foodForm.ingredients;
 
+    const isVegVal = foodForm.dietary === "Non-Veg" ? false : true;
+
     const payload = {
       name: foodForm.name.trim(),
       category: foodForm.category,
@@ -64,7 +70,8 @@ const AdminFoods = ({ foods, onRefresh, showToast }) => {
       price: Number(foodForm.price),
       caloriesPerServing: Number(foodForm.caloriesPerServing) || Number(foodForm.price) * 2,
       deliveryTime: foodForm.deliveryTime || "25-30 mins",
-      isVeg: Boolean(foodForm.isVeg),
+      isVeg: isVegVal,
+      dietary: foodForm.dietary || (isVegVal ? "Veg" : "Non-Veg"),
       image: foodForm.image.trim(),
       description: foodForm.description.trim() || `Authentic ${foodForm.name} prepared fresh with aromatic ingredients.`,
       ingredients: ingArray.length > 0 ? ingArray : ["Fresh Ingredients", "Spices", "Chef Special Blend"],
@@ -232,17 +239,52 @@ const AdminFoods = ({ foods, onRefresh, showToast }) => {
             <span className="text-[10px] text-slate-400">Separated by comma for tags in product page</span>
           </div>
 
-          <div className="flex items-center gap-2 pt-1">
-            <input
-              type="checkbox"
-              id="vegCheck"
-              checked={foodForm.isVeg}
-              onChange={(e) => setFoodForm({ ...foodForm, isVeg: e.target.checked })}
-              className="h-4 w-4 rounded accent-emerald-600 cursor-pointer"
-            />
-            <label htmlFor="vegCheck" className="font-bold text-slate-700 cursor-pointer">
-              Pure Veg Dish (Green badge on Product page)
-            </label>
+          <div>
+            <label className="block font-bold text-slate-700 mb-1.5">Dietary / Food Type *</label>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => setFoodForm({ ...foodForm, dietary: "Veg", isVeg: true })}
+                className={`flex items-center justify-center gap-1.5 rounded-lg border py-2 px-1 text-xs font-bold transition ${
+                  (foodForm.dietary || (foodForm.isVeg ? "Veg" : "Non-Veg")) === "Veg"
+                    ? "border-green-600 bg-green-50 text-green-700"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <span className="flex h-3 w-3 items-center justify-center rounded-xs border border-green-600 p-[1px]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
+                </span>
+                <span>Veg</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFoodForm({ ...foodForm, dietary: "Non-Veg", isVeg: false })}
+                className={`flex items-center justify-center gap-1.5 rounded-lg border py-2 px-1 text-xs font-bold transition ${
+                  (foodForm.dietary || (foodForm.isVeg ? "Veg" : "Non-Veg")) === "Non-Veg"
+                    ? "border-red-600 bg-red-50 text-red-700"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <span className="flex h-3 w-3 items-center justify-center rounded-xs border border-red-600 p-[1px]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-red-600" />
+                </span>
+                <span>Non-Veg</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFoodForm({ ...foodForm, dietary: "Vegan", isVeg: true })}
+                className={`flex items-center justify-center gap-1.5 rounded-lg border py-2 px-1 text-xs font-bold transition ${
+                  foodForm.dietary === "Vegan"
+                    ? "border-emerald-600 bg-emerald-50 text-emerald-800"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <span className="text-xs">🌱</span>
+                <span>Vegan</span>
+              </button>
+            </div>
           </div>
 
           <div className="flex gap-2 pt-2">
@@ -283,59 +325,72 @@ const AdminFoods = ({ foods, onRefresh, showToast }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {foods.map((f) => (
-                <tr key={f.id} className="text-slate-700">
-                  <td className="py-3 flex items-center gap-3">
-                    <img src={f.image} alt={f.name} className="h-10 w-10 rounded-lg object-cover border border-slate-200" />
-                    <div>
-                      <Link to={`/restaurant/${f.id}`} target="_blank" className="font-bold text-slate-900 hover:text-emerald-600">
-                        {f.name}
-                      </Link>
-                      <p className="text-[10px] text-slate-400">{f.deliveryTime || "25-30 mins"}</p>
-                    </div>
-                  </td>
-                  <td className="font-medium text-slate-900">{f.category}</td>
-                  <td>
-                    <span className="rounded bg-slate-100 px-2 py-0.5 font-bold text-slate-700 text-[11px]">
-                      {f.cuisine || "Indian"}
-                    </span>
-                  </td>
-                  <td className="font-black text-slate-900">₹{f.price || f.caloriesPerServing}</td>
-                  <td>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${f.isVeg !== false ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-                      {f.isVeg !== false ? 'VEG' : 'NON-VEG'}
-                    </span>
-                  </td>
-                  <td className="text-right space-x-1.5">
-                    <button
-                      onClick={() => {
-                        setEditingFoodId(f.id);
-                        setFoodForm({
-                          name: f.name || "",
-                          category: f.category || "Biryani",
-                          cuisine: f.cuisine || "Indian",
-                          price: f.price || f.caloriesPerServing || 199,
-                          caloriesPerServing: f.caloriesPerServing || 300,
-                          deliveryTime: f.deliveryTime || "25-30 mins",
-                          isVeg: f.isVeg !== false,
-                          image: f.image || "",
-                          description: f.description || "",
-                          ingredients: Array.isArray(f.ingredients) ? f.ingredients.join(", ") : (f.ingredients || "")
-                        });
-                      }}
-                      className="rounded-lg bg-slate-100 px-2.5 py-1.5 font-bold text-slate-700 hover:bg-slate-200"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteFood(f.id)}
-                      className="rounded-lg bg-red-50 px-2.5 py-1.5 font-bold text-red-700 hover:bg-red-100"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {foods.map((f) => {
+                const isVegan = f.dietary === "Vegan";
+                const isVeg = f.isVeg !== false && f.dietary !== "Non-Veg";
+
+                return (
+                  <tr key={f.id} className="text-slate-700">
+                    <td className="py-3 flex items-center gap-3">
+                      <img src={f.image} alt={f.name} className="h-10 w-10 rounded-lg object-cover border border-slate-200" />
+                      <div>
+                        <Link to={`/restaurant/${f.id}`} target="_blank" className="font-bold text-slate-900 hover:text-emerald-600">
+                          {f.name}
+                        </Link>
+                        <p className="text-[10px] text-slate-400">{f.deliveryTime || "25-30 mins"}</p>
+                      </div>
+                    </td>
+                    <td className="font-medium text-slate-900">{f.category}</td>
+                    <td>
+                      <span className="rounded bg-slate-100 px-2 py-0.5 font-bold text-slate-700 text-[11px]">
+                        {f.cuisine || "Indian"}
+                      </span>
+                    </td>
+                    <td className="font-black text-slate-900">₹{f.price || f.caloriesPerServing}</td>
+                    <td>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                        isVegan
+                          ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                          : isVeg
+                          ? "bg-green-50 text-green-700 border border-green-200"
+                          : "bg-red-50 text-red-700 border border-red-200"
+                      }`}>
+                        {isVegan ? "VEGAN 🌱" : isVeg ? "VEG" : "NON-VEG"}
+                      </span>
+                    </td>
+                    <td className="text-right space-x-1.5">
+                      <button
+                        onClick={() => {
+                          setEditingFoodId(f.id);
+                          const foodDietary = f.dietary || (f.isVeg !== false ? "Veg" : "Non-Veg");
+                          setFoodForm({
+                            name: f.name || "",
+                            category: f.category || "Biryani",
+                            cuisine: f.cuisine || "Indian",
+                            price: f.price || f.caloriesPerServing || 199,
+                            caloriesPerServing: f.caloriesPerServing || 300,
+                            deliveryTime: f.deliveryTime || "25-30 mins",
+                            dietary: foodDietary,
+                            isVeg: foodDietary !== "Non-Veg",
+                            image: f.image || "",
+                            description: f.description || "",
+                            ingredients: Array.isArray(f.ingredients) ? f.ingredients.join(", ") : (f.ingredients || "")
+                          });
+                        }}
+                        className="rounded-lg bg-slate-100 px-2.5 py-1.5 font-bold text-slate-700 hover:bg-slate-200"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteFood(f.id)}
+                        className="rounded-lg bg-red-50 px-2.5 py-1.5 font-bold text-red-700 hover:bg-red-100"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

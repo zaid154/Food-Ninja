@@ -24,7 +24,7 @@ const getRecipe = async (req, res) => {
 // Admin: Add new food item
 const addRecipe = async (req, res) => {
   try {
-    const { name, category, price, image, isVeg, deliveryTime, description, ingredients, cuisine } = req.body;
+    const { name, category, price, image, isVeg, dietary, deliveryTime, description, ingredients, cuisine } = req.body;
     
     if (!name || !price || !image) {
       return res.status(400).json({ message: "Name, price and image are required." });
@@ -40,7 +40,8 @@ const addRecipe = async (req, res) => {
       price: Number(price),
       caloriesPerServing: Number(price),
       image,
-      isVeg: isVeg === undefined ? true : Boolean(isVeg),
+      isVeg: isVeg === undefined ? (dietary === "Non-Veg" ? false : true) : Boolean(isVeg),
+      dietary: dietary || (isVeg === false ? "Non-Veg" : "Veg"),
       deliveryTime: deliveryTime || "25-30 mins",
       cuisine: cuisine || "Indian",
       rating: 4.8,
@@ -60,7 +61,7 @@ const addRecipe = async (req, res) => {
 // Admin: Update food item
 const updateRecipe = async (req, res) => {
   try {
-    const { name, category, price, image, isVeg, deliveryTime, description, cuisine } = req.body;
+    const { name, category, price, image, isVeg, dietary, deliveryTime, description, cuisine } = req.body;
     
     const updateData = {
       name,
@@ -68,7 +69,8 @@ const updateRecipe = async (req, res) => {
       price: Number(price),
       caloriesPerServing: Number(price),
       image,
-      isVeg: isVeg === undefined ? true : Boolean(isVeg),
+      isVeg: isVeg === undefined ? (dietary === "Non-Veg" ? false : true) : Boolean(isVeg),
+      dietary: dietary || (isVeg === false ? "Non-Veg" : "Veg"),
       deliveryTime,
       description,
       cuisine

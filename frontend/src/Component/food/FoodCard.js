@@ -5,7 +5,7 @@ import { addCart, removeCart } from "../../utils/cartSlice";
 import { addWishlist, removeWishlist } from "../../utils/wishlistSlice";
 
 const FoodCard = ({ data }) => {
-  const { id, name, image, price, category, rating, deliveryTime, isVeg, description } = data;
+  const { id, name, image, price, category, rating, deliveryTime, isVeg, dietary, description } = data;
   const dispatch = useDispatch();
 
   const wishlistItems = useSelector((store) => store.wishlist.item);
@@ -48,11 +48,18 @@ const FoodCard = ({ data }) => {
           loading="lazy"
         />
 
-        {/* Authentic Veg / Non-Veg Indicator */}
+        {/* Authentic Veg / Non-Veg / Vegan Indicator */}
         <div className="absolute left-3 top-3 rounded-md bg-white/90 p-1 shadow-sm backdrop-blur-sm">
-          <div className={`flex items-center justify-center h-3.5 w-3.5 rounded-sm border ${isVeg ? 'border-green-600' : 'border-red-600'} p-[2px]`}>
-            <div className={`h-1.5 w-1.5 rounded-full ${isVeg ? 'bg-green-600' : 'bg-red-600'}`} />
-          </div>
+          {dietary === "Vegan" ? (
+            <div className="flex items-center gap-1 px-0.5">
+              <span className="text-[10px]">🌱</span>
+              <span className="text-[9px] font-bold text-emerald-800">Vegan</span>
+            </div>
+          ) : (
+            <div className={`flex items-center justify-center h-3.5 w-3.5 rounded-sm border ${isVeg ? 'border-green-600' : 'border-red-600'} p-[2px]`}>
+              <div className={`h-1.5 w-1.5 rounded-full ${isVeg ? 'bg-green-600' : 'bg-red-600'}`} />
+            </div>
+          )}
         </div>
 
         {/* Rating Pill */}
