@@ -4,6 +4,7 @@ import { useOutletContext } from "react-router-dom";
 const AdminInquiries = (props) => {
   const context = useOutletContext() || {};
   const inquiries = props.inquiries || context.inquiries || [];
+  const orders = props.orders || context.orders || [];
   const onDeleteInquiry = props.onDeleteInquiry || context.handleDeleteInquiry;
 
   return (
@@ -39,7 +40,15 @@ const AdminInquiries = (props) => {
             <tbody className="divide-y divide-slate-100">
               {inquiries.map((inq) => {
                 const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(inq.email)}&su=${encodeURIComponent(`Re: ${inq.subject || "Your Food Ninja Inquiry"}`)}`;
-                const phone = inq.phone?.trim();
+                
+                // Check if customer phone is in inquiry, inside message text, or in previous orders
+                const orderMatch = orders.find(
+                  (o) =>
+                    (o.customerName && inq.name && o.customerName.trim().toLowerCase() === inq.name.trim().toLowerCase()) ||
+                    (o.phone && inq.message && inq.message.includes(o.phone))
+                );
+                const extractedPhone = inq.message?.match(/\b[6-9]\d{9}\b/)?.[0] || "";
+                const phone = inq.phone?.trim() || extractedPhone || orderMatch?.phone?.trim() || "";
 
                 return (
                   <tr key={inq._id || inq.id} className="text-slate-700 hover:bg-slate-50/50 transition">
@@ -92,7 +101,7 @@ const AdminInquiries = (props) => {
                           ✉️ Mail
                         </a>
 
-                        {/* Call Button */}
+                        {/* Call Button (Enabled if phone exists, cleanly disabled without alert if not) */}
                         {phone ? (
                           <a
                             href={`tel:${phone}`}
@@ -102,18 +111,12 @@ const AdminInquiries = (props) => {
                             📞 Call
                           </a>
                         ) : (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              alert(
-                                `Phone number not provided by ${inq.name}.\nPlease reply via Email: ${inq.email}`
-                              )
-                            }
-                            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-400 hover:text-slate-600 transition"
-                            title="No phone number provided"
+                          <span
+                            className="inline-flex items-center gap-1 rounded-lg border border-slate-200/60 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-300 cursor-not-allowed select-none"
+                            title="Customer did not provide phone number"
                           >
                             📞 Call
-                          </button>
+                          </span>
                         )}
 
                         {/* Delete Button */}
