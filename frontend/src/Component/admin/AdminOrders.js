@@ -1,65 +1,158 @@
-import React from "react";
+import React, { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 
-const AdminOrders = ({ orders, onUpdateStatus }) => {
+const STATUSES = ["All", "Placed", "Preparing", "Out for Delivery", "Delivered", "Cancelled"];
+
+const AdminOrders = (props) => {
+  const context = useOutletContext() || {};
+  const orders = props.orders || context.orders || [];
+  const onUpdateStatus = props.onUpdateStatus || context.handleUpdateOrderStatus;
+
+  const [search, setSearch] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("All");
+
+  const filteredOrders = orders.filter((o) => {
+    const q = search.trim().toLowerCase();
+    const matchesSearch =
+      !q ||
+      String(o.id).includes(q) ||
+      (o.customerName && o.customerName.toLowerCase().includes(q)) ||
+      (o.phone && o.phone.includes(q)) ||
+      (o.address && o.address.toLowerCase().includes(q));
+
+    const matchesStatus = selectedStatus === "All" || o.status === selectedStatus;
+    return matchesSearch && matchesStatus;
+  });
+
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h3 className="font-extrabold text-slate-900 text-sm mb-4">
-        Customer Orders & Live Delivery Status Updater ({orders.length})
-      </h3>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs">
-          <thead>
-            <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px]">
-              <th className="pb-3">Order ID & Date</th>
-              <th className="pb-3">Customer Information</th>
-              <th className="pb-3">Ordered Items</th>
-              <th className="pb-3">Amount & Payment</th>
-              <th className="pb-3">Update Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {orders.map((o) => (
-              <tr key={o.id} className="text-slate-700">
-                <td className="py-3.5 align-top">
-                  <p className="font-mono font-black text-slate-900">#{o.id}</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">{o.date}</p>
-                </td>
-                <td className="py-3.5 align-top">
-                  <p className="font-bold text-slate-900">{o.customerName}</p>
-                  <p className="text-[11px] text-slate-500 font-mono">{o.phone}</p>
-                  <p className="text-[11px] text-slate-400 max-w-[200px] truncate" title={o.address}>
-                    {o.address}
-                  </p>
-                </td>
-                <td className="py-3.5 align-top">
-                  <ul className="space-y-0.5 text-[11px]">
-                    {o.items?.map((it, idx) => (
-                      <li key={idx}>• {it.name || it.title} (x{it.quantity || 1})</li>
-                    ))}
-                  </ul>
-                </td>
-                <td className="py-3.5 align-top">
-                  <p className="font-black text-slate-900 text-sm">₹{o.total}</p>
-                  <p className="text-[10px] text-slate-500">{o.payment}</p>
-                </td>
-                <td className="py-3.5 align-top">
-                  <select
-                    value={o.status}
-                    onChange={(e) => onUpdateStatus(o.id, e.target.value)}
-                    className="rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 font-bold text-xs outline-none focus:border-emerald-500 shadow-xs"
-                  >
-                    <option value="Placed">Placed</option>
-                    <option value="Preparing">Preparing</option>
-                    <option value="Out for Delivery">Out for Delivery</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-5">
+      {/* Header & Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div>
+          <h2 className="text-sm font-bold text-slate-900">
+            Customer Orders & Live Delivery Updater ({filteredOrders.length})
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Change order status live to update customer delivery progress
+          </p>
+        </div>
+
+        {/* Search Input */}
+        <div className="relative w-full sm:w-64">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search order ID, name, phone..."
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-8 pr-3 text-xs outline-none focus:border-emerald-500 focus:bg-white transition"
+          />
+          <svg className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
       </div>
+
+      {/* Status Filter Chips */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        {STATUSES.map((st) => {
+          const count = st === "All" ? orders.length : orders.filter((o) => o.status === st).length;
+          const isActive = selectedStatus === st;
+          return (
+            <button
+              type="button"
+              key={st}
+              onClick={() => setSelectedStatus(st)}
+              className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                isActive
+                  ? "bg-slate-900 text-white shadow-2xs"
+                  : "bg-slate-50 text-slate-600 border border-slate-200/80 hover:bg-slate-100"
+              }`}
+            >
+              <span>{st}</span>
+              <span className={`ml-1.5 text-[10px] font-bold ${isActive ? "text-slate-300" : "text-slate-400"}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Orders Table */}
+      {filteredOrders.length === 0 ? (
+        <div className="py-12 text-center text-xs text-slate-500">
+          No orders found matching your search or selected status.
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px]">
+                <th className="pb-3">Order & Date</th>
+                <th className="pb-3">Customer Information</th>
+                <th className="pb-3">Ordered Items</th>
+                <th className="pb-3">Total & Payment</th>
+                <th className="pb-3 text-right">Update Live Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredOrders.map((o) => (
+                <tr key={o.id} className="text-slate-700 hover:bg-slate-50/50 transition">
+                  <td className="py-3.5 align-top">
+                    <p className="font-mono font-bold text-slate-900">#{o.id}</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">{o.date}</p>
+                  </td>
+                  <td className="py-3.5 align-top">
+                    <p className="font-bold text-slate-900">{o.customerName}</p>
+                    <p className="text-[11px] text-slate-500 font-mono">{o.phone}</p>
+                    <p className="text-[11px] text-slate-400 max-w-[220px] truncate" title={o.address}>
+                      {o.address}
+                    </p>
+                  </td>
+                  <td className="py-3.5 align-top">
+                    <ul className="space-y-0.5 text-[11px]">
+                      {o.items?.map((it, idx) => (
+                        <li key={idx} className="flex items-center gap-1.5">
+                          <span className="font-semibold text-slate-800">{it.name || it.title}</span>
+                          <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-1 rounded">
+                            x{it.quantity || 1}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td className="py-3.5 align-top">
+                    <p className="font-black text-slate-900 text-sm">₹{o.total}</p>
+                    <p className="text-[10px] text-slate-400">{o.payment}</p>
+                  </td>
+                  <td className="py-3.5 align-top text-right">
+                    <select
+                      value={o.status}
+                      onChange={(e) => onUpdateStatus(o.id, e.target.value)}
+                      className={`rounded-lg border px-2.5 py-1.5 font-bold text-xs outline-none shadow-2xs transition ${
+                        o.status === "Delivered"
+                          ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+                          : o.status === "Cancelled"
+                          ? "border-red-300 bg-red-50 text-red-800"
+                          : o.status === "Out for Delivery"
+                          ? "border-blue-300 bg-blue-50 text-blue-800"
+                          : o.status === "Preparing"
+                          ? "border-amber-300 bg-amber-50 text-amber-800"
+                          : "border-slate-300 bg-white text-slate-800"
+                      }`}
+                    >
+                      <option value="Placed">● Placed</option>
+                      <option value="Preparing">● Preparing</option>
+                      <option value="Out for Delivery">● Out for Delivery</option>
+                      <option value="Delivered">● Delivered</option>
+                      <option value="Cancelled">● Cancelled</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

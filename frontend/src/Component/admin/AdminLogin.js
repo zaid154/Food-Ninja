@@ -7,12 +7,17 @@ const AdminLogin = ({ adminEmail, setAdminEmail, adminPassword, setAdminPassword
     <section className="flex min-h-[80vh] items-center justify-center bg-slate-100 px-4 py-12">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm border border-slate-200">
         <div className="text-center mb-6">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-200 p-2 shadow-sm mb-3">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-200 p-2 shadow-2xs mb-3">
             <img src={LOGO} alt="Food Ninja" className="h-full w-full object-contain" />
           </div>
-          <h1 className="text-2xl font-black text-slate-900">Store Admin Login</h1>
-          <p className="mt-1 text-xs text-slate-500">
-            Enter administrator credentials to manage store, food dishes & orders.
+          <h1 className="text-xl font-bold tracking-tight text-slate-900">
+            Food<span className="text-emerald-600">Ninja</span>
+          </h1>
+          <p className="text-xs font-semibold text-slate-500 mt-0.5">
+            Admin Dashboard
+          </p>
+          <p className="mt-2 text-xs text-slate-400">
+            Sign in with administrative credentials to manage store.
           </p>
         </div>
 

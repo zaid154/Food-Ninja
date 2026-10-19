@@ -1,6 +1,10 @@
 import React from "react";
+import { useOutletContext } from "react-router-dom";
 
-const AdminInquiries = ({ inquiries = [], onDeleteInquiry }) => {
+const AdminInquiries = (props) => {
+  const context = useOutletContext() || {};
+  const inquiries = props.inquiries || context.inquiries || [];
+  const onDeleteInquiry = props.onDeleteInquiry || context.handleDeleteInquiry;
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">

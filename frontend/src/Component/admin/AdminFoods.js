@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
 
 export const FOOD_CATEGORIES = [
@@ -37,7 +37,12 @@ export const FOOD_CUISINES = [
   "Thai"
 ];
 
-const AdminFoods = ({ foods, onRefresh, showToast }) => {
+const AdminFoods = (props) => {
+  const context = useOutletContext() || {};
+  const foods = props.foods || context.foods || [];
+  const onRefresh = props.onRefresh || context.fetchData;
+  const showToast = props.showToast || context.showToast || alert;
+
   const initialFood = {
     name: "",
     category: "Biryani",
