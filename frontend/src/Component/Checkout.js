@@ -1,10 +1,23 @@
 import React, { useState, useContext } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../utils/cartSlice";
 import { addOrder } from "../utils/ordersSlice";
 import UserContext from "./Usercontext";
 import { API_BASE_URL } from "../utils/Constants";
+
+// Validation helper to detect fake keyboard spam / gibberish
+const isGibberish = (str) => {
+    if (!str) return false;
+    const clean = str.trim().toLowerCase();
+    // 4+ repeated consecutive identical characters (e.g. "aaaaaa", "111111")
+    if (/(.)\1{3,}/.test(clean)) return true;
+    // 6+ consecutive consonants without vowel or space (e.g. "ndjuhjdhjsdjas", "asdfghjkl")
+    if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(clean)) return true;
+    // Common fake patterns
+    if (/^(na|n\/a|none|null|nil|test|fake|asdf|qwerty|zxcv)$/i.test(clean)) return true;
+    return false;
+};
 
 const Checkout = () => {
     const cartItems = useSelector((store) => store.cart.item);
@@ -21,9 +34,14 @@ const Checkout = () => {
         ? [{ ...buyNowItem, quantity: 1 }]
         : cartItems;
 
+    // Structured address fields to ensure 100% valid delivery information
     const [name, setName] = useState(user ? user.name : "");
-    const [address, setAddress] = useState("");
     const [phone, setPhone] = useState("");
+    const [house, setHouse] = useState("");
+    const [street, setStreet] = useState("");
+    const [landmark, setLandmark] = useState("");
+    const [city, setCity] = useState("Delhi NCR");
+    const [pincode, setPincode] = useState("");
     const [payment, setPayment] = useState("Cash on Delivery");
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
@@ -40,20 +58,43 @@ const Checkout = () => {
 
     const placeOrder = async (e) => {
         e.preventDefault();
+        setError("");
 
-        if (!name.trim()) {
-            setError("Please enter your full name.");
+        // 1. Validate Name
+        if (!name.trim() || name.trim().length < 3 || isGibberish(name)) {
+            setError("Please enter a valid full name (minimum 3 letters).");
             return;
         }
 
+        // 2. Validate Indian Mobile Number (10 digits starting with 6, 7, 8, or 9)
         const cleanPhone = phone.replace(/\D/g, "");
-        if (cleanPhone.length !== 10) {
-            setError("Please enter a valid 10-digit mobile number.");
+        if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+            setError("Please enter a valid 10-digit mobile number (e.g. 9876543210).");
             return;
         }
 
-        if (address.trim().length < 10) {
-            setError("Please enter a complete delivery address (minimum 10 characters).");
+        // 3. Validate House / Flat details
+        if (!house.trim() || house.trim().length < 2 || isGibberish(house)) {
+            setError("Please enter a valid Flat / House / Building details (e.g. Flat 302, Tower B).");
+            return;
+        }
+
+        // 4. Validate Street / Locality
+        if (!street.trim() || street.trim().length < 4 || isGibberish(street)) {
+            setError("Please enter a valid Street / Area / Locality (e.g. Sector 62, MG Road).");
+            return;
+        }
+
+        // 5. Validate City
+        if (!city.trim() || city.trim().length < 3 || isGibberish(city)) {
+            setError("Please enter a valid City / Town name (e.g. Delhi NCR, Noida).");
+            return;
+        }
+
+        // 6. Validate 6-digit PIN code
+        const cleanPincode = pincode.trim();
+        if (!/^[1-9][0-9]{5}$/.test(cleanPincode)) {
+            setError("Please enter a valid 6-digit Indian PIN code (e.g. 110001, 201301).");
             return;
         }
 
@@ -62,13 +103,14 @@ const Checkout = () => {
             return;
         }
 
-        const estDelivery = totalItems > 4 ? "40–50 mins" : "30–40 mins";
+        const fullAddress = `${house.trim()}, ${street.trim()}${landmark.trim() ? `, Near ${landmark.trim()}` : ""}, ${city.trim()} - ${cleanPincode}`;
+        const estDelivery = totalItems > 4 ? "40–50 mins" : "25–30 mins";
 
         const newOrder = {
             id: Date.now(),
             userEmail: user ? user.email : "guest@foodninja.com",
             customerName: name.trim(),
-            address: address.trim(),
+            address: fullAddress,
             phone: cleanPhone,
             payment: payment,
             items: items,
@@ -78,7 +120,14 @@ const Checkout = () => {
             total: grandTotal,
             estDelivery: estDelivery,
             status: "Placed",
-            date: new Date().toLocaleString()
+            date: new Date().toLocaleString("en-US", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true
+            })
         };
 
         try {
@@ -100,7 +149,7 @@ const Checkout = () => {
             setConfirmedOrder(newOrder);
         } catch (err) {
             console.error("Order error:", err);
-            // Even if offline, proceed with local state
+            // Fallback: save to local store even if offline
             dispatch(addOrder(newOrder));
             if (!isBuyNow) dispatch(clearCart());
             setConfirmedOrder(newOrder);
@@ -109,7 +158,7 @@ const Checkout = () => {
         }
     };
 
-    // Full Order Confirmation Screen with Complete Bill Calculation
+    // Full Order Confirmation Screen with Direct Tracking Button
     if (confirmedOrder) {
         return (
             <section className="min-h-[85vh] bg-slate-50 px-4 py-8">
@@ -151,52 +200,17 @@ const Checkout = () => {
                         </div>
                     </div>
 
-                    {/* Delivery Details */}
-                    <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 text-xs space-y-1">
-                        <p className="font-bold text-slate-800">
-                            Delivering to: <span className="font-normal text-slate-600">{confirmedOrder.customerName} ({confirmedOrder.phone})</span>
-                        </p>
-                        <p className="text-slate-600">
-                            <span className="font-bold text-slate-800">Address: </span>
-                            {confirmedOrder.address}
-                        </p>
+                    {/* Delivery Address Summary */}
+                    <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 text-xs">
+                        <p className="font-bold text-slate-700">Delivery Address:</p>
+                        <p className="mt-0.5 text-slate-600">{confirmedOrder.address}</p>
+                        <p className="mt-1 text-slate-500 text-[11px]">Phone: +91 {confirmedOrder.phone}</p>
                     </div>
 
-                    {/* Dishes Ordered */}
-                    <div className="mt-5">
-                        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                            Dishes Ordered ({confirmedOrder.items.length})
-                        </h2>
-                        <div className="divide-y divide-slate-100 border-y border-slate-100">
-                            {confirmedOrder.items.map((it, idx) => {
-                                const itemPrice = it.price || it.caloriesPerServing || 0;
-                                const itemQty = it.quantity || 1;
-                                return (
-                                    <div key={idx} className="flex items-center justify-between py-2.5 text-xs">
-                                        <div className="flex items-center gap-3">
-                                            {it.image && (
-                                                <img
-                                                    src={it.image}
-                                                    alt={it.name || it.title}
-                                                    className="h-10 w-10 rounded-lg object-cover bg-slate-100 border border-slate-100 shrink-0"
-                                                />
-                                            )}
-                                            <div>
-                                                <p className="font-bold text-slate-800">{it.name || it.title}</p>
-                                                <p className="text-[11px] text-slate-400">Qty: {itemQty} × ₹{itemPrice}</p>
-                                            </div>
-                                        </div>
-                                        <span className="font-bold text-slate-800">₹{itemPrice * itemQty}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Complete Bill Calculation */}
-                    <div className="mt-4 rounded-xl border border-slate-200/80 bg-slate-50/60 p-4 text-xs space-y-2">
-                        <h3 className="font-bold text-slate-700 pb-1 border-b border-slate-200/60">
-                            Bill Details & Calculation
+                    {/* Bill Breakdown */}
+                    <div className="mt-5 space-y-2 border-t border-slate-100 pt-4 text-xs">
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                            Payment Summary
                         </h3>
                         <div className="flex justify-between text-slate-600 pt-1">
                             <span>Item Total</span>
@@ -218,20 +232,25 @@ const Checkout = () => {
 
                     {/* Actions */}
                     <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                        <button
-                            type="button"
-                            onClick={() => navigate("/")}
-                            className="flex-1 rounded-xl bg-emerald-600 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-emerald-700 active:scale-95"
+                        <Link
+                            to={`/orders/${confirmedOrder.id}`}
+                            className="flex-1 rounded-xl bg-emerald-600 py-3 text-center text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-emerald-700 active:scale-95 flex items-center justify-center gap-1.5"
                         >
-                            Explore Food Menu
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => navigate("/orders")}
-                            className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
+                            <span>Track Order Details</span>
+                            <span>→</span>
+                        </Link>
+                        <Link
+                            to="/orders"
+                            className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-center text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                         >
-                            View All Past Orders →
-                        </button>
+                            View All Past Orders
+                        </Link>
+                        <Link
+                            to="/"
+                            className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-xs font-bold text-slate-600 transition hover:bg-slate-50"
+                        >
+                            Menu
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -248,22 +267,28 @@ const Checkout = () => {
                     <p className="mt-2 text-sm text-slate-600">
                         Add some delicious food dishes before checkout.
                     </p>
+                    <Link
+                        to="/"
+                        className="mt-4 inline-block rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-emerald-700"
+                    >
+                        Explore Food Menu
+                    </Link>
                 </div>
             </section>
         );
     }
 
     return (
-        <section className="bg-slate-50 px-4 py-10 min-h-[85vh]">
-            <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1.2fr_1fr]">
-                {/* Delivery Form */}
+        <section className="bg-slate-50 px-4 py-8 sm:py-10 min-h-[85vh]">
+            <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1.25fr_1fr]">
+                {/* Structured Delivery Form */}
                 <form onSubmit={placeOrder} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                         <div>
                             <h1 className="text-xl font-black text-slate-900">
                                 Delivery Address & Payment
                             </h1>
-                            <p className="text-xs text-slate-500 mt-0.5">Please provide where you want your order delivered.</p>
+                            <p className="text-xs text-slate-500 mt-0.5">Please provide where you want your food delivered.</p>
                         </div>
                         {isBuyNow && (
                             <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
@@ -273,50 +298,124 @@ const Checkout = () => {
                     </div>
 
                     <div className="mt-5 space-y-4">
+                        {/* Name and Mobile Grid */}
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">Full Name *</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="e.g. Mohd Zaid"
+                                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">Phone Number *</label>
+                                <div className="relative mt-1">
+                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-xs font-bold text-slate-500">
+                                        +91
+                                    </span>
+                                    <input
+                                        type="tel"
+                                        required
+                                        maxLength={10}
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+                                        className="w-full rounded-lg border border-slate-300 pl-11 pr-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
+                                        placeholder="10-digit mobile"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Flat / House No */}
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-slate-700">Full Name *</label>
+                            <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                                Flat / House / Floor / Building *
+                            </label>
                             <input
                                 type="text"
                                 required
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Enter your full name"
-                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+                                value={house}
+                                onChange={(e) => setHouse(e.target.value)}
+                                placeholder="e.g. Flat 402, Sunshine Heights, Tower 3"
+                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
                             />
                         </div>
 
+                        {/* Street / Locality */}
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-slate-700">Phone Number *</label>
+                            <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                                Street / Area / Locality *
+                            </label>
                             <input
-                                type="tel"
+                                type="text"
                                 required
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500"
-                                placeholder="10-digit mobile number"
+                                value={street}
+                                onChange={(e) => setStreet(e.target.value)}
+                                placeholder="e.g. Sector 62, Near Metro Station"
+                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
                             />
                         </div>
 
+                        {/* Landmark */}
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-slate-700">Delivery Address *</label>
-                            <textarea
-                                required
-                                value={address}
-                                onChange={(e) => setAddress(e.target.value)}
-                                rows={3}
-                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500"
-                                placeholder="Complete address: House/Flat no, building, street, landmark, city"
+                            <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                                Landmark (Optional)
+                            </label>
+                            <input
+                                type="text"
+                                value={landmark}
+                                onChange={(e) => setLandmark(e.target.value)}
+                                placeholder="e.g. Opposite City Hospital or Apollo Pharmacy"
+                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
                             />
                         </div>
 
+                        {/* City and 6-digit Pincode Grid */}
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                                    City / Town *
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={city}
+                                    onChange={(e) => setCity(e.target.value)}
+                                    placeholder="e.g. Delhi NCR, Noida, Gurugram"
+                                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                                    6-Digit PIN Code *
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    maxLength={6}
+                                    value={pincode}
+                                    onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
+                                    placeholder="e.g. 110001 or 201301"
+                                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition font-mono"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Payment Method */}
                         <div>
                             <label className="text-xs font-bold uppercase tracking-wider text-slate-700">Payment Method</label>
                             <div className="mt-1 flex items-center justify-between rounded-lg border-2 border-emerald-500 bg-emerald-50/60 p-3">
                                 <div className="flex items-center gap-2.5">
                                     <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-xs text-white font-bold">✓</span>
                                     <div>
-                                        <p className="text-xs font-bold text-slate-900">Cash on Delivery</p>
-                                        <p className="text-[11px] text-slate-500">Pay with cash/UPI when your food arrives</p>
+                                        <p className="text-xs font-bold text-slate-900">Cash on Delivery / Pay on Arrival</p>
+                                        <p className="text-[11px] text-slate-500">Pay with Cash, UPI, or Card upon food arrival</p>
                                     </div>
                                 </div>
                                 <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">Only Available</span>
@@ -324,9 +423,10 @@ const Checkout = () => {
                         </div>
 
                         {error && (
-                            <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs font-semibold text-red-700">
-                                {error}
-                            </p>
+                            <div className="rounded-lg bg-red-50 border border-red-200 px-3.5 py-2.5 text-xs font-semibold text-red-700 flex items-start gap-2">
+                                <span className="text-sm font-bold">⚠</span>
+                                <span>{error}</span>
+                            </div>
                         )}
 
                         <button
@@ -334,7 +434,7 @@ const Checkout = () => {
                             disabled={submitting}
                             className="w-full rounded-lg bg-emerald-600 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95 disabled:opacity-50"
                         >
-                            {submitting ? "Placing Order..." : `Confirm Order — ₹${grandTotal}`}
+                            {submitting ? "Placing Order..." : `Confirm & Place Order — ₹${grandTotal}`}
                         </button>
                     </div>
                 </form>

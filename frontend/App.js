@@ -16,6 +16,7 @@ import Register from "./src/Component/Register";
 import Wishlist from "./src/Component/Wishlist";
 import Checkout from "./src/Component/Checkout";
 import Orders from "./src/Component/Orders";
+import OrderDetail from "./src/Component/OrderDetail";
 import ProtectedRoute from "./src/Component/ProtectedRoute";
 import Admin from "./src/Component/Admin";
 import AdminOverview from "./src/Component/admin/AdminOverview";
@@ -79,6 +80,8 @@ const appRouter = createBrowserRouter([
         )
       },
       { path: "/orders", element: <Orders /> },
+      { path: "/orders/:id", element: <OrderDetail /> },
+      { path: "/order/:id", element: <OrderDetail /> },
       {
         path: "/admin",
         element: <Admin />,

@@ -98,7 +98,15 @@ const AdminOrders = (props) => {
               {filteredOrders.map((o) => (
                 <tr key={o.id} className="text-slate-700 hover:bg-slate-50/50 transition">
                   <td className="py-3.5 align-top">
-                    <p className="font-mono font-bold text-slate-900">#{o.id}</p>
+                    <a
+                      href={`/orders/${o.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono font-bold text-emerald-700 hover:underline"
+                      title="View live order details"
+                    >
+                      #{o.id} ↗
+                    </a>
                     <p className="text-[11px] text-slate-400 mt-0.5">{o.date}</p>
                   </td>
                   <td className="py-3.5 align-top">

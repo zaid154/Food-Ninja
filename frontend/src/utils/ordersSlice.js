@@ -15,20 +15,28 @@ const ordersSlice = createSlice({
         // add a new order to the top of the list
         addOrder: (state, action) => {
             state.list.unshift(action.payload);
+            try {
+                localStorage.setItem("orders", JSON.stringify(state.list));
+            } catch (e) {}
         },
 
-        // cancel an order the customer just placed. Only "Placed" orders can be
-        // cancelled; already-cancelled/other statuses are left untouched.
+        // cancel an order the customer just placed.
         cancelOrder: (state, action) => {
             const order = state.list.find((o) => o.id === action.payload);
             if (order && order.status === "Placed") {
                 order.status = "Cancelled";
+                try {
+                    localStorage.setItem("orders", JSON.stringify(state.list));
+                } catch (e) {}
             }
         },
 
         // remove all orders (used on logout if needed)
         clearOrders: (state) => {
             state.list = [];
+            try {
+                localStorage.removeItem("orders");
+            } catch (e) {}
         }
     }
 });

@@ -9,7 +9,11 @@ const orderSchema = new mongoose.Schema(
     address: { type: String, required: true },
     payment: { type: String, default: "Cash on Delivery" },
     items: { type: Array, required: true },
+    subtotal: { type: Number },
+    deliveryFee: { type: Number, default: 30 },
+    taxes: { type: Number, default: 0 },
     total: { type: Number, required: true },
+    estDelivery: { type: String, default: "30–40 mins" },
     status: {
       type: String,
       enum: ["Placed", "Preparing", "Out for Delivery", "Delivered", "Cancelled"],

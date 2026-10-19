@@ -15,11 +15,41 @@ const getOrders = async (req, res) => {
   }
 };
 
+// Get single order by ID
+const getOrderById = async (req, res) => {
+  try {
+    const rawId = req.params.id;
+    let query = { id: Number(rawId) };
+    if (isNaN(query.id)) {
+      query = { _id: rawId };
+    }
+    const order = await Order.findOne(query);
+    if (!order) return res.status(404).json({ message: "Order not found." });
+    return res.status(200).json({ order });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to fetch order", error: error.message });
+  }
+};
+
 // Create new customer order
 const createOrder = async (req, res) => {
   try {
-    const { id, userEmail, customerName, phone, address, payment, items, total, date } = req.body;
-    
+    const {
+      id,
+      userEmail,
+      customerName,
+      phone,
+      address,
+      payment,
+      items,
+      subtotal,
+      deliveryFee,
+      taxes,
+      total,
+      estDelivery,
+      date,
+    } = req.body;
+
     if (!customerName || !phone || !address || !items || !total) {
       return res.status(400).json({ message: "Missing required order details." });
     }
@@ -33,9 +63,13 @@ const createOrder = async (req, res) => {
       address,
       payment: payment || "Cash on Delivery",
       items,
+      subtotal: subtotal || 0,
+      deliveryFee: deliveryFee !== undefined ? deliveryFee : 30,
+      taxes: taxes || 0,
       total,
+      estDelivery: estDelivery || "30–40 mins",
       status: "Placed",
-      date: date || new Date().toLocaleString()
+      date: date || new Date().toLocaleString(),
     });
 
     await newOrder.save();
@@ -61,4 +95,4 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-module.exports = { getOrders, createOrder, updateOrderStatus };
+module.exports = { getOrders, getOrderById, createOrder, updateOrderStatus };
