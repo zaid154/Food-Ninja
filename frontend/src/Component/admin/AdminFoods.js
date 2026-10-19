@@ -120,9 +120,9 @@ const AdminFoods = (props) => {
   return (
     <div className="grid gap-6 lg:grid-cols-[400px_1fr]">
       {/* Food Form */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm h-fit">
+      <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs h-fit">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-          <h3 className="font-black text-slate-900 text-sm">
+          <h3 className="font-bold text-slate-900 text-sm">
             {editingFoodId ? "Edit Food Dish" : "Add New Food Dish"}
           </h3>
           {editingFoodId && (
@@ -313,8 +313,8 @@ const AdminFoods = (props) => {
       </div>
 
       {/* Food Dishes Table */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="font-extrabold text-slate-900 text-sm mb-4">
+      <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs">
+        <h3 className="font-bold text-slate-900 text-sm mb-4">
           Current Active Food Dishes ({foods.length})
         </h3>
         <div className="overflow-x-auto max-h-[640px] overflow-y-auto pr-1">

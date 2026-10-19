@@ -6,10 +6,10 @@ const AdminInquiries = (props) => {
   const inquiries = props.inquiries || context.inquiries || [];
   const onDeleteInquiry = props.onDeleteInquiry || context.handleDeleteInquiry;
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-extrabold text-slate-900 text-sm">
+          <h3 className="font-bold text-slate-900 text-sm">
             Customer Inquiries & Feedback ({inquiries.length})
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">
