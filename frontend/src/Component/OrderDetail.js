@@ -6,10 +6,10 @@ import { API_BASE_URL } from "../utils/Constants";
 import UserContext from "./Usercontext";
 
 const TIMELINE_STEPS = [
-    { key: "Placed", title: "Order Placed", desc: "Received and acknowledged" },
-    { key: "Preparing", title: "In the Kitchen", desc: "Chef is preparing your food" },
-    { key: "Out for Delivery", title: "Out for Delivery", desc: "Rider on the way" },
-    { key: "Delivered", title: "Delivered", desc: "Delivered to your address" },
+    { key: "Placed", title: "Order Placed", desc: "Received by kitchen" },
+    { key: "Preparing", title: "Cooking", desc: "Chef preparing your meal" },
+    { key: "Out for Delivery", title: "On the Way", desc: "Rider heading to you" },
+    { key: "Delivered", title: "Delivered", desc: "Delivered to your door" },
 ];
 
 const getStepNumber = (status) => {
@@ -45,7 +45,7 @@ const getStatusBadge = (status) => {
             return {
                 badge: "bg-amber-50 text-amber-800 border-amber-200",
                 dot: "bg-amber-600",
-                label: "Preparing in Kitchen",
+                label: "In the Kitchen",
             };
         case "Cancelled":
             return {
@@ -70,7 +70,14 @@ const OrderDetail = () => {
 
     const localOrders = useSelector((store) => store.orders.list);
     const [order, setOrder] = useState(() => {
-        return localOrders.find((o) => String(o.id) === String(id)) || null;
+        const reduxMatch = localOrders.find((o) => String(o.id) === String(id));
+        if (reduxMatch) return reduxMatch;
+        try {
+            const saved = JSON.parse(localStorage.getItem("orders") || "[]");
+            return saved.find((o) => String(o.id) === String(id)) || null;
+        } catch {
+            return null;
+        }
     });
     const [loading, setLoading] = useState(!order);
     const [cancelling, setCancelling] = useState(false);
@@ -80,7 +87,7 @@ const OrderDetail = () => {
 
         const loadOrder = async () => {
             try {
-                // Try fetching single order from backend
+                // 1. Try single order endpoint
                 const res = await fetch(`${API_BASE_URL}/orders/${id}`);
                 if (res.ok) {
                     const data = await res.json();
@@ -91,9 +98,8 @@ const OrderDetail = () => {
                     }
                 }
 
-                // Fallback: fetch user's orders list
-                const userEmail = user?.email || "guest@foodninja.com";
-                const listRes = await fetch(`${API_BASE_URL}/orders?email=${userEmail}`);
+                // 2. Try all orders endpoint (without email restriction for guest/local orders)
+                const listRes = await fetch(`${API_BASE_URL}/orders`);
                 if (listRes.ok) {
                     const listData = await listRes.json();
                     const matched = (listData.orders || []).find((o) => String(o.id) === String(id));
@@ -104,12 +110,21 @@ const OrderDetail = () => {
                     }
                 }
             } catch (err) {
-                console.warn("Could not fetch remote order, using local store:", err);
+                console.warn("Could not fetch remote order:", err);
             }
 
+            // 3. Fallback: Local Redux & localStorage
             if (isMounted) {
-                const localMatch = localOrders.find((o) => String(o.id) === String(id));
-                if (localMatch) setOrder(localMatch);
+                const reduxMatch = localOrders.find((o) => String(o.id) === String(id));
+                if (reduxMatch) {
+                    setOrder(reduxMatch);
+                } else {
+                    try {
+                        const saved = JSON.parse(localStorage.getItem("orders") || "[]");
+                        const storageMatch = saved.find((o) => String(o.id) === String(id));
+                        if (storageMatch) setOrder(storageMatch);
+                    } catch {}
+                }
                 setLoading(false);
             }
         };
@@ -147,9 +162,10 @@ const OrderDetail = () => {
             <section className="min-h-[80vh] bg-slate-50 px-4 py-8">
                 <div className="mx-auto max-w-5xl space-y-4 animate-pulse">
                     <div className="h-6 w-36 bg-slate-200 rounded" />
-                    <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-                        <div className="h-96 bg-white border border-slate-200 rounded-xl" />
-                        <div className="h-64 bg-white border border-slate-200 rounded-xl" />
+                    <div className="h-32 bg-white border border-slate-200 rounded-2xl" />
+                    <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr]">
+                        <div className="h-96 bg-white border border-slate-200 rounded-2xl" />
+                        <div className="h-64 bg-white border border-slate-200 rounded-2xl" />
                     </div>
                 </div>
             </section>
@@ -159,14 +175,14 @@ const OrderDetail = () => {
     if (!order) {
         return (
             <section className="flex min-h-[70vh] items-center justify-center bg-slate-50 px-4">
-                <div className="max-w-md rounded-xl border border-slate-200 bg-white p-8 text-center shadow-xs">
+                <div className="max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xs">
                     <h1 className="text-xl font-bold text-slate-900">Order Not Found</h1>
                     <p className="mt-2 text-xs text-slate-500">
                         We could not find order #{id}. It may have been placed in another session or removed.
                     </p>
                     <Link
                         to="/orders"
-                        className="mt-5 inline-block rounded-lg bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700"
+                        className="mt-5 inline-block rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700"
                     >
                         ← Back to My Orders
                     </Link>
@@ -189,9 +205,9 @@ const OrderDetail = () => {
     const grandTotal = order.total || subtotal + deliveryFee + taxes;
 
     return (
-        <section className="min-h-[85vh] bg-slate-50 px-4 pt-6 pb-16">
-            <div className="mx-auto max-w-5xl space-y-5">
-                {/* Breadcrumb Header */}
+        <section className="min-h-[85vh] bg-slate-50/70 px-4 pt-6 pb-16">
+            <div className="mx-auto max-w-5xl space-y-4">
+                {/* Breadcrumb & Actions Bar */}
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <button
                         onClick={() => navigate("/orders")}
@@ -208,97 +224,119 @@ const OrderDetail = () => {
                         <svg className="h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                         </svg>
-                        <span>Download Invoice</span>
+                        <span>Print Invoice</span>
                     </button>
                 </div>
 
-                {/* Real-World 2-Column Layout */}
-                <div className="grid gap-6 lg:grid-cols-[1.55fr_1fr] items-start">
-                    {/* LEFT COLUMN: Live Status, Dishes & Bill Summary */}
-                    <div className="space-y-5">
-                        {/* Status & Live Tracker Card */}
-                        <div className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs">
-                            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <h1 className="text-xl font-bold tracking-tight text-slate-900">
-                                            Order #{order.id}
-                                        </h1>
-                                        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusInfo.badge}`}>
-                                            <span className={`h-1.5 w-1.5 rounded-full ${statusInfo.dot}`} />
-                                            <span>{statusInfo.label}</span>
-                                        </span>
-                                    </div>
-                                    <p className="mt-1 text-xs text-slate-400">
-                                        Placed on {order.date}
-                                    </p>
-                                </div>
-
-                                {!isCancelled && !isDelivered && (
-                                    <div className="text-right">
-                                        <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">Estimated Arrival</span>
-                                        <span className="text-sm font-bold text-slate-900">{order.estDelivery || "25–30 mins"}</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Realistic Live Delivery Progress Bar */}
-                            {isCancelled ? (
-                                <div className="mt-5 rounded-lg border border-rose-200 bg-rose-50/70 p-4 text-xs text-rose-800">
-                                    <p className="font-bold">This order was cancelled</p>
-                                    <p className="mt-0.5 text-[11px] text-rose-600">
-                                        If you made an online payment, your refund will be processed back to the original source in 24–48 hours.
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="mt-5">
-                                    {/* Progress Step Bar */}
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {TIMELINE_STEPS.map((step, idx) => {
-                                            const stepNum = idx + 1;
-                                            const isDone = stepNum <= currentStep;
-                                            const isCurrent = stepNum === currentStep;
-
-                                            return (
-                                                <div key={step.key} className="space-y-1.5">
-                                                    <div
-                                                        className={`h-1.5 rounded-full transition-colors ${
-                                                            isDone ? "bg-emerald-600" : "bg-slate-200"
-                                                        }`}
-                                                    />
-                                                    <p
-                                                        className={`text-xs font-semibold ${
-                                                            isCurrent
-                                                                ? "text-emerald-700"
-                                                                : isDone
-                                                                ? "text-slate-800"
-                                                                : "text-slate-400"
-                                                        }`}
-                                                    >
-                                                        {step.title}
-                                                    </p>
-                                                    <p className="hidden sm:block text-[10px] text-slate-400 leading-tight">
-                                                        {step.desc}
-                                                    </p>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Items Ordered Card */}
-                        <div className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs">
-                            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                                <h2 className="text-sm font-bold text-slate-900">
-                                    Items Ordered ({order.items ? order.items.length : 0})
-                                </h2>
-                                <span className="text-xs text-slate-400 font-mono">
-                                    Food Ninja Kitchen
+                {/* Hero Live Status Banner (Swiggy / Zomato Real-Time Header) */}
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                        <div>
+                            <div className="flex items-center gap-2.5">
+                                <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                                    {isDelivered
+                                        ? "Order Delivered 🎉"
+                                        : isCancelled
+                                        ? "Order Cancelled"
+                                        : "Order Confirmed & Preparing"}
+                                </h1>
+                                <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusInfo.badge}`}>
+                                    <span className={`h-1.5 w-1.5 rounded-full ${statusInfo.dot}`} />
+                                    <span>{statusInfo.label}</span>
                                 </span>
                             </div>
+                            <p className="mt-1 text-xs text-slate-500">
+                                {isDelivered
+                                    ? "Food Ninja Express delivered your food. Enjoy your meal!"
+                                    : isCancelled
+                                    ? "This order was cancelled."
+                                    : `Food Ninja Kitchen has confirmed your order. Arriving in ${order.estDelivery || "25–30 mins"}.`}
+                            </p>
+                        </div>
+                        <div className="text-left sm:text-right shrink-0">
+                            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Order ID</p>
+                            <p className="font-mono text-sm font-bold text-slate-800">#{order.id}</p>
+                        </div>
+                    </div>
 
+                    {/* Realistic Stepper Progress Tracker */}
+                    {!isCancelled && (
+                        <div className="mt-5 pt-1">
+                            <div className="relative">
+                                {/* Track lines */}
+                                <div className="absolute top-4 left-6 right-6 h-1 bg-slate-100 -z-0" />
+                                <div
+                                    className="absolute top-4 left-6 h-1 bg-emerald-600 transition-all duration-500 -z-0"
+                                    style={{
+                                        width: `calc(${((currentStep - 1) / 3) * 100}% - 3rem)`,
+                                    }}
+                                />
+
+                                <div className="flex justify-between relative z-10">
+                                    {TIMELINE_STEPS.map((step, idx) => {
+                                        const stepNum = idx + 1;
+                                        const isDone = stepNum <= currentStep;
+                                        const isCurrent = stepNum === currentStep;
+
+                                        return (
+                                            <div key={step.key} className="flex flex-col items-center text-center max-w-[80px] sm:max-w-[120px]">
+                                                <div
+                                                    className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all ${
+                                                        isDone
+                                                            ? "bg-emerald-600 text-white shadow-2xs"
+                                                            : "border-2 border-slate-200 bg-white text-slate-400"
+                                                    }`}
+                                                >
+                                                    {isDone ? "✓" : stepNum}
+                                                </div>
+                                                <p
+                                                    className={`mt-2 text-xs font-semibold ${
+                                                        isCurrent
+                                                            ? "text-emerald-700 font-bold"
+                                                            : isDone
+                                                            ? "text-slate-800"
+                                                            : "text-slate-400"
+                                                    }`}
+                                                >
+                                                    {step.title}
+                                                </p>
+                                                <p className="hidden sm:block text-[10px] text-slate-400 mt-0.5 leading-tight">
+                                                    {step.desc}
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Real-World 2-Column Section */}
+                <div className="grid gap-5 lg:grid-cols-[1.55fr_1fr] items-start">
+                    {/* LEFT COLUMN: Authentic Restaurant Receipt */}
+                    <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-5">
+                        {/* Restaurant Header */}
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 font-black text-sm">
+                                    FN
+                                </div>
+                                <div>
+                                    <h2 className="text-base font-bold text-slate-900">Food Ninja Kitchen</h2>
+                                    <p className="text-xs text-slate-400">North Indian, Mughlai, Fast Food • Express Delivery</p>
+                                </div>
+                            </div>
+                            <span className="rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
+                                ★ 4.6
+                            </span>
+                        </div>
+
+                        {/* Itemized Food Dishes */}
+                        <div>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pb-2">
+                                Items Ordered ({order.items ? order.items.length : 0})
+                            </h3>
                             <div className="divide-y divide-slate-100">
                                 {(order.items || []).map((it, idx) => {
                                     const itemPrice = it.price || it.caloriesPerServing || 0;
@@ -306,167 +344,160 @@ const OrderDetail = () => {
                                     const isVeg = it.isVeg !== false && it.dietary !== "Non-Veg";
 
                                     return (
-                                        <div key={idx} className="flex items-center justify-between gap-4 py-3.5">
-                                            <div className="flex items-center gap-3.5">
-                                                {/* Dish Image */}
-                                                {it.image ? (
+                                        <div key={idx} className="flex items-center justify-between gap-3 py-3">
+                                            <div className="flex items-center gap-3">
+                                                {/* Standard Veg / Non-Veg Icon */}
+                                                <span
+                                                    className={`inline-flex h-4 w-4 items-center justify-center rounded-xs border p-0.5 shrink-0 ${
+                                                        isVeg ? "border-emerald-600" : "border-rose-600"
+                                                    }`}
+                                                    title={isVeg ? "Pure Veg" : "Non-Veg"}
+                                                >
+                                                    <span className={`h-2 w-2 rounded-full ${isVeg ? "bg-emerald-600" : "bg-rose-600"}`} />
+                                                </span>
+
+                                                {/* Dish Image Thumbnail */}
+                                                {it.image && (
                                                     <img
                                                         src={it.image}
                                                         alt={it.name || it.title}
-                                                        className="h-14 w-14 rounded-lg object-cover bg-slate-100 border border-slate-200 shrink-0"
+                                                        className="h-11 w-11 rounded-lg object-cover bg-slate-100 shrink-0 border border-slate-200"
                                                         onError={(e) => {
                                                             e.target.style.display = "none";
                                                         }}
                                                     />
-                                                ) : (
-                                                    <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-slate-100 text-slate-500 font-bold text-xs shrink-0">
-                                                        Dish
-                                                    </div>
                                                 )}
 
                                                 <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span
-                                                            className={`inline-block h-3.5 w-3.5 rounded-xs border p-0.5 shrink-0 ${
-                                                                isVeg ? "border-emerald-600" : "border-red-600"
-                                                            }`}
-                                                            title={isVeg ? "Pure Veg" : "Non-Veg"}
-                                                        >
-                                                            <span
-                                                                className={`block h-full w-full rounded-full ${
-                                                                    isVeg ? "bg-emerald-600" : "bg-red-600"
-                                                                }`}
-                                                            />
-                                                        </span>
-                                                        <h3 className="text-sm font-semibold text-slate-900">
-                                                            {it.name || it.title}
-                                                        </h3>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
-                                                        <span>Qty: {itemQty}</span>
-                                                        <span>•</span>
-                                                        <span>₹{itemPrice} each</span>
-                                                    </div>
+                                                    <h4 className="text-sm font-semibold text-slate-800">
+                                                        {it.name || it.title}
+                                                    </h4>
+                                                    <p className="text-xs text-slate-400">
+                                                        {itemQty} × ₹{itemPrice}
+                                                    </p>
                                                 </div>
                                             </div>
 
-                                            <div className="text-right">
-                                                <p className="text-sm font-bold text-slate-900">
-                                                    ₹{itemPrice * itemQty}
-                                                </p>
-                                            </div>
+                                            <span className="text-sm font-bold text-slate-900">
+                                                ₹{itemPrice * itemQty}
+                                            </span>
                                         </div>
                                     );
                                 })}
                             </div>
                         </div>
 
-                        {/* Bill Breakdown Card */}
-                        <div className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs">
-                            <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100">
-                                Bill Summary
-                            </h2>
-
-                            <div className="mt-3.5 space-y-2 text-xs text-slate-600">
+                        {/* Bill Details Breakdown */}
+                        <div className="border-t border-slate-100 pt-4">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pb-3">
+                                Bill Details
+                            </h3>
+                            <div className="space-y-2 text-xs text-slate-600">
                                 <div className="flex justify-between">
                                     <span>Item Total</span>
-                                    <span className="font-semibold text-slate-900">₹{subtotal}</span>
+                                    <span className="font-semibold text-slate-800">₹{subtotal}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Delivery Partner Fee</span>
-                                    <span className="font-semibold text-slate-900">₹{deliveryFee}</span>
+                                    <span className="font-semibold text-slate-800">₹{deliveryFee}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Govt. Taxes (5% GST)</span>
-                                    <span className="font-semibold text-slate-900">₹{taxes}</span>
+                                    <span className="font-semibold text-slate-800">₹{taxes}</span>
                                 </div>
-                                <div className="flex justify-between text-emerald-700">
-                                    <span>Restaurant Packaging</span>
-                                    <span className="font-semibold uppercase text-[11px]">Free</span>
+                                <div className="flex justify-between text-emerald-700 font-medium">
+                                    <span>Restaurant Packaging Charges</span>
+                                    <span className="text-[11px] font-bold uppercase">Free</span>
                                 </div>
 
-                                <div className="mt-3 flex justify-between border-t border-slate-200 pt-3 text-sm font-bold text-slate-900">
-                                    <span>Grand Total Paid</span>
+                                <div className="flex justify-between border-t border-slate-200 pt-3 text-sm font-bold text-slate-900">
+                                    <span>Grand Total</span>
                                     <span className="text-base text-slate-900">₹{grandTotal}</span>
                                 </div>
+                            </div>
+
+                            <div className="mt-4 flex items-center justify-between rounded-xl bg-slate-50 border border-slate-100 p-3 text-xs">
+                                <span className="text-slate-500 font-medium">Payment Mode</span>
+                                <span className="font-bold text-slate-800">
+                                    {order.payment || "Cash on Delivery"} {isDelivered ? "(Paid)" : "(Pay on Delivery)"}
+                                </span>
                             </div>
                         </div>
                     </div>
 
-                    {/* RIGHT COLUMN: Delivery Info, Payment & Support Actions */}
-                    <div className="space-y-5">
+                    {/* RIGHT COLUMN: Delivery Info & Actions */}
+                    <div className="space-y-4">
                         {/* Delivery Address Card */}
-                        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-2xs">
+                        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-3">
                             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                                 <svg className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <h2 className="text-sm font-bold text-slate-900">
-                                    Delivery Address
-                                </h2>
+                                <h3 className="text-sm font-bold text-slate-900">Delivery Address</h3>
                             </div>
-
-                            <div className="mt-3 text-xs space-y-1.5">
-                                <p className="font-bold text-slate-900">{order.customerName}</p>
+                            <div className="text-xs space-y-1">
+                                <p className="font-bold text-slate-900 text-sm">{order.customerName}</p>
                                 <p className="text-slate-500 font-mono">+91 {order.phone}</p>
-                                <p className="text-slate-600 leading-relaxed pt-1">
+                                <p className="text-slate-600 leading-relaxed pt-1 font-medium">
                                     {order.address}
                                 </p>
                             </div>
                         </div>
 
-                        {/* Payment Details Card */}
-                        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-2xs">
+                        {/* Order Metadata Card */}
+                        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-2.5">
                             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                                 <svg className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                <h2 className="text-sm font-bold text-slate-900">
-                                    Payment Method
-                                </h2>
+                                <h3 className="text-sm font-bold text-slate-900">Order Summary</h3>
                             </div>
-
-                            <div className="mt-3 text-xs space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-slate-500">Method</span>
-                                    <span className="font-semibold text-slate-900">{order.payment || "Cash on Delivery"}</span>
+                            <div className="text-xs space-y-2 text-slate-600">
+                                <div className="flex justify-between">
+                                    <span className="text-slate-400">Order ID:</span>
+                                    <span className="font-mono font-bold text-slate-800">#{order.id}</span>
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-slate-500">Status</span>
-                                    <span className="font-semibold text-emerald-700">
-                                        {isDelivered ? "Paid" : "Pay on Delivery"}
-                                    </span>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-400">Date Placed:</span>
+                                    <span className="font-medium text-slate-700">{order.date}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-400">Delivery Partner:</span>
+                                    <span className="font-medium text-slate-700">Food Ninja Express</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Order Actions & Help */}
-                        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-2xs space-y-3">
+                        {/* Actions Card */}
+                        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs space-y-2.5">
                             {order.status === "Placed" && (
                                 <button
                                     onClick={handleCancel}
                                     disabled={cancelling}
-                                    className="w-full rounded-lg border border-rose-300 bg-white py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50 transition active:scale-95 disabled:opacity-50"
+                                    className="w-full rounded-xl border border-rose-300 bg-white py-2.5 text-xs font-bold text-rose-700 hover:bg-rose-50 transition active:scale-95 disabled:opacity-50"
                                 >
-                                    {cancelling ? "Cancelling..." : "Cancel Order"}
+                                    {cancelling ? "Cancelling Order..." : "Cancel Order"}
                                 </button>
                             )}
 
                             {isDelivered && (
                                 <Link
                                     to="/"
-                                    className="block w-full rounded-lg bg-emerald-600 py-2.5 text-center text-xs font-bold text-white shadow-2xs hover:bg-emerald-700 transition active:scale-95"
+                                    className="block w-full rounded-xl bg-emerald-600 py-2.5 text-center text-xs font-bold text-white shadow-2xs hover:bg-emerald-700 transition active:scale-95"
                                 >
-                                    Order Again
+                                    Reorder Food
                                 </Link>
                             )}
 
                             <Link
                                 to="/contact"
-                                className="block text-center text-xs font-medium text-slate-500 hover:text-slate-900 transition pt-1"
+                                className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
                             >
-                                Need help with this order? Contact Support →
+                                <svg className="h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                                <span>Need Help with Order?</span>
                             </Link>
                         </div>
                     </div>
