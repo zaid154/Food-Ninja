@@ -317,16 +317,16 @@ const AdminFoods = (props) => {
         <h3 className="font-extrabold text-slate-900 text-sm mb-4">
           Current Active Food Dishes ({foods.length})
         </h3>
-        <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="sticky top-0 bg-white border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px]">
+        <div className="overflow-x-auto max-h-[640px] overflow-y-auto pr-1">
+          <table className="w-full text-left text-xs min-w-[620px]">
+            <thead className="sticky top-0 bg-white border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px] z-10">
               <tr>
-                <th className="pb-2.5">Dish</th>
-                <th className="pb-2.5">Category</th>
-                <th className="pb-2.5">Cuisine / Origin</th>
-                <th className="pb-2.5">Price</th>
-                <th className="pb-2.5">Type</th>
-                <th className="pb-2.5 text-right">Actions</th>
+                <th className="pb-2.5 min-w-[160px]">Dish</th>
+                <th className="pb-2.5 min-w-[90px]">Category</th>
+                <th className="pb-2.5 min-w-[100px]">Cuisine</th>
+                <th className="pb-2.5 min-w-[70px]">Price</th>
+                <th className="pb-2.5 min-w-[90px]">Type</th>
+                <th className="pb-2.5 text-right min-w-[110px] pr-2">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -335,25 +335,25 @@ const AdminFoods = (props) => {
                 const isVeg = f.isVeg !== false && f.dietary !== "Non-Veg";
 
                 return (
-                  <tr key={f.id} className="text-slate-700">
+                  <tr key={f.id} className="text-slate-700 hover:bg-slate-50/50 transition">
                     <td className="py-3 flex items-center gap-3">
-                      <img src={f.image} alt={f.name} className="h-10 w-10 rounded-lg object-cover border border-slate-200" />
-                      <div>
-                        <Link to={`/restaurant/${f.id}`} target="_blank" className="font-bold text-slate-900 hover:text-emerald-600">
+                      <img src={f.image} alt={f.name} className="h-10 w-10 rounded-lg object-cover border border-slate-200 shrink-0" />
+                      <div className="min-w-0">
+                        <Link to={`/restaurant/${f.id}`} target="_blank" className="font-bold text-slate-900 hover:text-emerald-600 truncate block">
                           {f.name}
                         </Link>
                         <p className="text-[10px] text-slate-400">{f.deliveryTime || "25-30 mins"}</p>
                       </div>
                     </td>
-                    <td className="font-medium text-slate-900">{f.category}</td>
-                    <td>
+                    <td className="font-medium text-slate-900 whitespace-nowrap">{f.category}</td>
+                    <td className="whitespace-nowrap">
                       <span className="rounded bg-slate-100 px-2 py-0.5 font-bold text-slate-700 text-[11px]">
                         {f.cuisine || "Indian"}
                       </span>
                     </td>
-                    <td className="font-black text-slate-900">₹{f.price || f.caloriesPerServing}</td>
-                    <td>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                    <td className="font-black text-slate-900 whitespace-nowrap">₹{f.price || f.caloriesPerServing}</td>
+                    <td className="whitespace-nowrap">
+                      <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded whitespace-nowrap ${
                         isVegan
                           ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
                           : isVeg
@@ -363,7 +363,7 @@ const AdminFoods = (props) => {
                         {isVegan ? "VEGAN 🌱" : isVeg ? "VEG" : "NON-VEG"}
                       </span>
                     </td>
-                    <td className="text-right space-x-1.5">
+                    <td className="text-right space-x-1.5 whitespace-nowrap pr-2">
                       <button
                         onClick={() => {
                           setEditingFoodId(f.id);

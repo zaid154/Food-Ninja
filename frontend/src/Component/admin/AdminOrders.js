@@ -84,14 +84,14 @@ const AdminOrders = (props) => {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-left text-xs min-w-[700px]">
             <thead>
               <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px]">
-                <th className="pb-3">Order & Date</th>
-                <th className="pb-3">Customer Information</th>
-                <th className="pb-3">Ordered Items</th>
-                <th className="pb-3">Total & Payment</th>
-                <th className="pb-3 text-right">Update Live Status</th>
+                <th className="pb-3 min-w-[140px]">Order & Date</th>
+                <th className="pb-3 min-w-[180px]">Customer Information</th>
+                <th className="pb-3 min-w-[180px]">Ordered Items</th>
+                <th className="pb-3 min-w-[110px]">Total & Payment</th>
+                <th className="pb-3 text-right min-w-[150px] pr-2">Update Live Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
