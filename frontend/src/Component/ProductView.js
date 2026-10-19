@@ -12,6 +12,8 @@ const ProductView = () => {
     const navigate = useNavigate();
 
     const cartItems = useSelector((store) => store.cart.item);
+    const wishlistItems = useSelector((store) => store.wishlist.item);
+
     if (!data) {
         return (
             <div className="mx-auto max-w-7xl px-4 py-8 animate-pulse">
@@ -28,7 +30,6 @@ const ProductView = () => {
         );
     }
 
-    const wishlistItems = useSelector((store) => store.wishlist.item);
     const product = (data.recipes || []).find((item) => String(item.id) === String(id));
 
     if (!product) {
