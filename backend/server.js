@@ -20,18 +20,57 @@ app.use("/api/recipes", require("./routes/recipe"));
 app.use("/api/orders", require("./routes/order"));
 app.use("/api/users", require("./routes/user"));
 
-// Contact Form Endpoint
-app.post("/api/contact", (req, res) => {
-  const { name, email, subject, message } = req.body;
-  if (!name || !email || !message) {
-    return res.status(400).json({ success: false, message: "Please provide your name, email, and message." });
+// Contact Form & Inquiry Endpoints
+const Inquiry = require("./models/inquiry");
+
+app.post("/api/contact", async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+    if (!name || !email || !message) {
+      return res.status(400).json({ success: false, message: "Please provide your name, email, and message." });
+    }
+    
+    let savedInquiry;
+    try {
+      savedInquiry = await Inquiry.create({
+        name,
+        email,
+        subject: subject || "General Inquiry",
+        message
+      });
+    } catch (dbErr) {
+      console.warn("DB save error for inquiry, continuing:", dbErr.message);
+    }
+
+    console.log(`[Contact Form Received] From: ${name} <${email}> | Subject: ${subject || "General Inquiry"}`);
+    res.json({
+      success: true,
+      message: "Thank you for reaching out! Your message has been received, and our team will get back to you shortly.",
+      data: savedInquiry || { name, email, subject, receivedAt: new Date().toISOString() }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-  console.log(`[Contact Form Received] From: ${name} <${email}> | Subject: ${subject || "General Inquiry"}`);
-  res.json({
-    success: true,
-    message: "Thank you for reaching out! Your message has been received, and our team will get back to you shortly.",
-    data: { name, email, subject, receivedAt: new Date().toISOString() }
-  });
+});
+
+// Admin: Get all customer inquiries
+app.get("/api/contact", async (req, res) => {
+  try {
+    const inquiries = await Inquiry.find().sort({ createdAt: -1 });
+    res.json({ success: true, inquiries });
+  } catch (error) {
+    res.status(500).json({ success: false, inquiries: [], message: error.message });
+  }
+});
+
+// Admin: Delete an inquiry
+app.delete("/api/contact/:id", async (req, res) => {
+  try {
+    await Inquiry.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "Inquiry deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 });
 
 // Database diagnostic and health check

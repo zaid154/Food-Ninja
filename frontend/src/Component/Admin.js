@@ -3,6 +3,7 @@ import AdminLogin from "./admin/AdminLogin";
 import AdminOverview from "./admin/AdminOverview";
 import AdminOrders from "./admin/AdminOrders";
 import AdminFoods from "./admin/AdminFoods";
+import AdminInquiries from "./admin/AdminInquiries";
 import { API_BASE_URL } from "../utils/Constants";
 
 const Admin = () => {
@@ -11,9 +12,10 @@ const Admin = () => {
   const [adminPassword, setAdminPassword] = useState("");
   const [authError, setAuthError] = useState("");
 
-  const [activeTab, setActiveTab] = useState("overview"); // 'overview' | 'orders' | 'foods'
+  const [activeTab, setActiveTab] = useState("overview"); // 'overview' | 'orders' | 'foods' | 'inquiries'
   const [orders, setOrders] = useState([]);
   const [foods, setFoods] = useState([]);
+  const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
@@ -41,12 +43,14 @@ const Admin = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [ordRes, foodRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/orders`).then((r) => r.json()),
-        fetch(`${API_BASE_URL}/recipes`).then((r) => r.json()),
+      const [ordRes, foodRes, inqRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/orders`).then((r) => r.json()).catch(() => ({ orders: [] })),
+        fetch(`${API_BASE_URL}/recipes`).then((r) => r.json()).catch(() => ({ recipes: [] })),
+        fetch(`${API_BASE_URL}/contact`).then((r) => r.json()).catch(() => ({ inquiries: [] })),
       ]);
       setOrders(ordRes.orders || []);
       setFoods(foodRes.recipes || []);
+      setInquiries(inqRes.inquiries || []);
     } catch (err) {
       console.error("Admin data fetch error:", err);
     } finally {
@@ -71,6 +75,19 @@ const Admin = () => {
       }
     } catch {
       alert("Failed to update order status");
+    }
+  };
+
+  const handleDeleteInquiry = async (id) => {
+    if (!window.confirm("Do you want to delete this customer inquiry?")) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/contact/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        showToast("Customer inquiry deleted");
+        setInquiries((prev) => prev.filter((i) => (i._id || i.id) !== id));
+      }
+    } catch {
+      alert("Failed to delete inquiry");
     }
   };
 
@@ -115,6 +132,15 @@ const Admin = () => {
         </svg>
       )
     },
+    {
+      id: "inquiries",
+      label: `Customer Messages (${inquiries.length})`,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      )
+    },
   ];
 
   return (
@@ -131,6 +157,7 @@ const Admin = () => {
 
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={fetchData}
               disabled={loading}
               className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs"
@@ -141,6 +168,7 @@ const Admin = () => {
               <span>{loading ? "Syncing..." : "Refresh"}</span>
             </button>
             <button
+              type="button"
               onClick={handleAdminLogout}
               className="rounded-lg bg-red-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-red-700 shadow-xs transition"
             >
@@ -154,7 +182,7 @@ const Admin = () => {
         {msg && (
           <div className="mb-4 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white shadow-sm flex items-center justify-between">
             <span>{msg}</span>
-            <button onClick={() => setMsg("")} className="text-white/80 hover:text-white text-sm">✕</button>
+            <button type="button" onClick={() => setMsg("")} className="text-white/80 hover:text-white text-sm">✕</button>
           </div>
         )}
 
@@ -162,6 +190,7 @@ const Admin = () => {
         <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-3 text-xs font-bold">
           {tabs.map((t) => (
             <button
+              type="button"
               key={t.id}
               onClick={() => setActiveTab(t.id)}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 transition ${
@@ -198,6 +227,13 @@ const Admin = () => {
               foods={foods}
               onRefresh={fetchData}
               showToast={showToast}
+            />
+          )}
+
+          {activeTab === "inquiries" && (
+            <AdminInquiries
+              inquiries={inquiries}
+              onDeleteInquiry={handleDeleteInquiry}
             />
           )}
         </div>
