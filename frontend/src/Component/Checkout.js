@@ -41,8 +41,19 @@ const Checkout = () => {
     const placeOrder = async (e) => {
         e.preventDefault();
 
-        if (name.trim() === "" || address.trim() === "" || phone.trim() === "") {
-            setError("Please fill in your name, contact phone, and delivery address.");
+        if (!name.trim()) {
+            setError("Please enter your full name.");
+            return;
+        }
+
+        const cleanPhone = phone.replace(/\D/g, "");
+        if (cleanPhone.length !== 10) {
+            setError("Please enter a valid 10-digit mobile number.");
+            return;
+        }
+
+        if (address.trim().length < 10) {
+            setError("Please enter a complete delivery address (minimum 10 characters).");
             return;
         }
 
@@ -51,15 +62,21 @@ const Checkout = () => {
             return;
         }
 
+        const estDelivery = totalItems > 4 ? "40–50 mins" : "30–40 mins";
+
         const newOrder = {
             id: Date.now(),
             userEmail: user ? user.email : "guest@foodninja.com",
-            customerName: name,
-            address: address,
-            phone: phone,
+            customerName: name.trim(),
+            address: address.trim(),
+            phone: cleanPhone,
             payment: payment,
             items: items,
+            subtotal: subtotal,
+            deliveryFee: deliveryFee,
+            taxes: taxes,
             total: grandTotal,
+            estDelivery: estDelivery,
             status: "Placed",
             date: new Date().toLocaleString()
         };
@@ -92,86 +109,128 @@ const Checkout = () => {
         }
     };
 
-    // Professional In-App Order Confirmation Screen
+    // Full Order Confirmation Screen with Complete Bill Calculation
     if (confirmedOrder) {
         return (
-            <section className="min-h-[85vh] bg-slate-50 px-4 py-12 flex items-center justify-center">
-                <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xl text-center">
-                    {/* Animated Checkmark */}
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mb-4 ring-8 ring-emerald-50">
-                        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+            <section className="min-h-[85vh] bg-slate-50 px-4 py-8">
+                <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+                    {/* Top Status */}
+                    <div className="text-center pb-6 border-b border-slate-100">
+                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mb-3 ring-8 ring-emerald-50">
+                            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-0.5 text-xs font-bold text-emerald-800">
+                            Order Placed Successfully
+                        </span>
+                        <h1 className="mt-2 text-2xl font-black text-slate-900">
+                            Thank You, {confirmedOrder.customerName}!
+                        </h1>
+                        <p className="mt-1 text-xs text-slate-500">
+                            Your order has been confirmed and kitchen preparation has started.
+                        </p>
                     </div>
 
-                    <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-800">
-                        Order Confirmed
-                    </span>
-
-                    <h1 className="mt-3 text-2xl font-black text-slate-900">
-                        Thank You, {confirmedOrder.customerName}!
-                    </h1>
-                    <p className="mt-1 text-xs text-slate-500">
-                        Your delicious meal has been booked and sent to the kitchen.
-                    </p>
-
-                    {/* Order Details Card */}
-                    <div className="mt-6 rounded-xl border border-slate-100 bg-slate-50 p-4 text-left text-xs space-y-2.5">
-                        <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
-                            <span className="text-slate-500 font-medium">Order ID</span>
-                            <span className="font-mono font-bold text-slate-900">#{confirmedOrder.id}</span>
+                    {/* Meta Bar */}
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <div>
+                            <span className="text-slate-400 font-medium">Order ID: </span>
+                            <span className="font-mono font-bold text-slate-800">#{confirmedOrder.id}</span>
                         </div>
-
-                        <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
-                            <span className="text-slate-500 font-medium">Estimated Delivery</span>
-                            <span className="font-bold text-emerald-700 flex items-center gap-1">
-                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                    <circle cx="12" cy="12" r="10" />
-                                    <polyline points="12 6 12 12 16 14" />
-                                </svg>
-                                25–30 mins
-                            </span>
+                        <div className="flex items-center gap-1 font-semibold text-emerald-700">
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span>Estimated: {confirmedOrder.estDelivery}</span>
                         </div>
-
-                        <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
-                            <span className="text-slate-500 font-medium">Payment Mode</span>
+                        <div>
+                            <span className="text-slate-400 font-medium">Mode: </span>
                             <span className="font-bold text-slate-800">{confirmedOrder.payment}</span>
                         </div>
+                    </div>
 
-                        <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
-                            <span className="text-slate-500 font-medium">Items Ordered</span>
-                            <span className="font-bold text-slate-800">
-                                {confirmedOrder.items.length} {confirmedOrder.items.length === 1 ? "dish" : "dishes"}
-                            </span>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-1">
-                            <span className="text-slate-800 font-bold">Total Paid</span>
-                            <span className="text-base font-black text-emerald-700">₹{confirmedOrder.total}</span>
-                        </div>
-
-                        <div className="mt-2 pt-2 border-t border-slate-200/60 text-[11px] text-slate-500">
-                            <span className="font-medium text-slate-700">Delivering to: </span>
+                    {/* Delivery Details */}
+                    <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 text-xs space-y-1">
+                        <p className="font-bold text-slate-800">
+                            Delivering to: <span className="font-normal text-slate-600">{confirmedOrder.customerName} ({confirmedOrder.phone})</span>
+                        </p>
+                        <p className="text-slate-600">
+                            <span className="font-bold text-slate-800">Address: </span>
                             {confirmedOrder.address}
+                        </p>
+                    </div>
+
+                    {/* Dishes Ordered */}
+                    <div className="mt-5">
+                        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                            Dishes Ordered ({confirmedOrder.items.length})
+                        </h2>
+                        <div className="divide-y divide-slate-100 border-y border-slate-100">
+                            {confirmedOrder.items.map((it, idx) => {
+                                const itemPrice = it.price || it.caloriesPerServing || 0;
+                                const itemQty = it.quantity || 1;
+                                return (
+                                    <div key={idx} className="flex items-center justify-between py-2.5 text-xs">
+                                        <div className="flex items-center gap-3">
+                                            {it.image && (
+                                                <img
+                                                    src={it.image}
+                                                    alt={it.name || it.title}
+                                                    className="h-10 w-10 rounded-lg object-cover bg-slate-100 border border-slate-100 shrink-0"
+                                                />
+                                            )}
+                                            <div>
+                                                <p className="font-bold text-slate-800">{it.name || it.title}</p>
+                                                <p className="text-[11px] text-slate-400">Qty: {itemQty} × ₹{itemPrice}</p>
+                                            </div>
+                                        </div>
+                                        <span className="font-bold text-slate-800">₹{itemPrice * itemQty}</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 
-                    {/* Action Buttons */}
+                    {/* Complete Bill Calculation */}
+                    <div className="mt-4 rounded-xl border border-slate-200/80 bg-slate-50/60 p-4 text-xs space-y-2">
+                        <h3 className="font-bold text-slate-700 pb-1 border-b border-slate-200/60">
+                            Bill Details & Calculation
+                        </h3>
+                        <div className="flex justify-between text-slate-600 pt-1">
+                            <span>Item Total</span>
+                            <span className="font-bold text-slate-800">₹{confirmedOrder.subtotal || subtotal}</span>
+                        </div>
+                        <div className="flex justify-between text-slate-600">
+                            <span>Delivery Partner Fee</span>
+                            <span className="font-bold text-slate-800">₹{confirmedOrder.deliveryFee || deliveryFee}</span>
+                        </div>
+                        <div className="flex justify-between text-slate-600">
+                            <span>Govt. Taxes (5% GST)</span>
+                            <span className="font-bold text-slate-800">₹{confirmedOrder.taxes || taxes}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-dashed border-slate-300 pt-2 text-sm font-black text-slate-900">
+                            <span>Grand Total</span>
+                            <span className="text-base text-emerald-700">₹{confirmedOrder.total}</span>
+                        </div>
+                    </div>
+
+                    {/* Actions */}
                     <div className="mt-6 flex flex-col sm:flex-row gap-3">
                         <button
                             type="button"
-                            onClick={() => navigate("/orders")}
-                            className="flex-1 rounded-xl bg-emerald-600 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-emerald-700 active:scale-95 flex items-center justify-center gap-1.5"
+                            onClick={() => navigate("/")}
+                            className="flex-1 rounded-xl bg-emerald-600 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-emerald-700 active:scale-95"
                         >
-                            <span>Track in My Orders</span>
-                            <span>→</span>
+                            Explore Food Menu
                         </button>
                         <button
                             type="button"
-                            onClick={() => navigate("/")}
+                            onClick={() => navigate("/orders")}
                             className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                         >
-                            Food Menu
+                            View All Past Orders →
                         </button>
                     </div>
                 </div>

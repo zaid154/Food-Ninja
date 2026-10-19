@@ -197,7 +197,7 @@ const Orders = () => {
                           <circle cx="12" cy="12" r="10" />
                           <polyline points="12 6 12 12 16 14" />
                         </svg>
-                        Est: 25–30 mins
+                        Est: {order.estDelivery || (order.items && order.items.length > 4 ? "40–50 mins" : "30–40 mins")}
                       </span>
                     )}
                     <span className={`rounded-full border px-3 py-1 text-xs font-bold ${statusStyle(order.status)}`}>
@@ -347,14 +347,25 @@ const Orders = () => {
                   })}
                 </div>
 
-                {/* Card Bottom / Bill & Actions */}
-                <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3.5">
-                  <div>
-                    <span className="text-xs text-slate-400 font-medium">Total Bill</span>
-                    <p className="text-lg font-black text-slate-900">₹{order.total}</p>
-                  </div>
+                {/* Card Bottom / Bill Calculation & Actions */}
+                <div className="mt-4 border-t border-slate-100 pt-3">
+                  {(() => {
+                    const itemTotal = order.subtotal || order.items.reduce((s, it) => s + (it.price || it.caloriesPerServing || 0) * (it.quantity || 1), 0);
+                    const fee = order.deliveryFee !== undefined ? order.deliveryFee : 30;
+                    const tax = order.taxes !== undefined ? order.taxes : Math.round(itemTotal * 0.05);
 
-                  <div className="flex items-center gap-2">
+                    return (
+                      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 pb-2">
+                        <span>Items: ₹{itemTotal} • Delivery: ₹{fee} • GST: ₹{tax}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold text-slate-700">Total Paid:</span>
+                          <span className="text-base font-black text-slate-900">₹{order.total}</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-50">
                     {order.status === "Placed" && (
                       <button
                         onClick={() => handleCancel(order.id)}
