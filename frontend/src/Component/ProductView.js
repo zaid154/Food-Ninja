@@ -2,7 +2,6 @@ import React from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import useResipe from "./useRecipes";
-import Shimmer from "./Shimmer";
 import { addCart, removeCart } from "../utils/cartSlice";
 import { addWishlist, removeWishlist } from "../utils/wishlistSlice";
 

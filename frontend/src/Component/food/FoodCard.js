@@ -88,7 +88,7 @@ const FoodCard = ({ data }) => {
           </h2>
         </Link>
 
-        <p className="mt-1 text-xs text-gray-500 line-clamp-2 leading-relaxed flex-1">
+        <p className="mt-1 text-xs text-gray-500 line-clamp-2 leading-relaxed h-9">
           {description || "Freshly cooked authentic preparation."}
         </p>
 

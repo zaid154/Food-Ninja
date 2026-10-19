@@ -23,19 +23,23 @@ const FoodMenu = () => {
 
   const filteredFoods = useMemo(() => {
     if (!data || !data.recipes) return [];
+    const q = search.trim().toLowerCase();
+    const targetCat = selectedCategory.toLowerCase();
+
     return data.recipes.filter((item) => {
       const matchSearch =
-        item.name.toLowerCase().includes(search.toLowerCase()) ||
-        item.category.toLowerCase().includes(search.toLowerCase()) ||
-        (item.cuisine && item.cuisine.toLowerCase().includes(search.toLowerCase()));
+        !q ||
+        item.name.toLowerCase().includes(q) ||
+        (item.category && item.category.toLowerCase().includes(q)) ||
+        (item.cuisine && item.cuisine.toLowerCase().includes(q));
 
       const matchCategory =
         selectedCategory === "All" ||
-        (item.category && item.category.toLowerCase() === selectedCategory.toLowerCase()) ||
-        (item.category && item.category.toLowerCase().includes(selectedCategory.toLowerCase())) ||
-        (item.cuisine && item.cuisine.toLowerCase().includes(selectedCategory.toLowerCase()));
+        (item.category && item.category.toLowerCase().includes(targetCat)) ||
+        (item.cuisine && item.cuisine.toLowerCase().includes(targetCat));
 
-      const matchVeg = vegOnly ? item.isVeg === true : true;
+      const matchVeg = !vegOnly || item.isVeg;
+
       return matchSearch && matchCategory && matchVeg;
     });
   }, [data, search, selectedCategory, vegOnly]);
