@@ -286,7 +286,9 @@ const AdminFoods = (props) => {
                     : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                 }`}
               >
-                <span className="text-xs">🌱</span>
+                <svg className="h-3 w-3 text-emerald-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/>
+                </svg>
                 <span>Vegan</span>
               </button>
             </div>
@@ -360,7 +362,7 @@ const AdminFoods = (props) => {
                           ? "bg-green-50 text-green-700 border border-green-200"
                           : "bg-red-50 text-red-700 border border-red-200"
                       }`}>
-                        {isVegan ? "VEGAN 🌱" : isVeg ? "VEG" : "NON-VEG"}
+                        {isVegan ? "VEGAN" : isVeg ? "VEG" : "NON-VEG"}
                       </span>
                     </td>
                     <td className="text-right space-x-1.5 whitespace-nowrap pr-2">
