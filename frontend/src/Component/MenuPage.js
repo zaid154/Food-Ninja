@@ -5,18 +5,47 @@ import Shimmer from "./Shimmer";
 import { API_BASE_URL } from "../utils/Constants";
 import { FALLBACK_RECIPES } from "../utils/fallbackDishes";
 
-const CATEGORY_LIST = [
-  "All",
-  "Biryani",
-  "Pizza",
-  "Burgers",
-  "Chinese",
-  "Indian",
-  "Italian",
-  "Beverages",
-  "Momos",
-  "Rolls",
-  "Desserts",
+const MENU_CATEGORIES = [
+  {
+    name: "All",
+    bg: "bg-slate-50",
+    img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Biryani",
+    bg: "bg-[#f4faee]",
+    img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Pizza",
+    bg: "bg-[#fff3eb]",
+    img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Burgers",
+    bg: "bg-[#fff8e7]",
+    img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Chinese",
+    bg: "bg-[#fef2f2]",
+    img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Indian",
+    bg: "bg-[#fef9c3]",
+    img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Italian",
+    bg: "bg-[#fdf2f8]",
+    img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Beverages",
+    bg: "bg-[#f0f9ff]",
+    img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300&auto=format&fit=crop&q=80",
+  },
 ];
 
 const SORT_OPTIONS = [
@@ -181,11 +210,6 @@ const MenuPage = () => {
         ======================================================== */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-slate-100">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-1">
-              <Link to="/" className="hover:underline text-slate-400">Home</Link>
-              <span className="text-slate-300">/</span>
-              <span>Menu</span>
-            </div>
             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
               Explore Our Menu
             </h1>
@@ -215,27 +239,55 @@ const MenuPage = () => {
         </div>
 
         {/* ========================================================
-            2. CATEGORY PILLS BAR
+            2. BROWSE BY CATEGORY (7 Pastel Cards + All)
         ======================================================== */}
-        <div className="py-5 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-2 min-w-max">
-            {CATEGORY_LIST.map((cat) => {
+        <div className="py-6 border-b border-slate-100">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-black text-slate-900 tracking-tight">Browse by Category</h2>
+              <p className="text-xs text-slate-400">Select a category to filter dishes</p>
+            </div>
+            {currentCategory !== "All" && (
+              <button
+                type="button"
+                onClick={() => handleCategorySelect("All")}
+                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 transition"
+              >
+                Clear Filter ✕
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
+            {MENU_CATEGORIES.map((cat) => {
               const isActive =
-                (cat === "All" && currentCategory === "All") ||
-                currentCategory.toLowerCase() === cat.toLowerCase();
+                (cat.name === "All" && currentCategory === "All") ||
+                currentCategory.toLowerCase() === cat.name.toLowerCase();
 
               return (
                 <button
-                  key={cat}
+                  key={cat.name}
                   type="button"
-                  onClick={() => handleCategorySelect(cat)}
-                  className={`rounded-full px-4 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                  onClick={() => handleCategorySelect(isActive && cat.name !== "All" ? "All" : cat.name)}
+                  className={`flex flex-col items-center justify-between p-3 rounded-2xl transition-all duration-200 border text-center cursor-pointer ${cat.bg} ${
                     isActive
-                      ? "bg-emerald-600 text-white shadow-xs"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                      ? "border-emerald-600 shadow-sm ring-2 ring-emerald-500/20"
+                      : "border-transparent hover:border-slate-300 hover:shadow-2xs"
                   }`}
                 >
-                  {cat}
+                  <div className="h-14 w-14 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-2">
+                    <img src={cat.img} alt={cat.name} className="h-full w-full object-cover rounded-full" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-800 mb-2">{cat.name}</span>
+                  <div
+                    className={`flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-xs text-slate-600 transition ${
+                      isActive ? "bg-emerald-700 text-white" : ""
+                    }`}
+                  >
+                    <svg viewBox="0 0 24 24" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </button>
               );
             })}
