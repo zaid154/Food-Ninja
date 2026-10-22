@@ -13,21 +13,12 @@ const About = () => {
   }, []);
 
   return (
-    <div className="bg-white min-h-[85vh] pt-6 sm:pt-10 pb-16 text-slate-800">
+    <div className="bg-white min-h-[85vh] pt-3 sm:pt-5 pb-10 text-slate-800">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         
         {/* Hero Section: Story & Plated Kitchen Visual */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-14">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-10 sm:mb-12">
           <div className="lg:col-span-7">
-            <div className="flex flex-wrap items-center gap-2 mb-3.5">
-              <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-800">
-                Direct Kitchen To Doorstep
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f4faee] border border-emerald-200/80 px-3 py-1 text-[11px] font-bold text-emerald-800">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-                <span>Single Kitchen • 100% In-House Fresh Cooking</span>
-              </span>
-            </div>
             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
               Fresh Restaurant Food. <br />
               <span className="text-emerald-700">Crafted on Order, Delivered Fast.</span>
@@ -114,8 +105,8 @@ const About = () => {
         </div>
 
         {/* 4-Step Kitchen Process: How FoodNinja Works */}
-        <div className="mb-14">
-          <div className="mb-6">
+        <div className="mb-10">
+          <div className="mb-4">
             <span className="text-xs font-black uppercase tracking-widest text-emerald-700">
               Kitchen Philosophy
             </span>
@@ -245,24 +236,6 @@ const About = () => {
             </div>
           </div>
 
-        </div>
-
-        {/* Bottom Banner CTA */}
-        <div className="rounded-2xl border border-emerald-200/80 bg-[#f4faee] p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-black text-emerald-950">
-              Ready to taste the FoodNinja difference?
-            </h3>
-            <p className="text-xs text-emerald-800 mt-1">
-              Explore 38+ handcrafted pizzas, bowls, burgers, biryanis, and chef specialties prepared fresh on order.
-            </p>
-          </div>
-          <Link
-            to="/menu"
-            className="rounded-full bg-emerald-700 px-7 py-2.5 text-xs font-bold text-white hover:bg-emerald-800 transition shadow-xs whitespace-nowrap self-start sm:self-auto"
-          >
-            Explore Food Menu →
-          </Link>
         </div>
 
       </div>
