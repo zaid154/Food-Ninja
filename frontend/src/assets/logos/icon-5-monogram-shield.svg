@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <!-- Hexagon Outer Shield Base -->
+  <path d="M 32 8 L 52 19 L 52 45 L 32 57 L 12 45 L 12 19 Z" fill="#0F172A" />
+  <path d="M 32 11 L 49 21 L 49 43 L 32 53 L 15 43 L 15 21 Z" stroke="#1E293B" stroke-width="1.2" />
+
+  <!-- Stylized "F" -->
+  <path d="M 22 23 L 22 43" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" />
+  <path d="M 22 24 L 35 24" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" />
+  <path d="M 22 31 L 31 31" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" />
+
+  <!-- Stylized "N" & Diagonal Slash -->
+  <path d="M 32 43 L 32 26" stroke="#10B981" stroke-width="2.6" stroke-linecap="round" />
+  <path d="M 24 26 L 40 43" stroke="#34D399" stroke-width="3" stroke-linecap="round" />
+  <path d="M 40 43 L 40 26" stroke="#10B981" stroke-width="2.6" stroke-linecap="round" />
+
+  <circle cx="40" cy="22" r="2.2" fill="#34D399" />
+</svg>

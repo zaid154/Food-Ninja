@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <!-- Sprout Bowl Icon -->
+  <ellipse cx="19" cy="27" rx="7" ry="4" transform="rotate(-22 19 27)" fill="#15803D" />
+  <path d="M 19 27 Q 22 26 25 28" stroke="#4ADE80" stroke-width="0.8" stroke-linecap="round" />
+  <path d="M 30 7 C 37 7 40 15 36 26 C 33 29 28 29 26 24 C 23 16 25 7 30 7 Z" fill="#22C55E" />
+  <path d="M 30 10 Q 32 18 30 25" stroke="#BBF7D0" stroke-width="1.2" stroke-linecap="round" />
+  <path d="M 41 14 C 49 18 49 26 44 30 C 40 32 36 30 36 26 C 37 20 39 16 41 14 Z" fill="#16A34A" />
+  <path d="M 40 17 Q 42 23 40 28" stroke="#86EFAC" stroke-width="0.9" stroke-linecap="round" />
+  <path d="M 24 28 Q 28 24 32 29" stroke="#F97316" stroke-width="2.8" stroke-linecap="round" />
+  <circle cx="34" cy="27" r="2" fill="#F59E0B" />
+  <path d="M 8 31 C 8 48 20 56 32 56 C 44 56 56 48 56 31 C 56 29 54 28.5 32 28.5 C 10 28.5 8 29 8 31 Z" fill="#0F172A" />
+  <ellipse cx="32" cy="30" rx="23" ry="2" fill="#1E293B" />
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <!-- Steam Blades -->
+  <path d="M 26 21 C 24 14 28 9 26 4 C 29 8 27 14 30 19 Z" fill="#10B981" opacity="0.85" />
+  <path d="M 36 20 C 39 13 36 8 39 3 C 37 7 41 13 38 19 Z" fill="#059669" opacity="0.85" />
+  <path d="M 32 10 C 34 14 34 18 32 22 C 30 18 30 14 32 10 Z" fill="#34D399" />
+
+  <!-- Ribbon Tails -->
+  <path d="M 8 34 Q 2 31 0 26 Q 5 29 10 31 Z" fill="#10B981" />
+  <path d="M 8 35 Q 2 37 0 42 Q 5 38 10 36 Z" fill="#059669" />
+
+  <!-- Bowl Base -->
+  <path d="M 10 34 C 10 52 20 59 32 59 C 44 59 54 52 54 34 C 54 31 10 31 10 34 Z" fill="#0F172A" />
+  <!-- Headband -->
+  <path d="M 10 33 L 54 33 L 54 36.5 L 10 36.5 Z" fill="#10B981" />
+  <!-- Eyes -->
+  <path d="M 21 42 Q 25 40 29 42" stroke="#F8FAFC" stroke-width="2" stroke-linecap="round" />
+  <path d="M 35 42 Q 39 40 43 42" stroke="#F8FAFC" stroke-width="2" stroke-linecap="round" />
+</svg>
