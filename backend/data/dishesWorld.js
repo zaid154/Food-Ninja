@@ -1,4 +1,4 @@
-// 25 Authentic Dishes Dataset
+// 40 Authentic Dishes Dataset
 module.exports = [
   {
     "name": "Classic Neapolitan Margherita Pizza",
@@ -606,10 +606,10 @@ module.exports = [
   },
   {
     "name": "Smoky Honey BBQ Chicken Wings (6 Pcs)",
-    "category": "Burgers",
+    "category": "Street Food",
     "price": 240,
     "caloriesPerServing": 490,
-    "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop&q=80",
+    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/51/Buffalo_wings-01.jpg/960px-Buffalo_wings-01.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
     "isVeg": false,
     "dietary": "Non-Veg",
     "rating": 4.8,

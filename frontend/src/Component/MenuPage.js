@@ -133,11 +133,26 @@ const MenuPage = () => {
       // Fallback on network or server error
       let filtered = [...FALLBACK_RECIPES];
       if (currentCategory && currentCategory !== "All") {
-        filtered = filtered.filter(
-          (d) =>
-            (d.category && d.category.toLowerCase().includes(currentCategory.toLowerCase())) ||
-            (d.cuisine && d.cuisine.toLowerCase().includes(currentCategory.toLowerCase()))
-        );
+        const catLower = currentCategory.trim().toLowerCase();
+        if (catLower === "indian") {
+          const indianCuisines = [
+            "indian", "north indian", "south indian", "punjabi", "awadhi", "mughlai",
+            "rajasthani", "kashmiri", "himachali", "bihari", "gujarati", "maharashtrian",
+            "goan", "chettinad", "kerala", "hyderabadi", "andhra", "karnataka", "bengali",
+            "odisha", "assamese", "naga", "khasi / meghalaya", "kolkata street food", "indo-chinese"
+          ];
+          filtered = filtered.filter(
+            (d) =>
+              (d.category && /indian/i.test(d.category)) ||
+              (d.cuisine && indianCuisines.some((c) => c.toLowerCase() === d.cuisine.toLowerCase()))
+          );
+        } else {
+          filtered = filtered.filter(
+            (d) =>
+              (d.category && d.category.toLowerCase().includes(catLower)) ||
+              (d.cuisine && d.cuisine.toLowerCase().includes(catLower))
+          );
+        }
       }
       if (currentSearch && currentSearch.trim()) {
         const q = currentSearch.toLowerCase();

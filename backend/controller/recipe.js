@@ -18,11 +18,28 @@ const getRecipes = async (req, res) => {
 
     // Category / Cuisine filter
     if (category && category.trim() && category.toLowerCase() !== "all") {
-      const catRegex = new RegExp(`^${category.trim()}$`, "i");
-      filter.$or = [
-        { category: catRegex },
-        { cuisine: catRegex }
-      ];
+      const catTrim = category.trim();
+      const catLower = catTrim.toLowerCase();
+
+      if (catLower === "indian") {
+        const indianCuisines = [
+          "indian", "north indian", "south indian", "punjabi", "awadhi", "mughlai",
+          "rajasthani", "kashmiri", "himachali", "bihari", "gujarati", "maharashtrian",
+          "goan", "chettinad", "kerala", "hyderabadi", "andhra", "karnataka", "bengali",
+          "odisha", "assamese", "naga", "khasi / meghalaya", "kolkata street food", "indo-chinese"
+        ];
+        const cuisineRegexes = indianCuisines.map((c) => new RegExp(`^${c}$`, "i"));
+        filter.$or = [
+          { category: /indian/i },
+          { cuisine: { $in: cuisineRegexes } }
+        ];
+      } else {
+        const catRegex = new RegExp(`^${catTrim}$`, "i");
+        filter.$or = [
+          { category: catRegex },
+          { cuisine: catRegex }
+        ];
+      }
     }
 
     // Text Search filter (name, category, cuisine, description)
