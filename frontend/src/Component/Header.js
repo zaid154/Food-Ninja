@@ -111,10 +111,10 @@ const Header = () => {
   const userInitial = user ? (user.name ? user.name[0].toUpperCase() : "M") : "M";
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 sm:px-10 py-4">
+    <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 sm:px-10 py-3.5">
         {/* Brand Logo (Leaf in dark bowl + FoodNinja) */}
-        <BrandLogo to="/" size="md" />
+        <BrandLogo to="/" size="md" hideSubtitle={true} />
 
         {/* Center Nav Links */}
         <nav className="hidden md:flex items-center gap-10">

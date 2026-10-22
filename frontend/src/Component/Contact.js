@@ -97,62 +97,33 @@ const Contact = () => {
           </div>
         </div>
 
-        {/* 4 Pastel Quick Support Category Cards (Identical to FoodNinja Category Theme) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          
-          {/* Card 1: Order Tracking (Mint Pastel) */}
-          <div className="rounded-2xl border border-slate-100 bg-[#f4faee] p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-xs text-emerald-700 mb-3.5">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="1" y="3" width="15" height="13" rx="2" />
-                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                <circle cx="5.5" cy="18.5" r="2.5" />
-                <circle cx="18.5" cy="18.5" r="2.5" />
-              </svg>
-            </div>
-            <h3 className="text-sm font-extrabold text-slate-900 mb-1">Order & Delivery Tracking</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">Real-time GPS status, rider contact, and address instructions.</p>
+        {/* Clean Topic Filter Pills (Replaces generic AI boxes with real interactive topics) */}
+        <div className="mb-8">
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5">
+            Select Inquiry Topic:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: "General Inquiry", label: "General Support & Feedback" },
+              { id: "Delivery Issue", label: "Live Order & Delivery Delay" },
+              { id: "Refund Claim", label: "Refunds & Payment Inquiries" },
+              { id: "Food Quality", label: "Food Quality & Packaging Check" },
+              { id: "Statutory Grievance", label: "Grievance & Legal Desk" },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setForm((prev) => ({ ...prev, subject: cat.id }))}
+                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+                  form.subject === cat.id
+                    ? "bg-slate-900 text-white shadow-xs"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
           </div>
-
-          {/* Card 2: Refunds & Billing (Peach Pastel) */}
-          <div className="rounded-2xl border border-slate-100 bg-[#fff3eb] p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-xs text-orange-600 mb-3.5">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <line x1="2" y1="10" x2="22" y2="10" />
-                <circle cx="7" cy="15" r="1" />
-              </svg>
-            </div>
-            <h3 className="text-sm font-extrabold text-slate-900 mb-1">Refunds & Invoicing</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">Failed UPI charges, pro-rata refund claims, and GST invoices.</p>
-          </div>
-
-          {/* Card 3: Food Quality (Warm Cream Pastel) */}
-          <div className="rounded-2xl border border-slate-100 bg-[#fff8e7] p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-xs text-amber-700 mb-3.5">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 2a8 8 0 0 0-8 8v1h16v-1a8 8 0 0 0-8-8z" />
-                <path d="M4 11v2a8 8 0 0 0 16 0v-2" />
-                <line x1="12" y1="21" x2="12" y2="23" />
-                <line x1="8" y1="23" x2="16" y2="23" />
-              </svg>
-            </div>
-            <h3 className="text-sm font-extrabold text-slate-900 mb-1">Quality & Missing Items</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">Spill reports, missing sauces, tamper-evident seal checks.</p>
-          </div>
-
-          {/* Card 4: Legal & Grievance (Sky Pastel) */}
-          <div className="rounded-2xl border border-slate-100 bg-[#f0f9ff] p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-xs text-sky-700 mb-3.5">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <circle cx="12" cy="11" r="3" />
-              </svg>
-            </div>
-            <h3 className="text-sm font-extrabold text-slate-900 mb-1">Grievance & Privacy Desk</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">Statutory dispute resolution and Data Protection queries.</p>
-          </div>
-
         </div>
 
         {/* 2-Column Main Section: Support Ticket Form + Corporate Credentials */}
@@ -308,8 +279,19 @@ const Contact = () => {
                 </div>
 
                 <div>
+                  <strong className="text-slate-900 block font-bold">Kitchen & Helpline Phone:</strong>
+                  <a href="tel:+919876543210" className="text-emerald-700 font-semibold hover:underline">+91 98765 43210</a>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">Kitchen Operational Hours: Mon–Sun, 9:00 AM – 11:30 PM</span>
+                </div>
+
+                <div>
                   <strong className="text-slate-900 block font-bold">Priority Customer Support:</strong>
                   <a href="mailto:support@foodninja.com" className="text-emerald-700 font-semibold hover:underline">support@foodninja.com</a>
+                </div>
+
+                <div>
+                  <strong className="text-slate-900 block font-bold">Food Safety & Compliance:</strong>
+                  <span className="text-slate-500">FSSAI Lic. No. 13324001000452 (Single Commercial Kitchen)</span>
                 </div>
 
                 <div>
