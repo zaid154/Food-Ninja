@@ -229,7 +229,7 @@ const Header = () => {
                     {user ? user.name || user.email : "Demo User"}
                   </p>
                   <p className="text-[11px] text-slate-400 truncate">
-                    {user ? user.email : "mohd.zaid@foodninja.com"}
+                    {user ? user.email : "foodninja@gmail.com"}
                   </p>
                 </div>
                 <Link

@@ -108,7 +108,7 @@ const Checkout = () => {
 
         const newOrder = {
             id: Date.now(),
-            userEmail: user ? user.email : "guest@foodninja.com",
+            userEmail: user ? user.email : "foodninja@gmail.com",
             customerName: name.trim(),
             address: fullAddress,
             phone: cleanPhone,

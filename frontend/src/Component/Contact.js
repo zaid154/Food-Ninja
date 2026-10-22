@@ -8,7 +8,7 @@ const FAQS = [
   },
   {
     q: "What if an item is missing, incorrect, or damaged in my delivery?",
-    a: "Please report any discrepancy within 2 hours of delivery. Submit a photo of the damaged seal or incorrect dish through this Help Center or email support@foodninja.com. Our support team will promptly dispatch a fresh replacement or issue an instant refund to your original payment method."
+    a: "Please report any discrepancy within 2 hours of delivery. Submit a photo of the damaged seal or incorrect dish through this Help Center or email foodninja@gmail.com. Our support team will promptly dispatch a fresh replacement or issue an instant refund to your original payment method."
   },
   {
     q: "How long does a payment refund take to reach my bank?",
@@ -20,7 +20,7 @@ const FAQS = [
   },
   {
     q: "How do I reach the Statutory Grievance Redressal Officer?",
-    a: "In compliance with the Consumer Protection (E-Commerce) Rules 2020 and IT Rules 2021, you can escalate unresolved concerns directly to our designated Grievance Officer at grievance@foodninja.com. Every formal ticket receives an acknowledgment within 24-48 hours and formal redressal within 15 business days."
+    a: "In compliance with the Consumer Protection (E-Commerce) Rules 2020 and IT Rules 2021, you can escalate unresolved concerns directly to our designated Grievance Officer at foodninja@gmail.com. Every formal ticket receives an acknowledgment within 24-48 hours and formal redressal within 15 business days."
   }
 ];
 
@@ -257,7 +257,7 @@ const Contact = () => {
 
                 <div>
                   <strong className="text-slate-900 block font-bold">Priority Customer Support:</strong>
-                  <a href="mailto:support@foodninja.com" className="text-emerald-700 font-semibold hover:underline">support@foodninja.com</a>
+                  <a href="mailto:foodninja@gmail.com" className="text-emerald-700 font-semibold hover:underline">foodninja@gmail.com</a>
                 </div>
 
                 <div>
@@ -267,7 +267,7 @@ const Contact = () => {
 
                 <div>
                   <strong className="text-slate-900 block font-bold">Statutory Grievance Redressal Desk:</strong>
-                  <a href="mailto:grievance@foodninja.com" className="text-emerald-700 font-semibold hover:underline">grievance@foodninja.com</a>
+                  <a href="mailto:foodninja@gmail.com" className="text-emerald-700 font-semibold hover:underline">foodninja@gmail.com</a>
                   <span className="text-[10px] text-slate-400 block mt-0.5">Turnaround: 24–48 hours statutory acknowledgment</span>
                 </div>
               </div>

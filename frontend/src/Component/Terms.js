@@ -228,7 +228,7 @@ const Terms = () => {
               <div className="mt-3 rounded-xl bg-white p-4 border border-emerald-200 text-xs space-y-1 text-slate-700">
                 <p><strong>Desk:</strong> Customer Care & Grievance Redressal Officer</p>
                 <p><strong>Restaurant Entity:</strong> FoodNinja Restaurant & Kitchen</p>
-                <p><strong>Official Email:</strong> <a href="mailto:grievance@foodninja.com" className="text-emerald-700 font-bold hover:underline">grievance@foodninja.com</a></p>
+                <p><strong>Official Email:</strong> <a href="mailto:foodninja@gmail.com" className="text-emerald-700 font-bold hover:underline">foodninja@gmail.com</a></p>
                 <p><strong>Kitchen Hub:</strong> FoodNinja Central Kitchen, Connaught Place, New Delhi 110001, India</p>
                 <p><strong>Turnaround:</strong> Acknowledgment within 24–48 hours; prompt resolution within 7 working days.</p>
               </div>

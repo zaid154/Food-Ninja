@@ -53,7 +53,7 @@ const Orders = () => {
     const fetchOrders = async () => {
         try {
             setLoading(true);
-            const userEmailParam = user && user.email ? user.email : "guest@foodninja.com";
+            const userEmailParam = user && user.email ? user.email : "foodninja@gmail.com";
             const res = await fetch(`${API_BASE_URL}/orders?email=${userEmailParam}`);
             const data = await res.json();
             if (data.orders && data.orders.length > 0) {

@@ -188,7 +188,7 @@ const Privacy = () => {
                 <li><strong>Right to Erasure (&quot;Right to be Forgotten&quot;):</strong> You may request the permanent deletion of your FoodNinja account and associated contact history, subject to statutory tax retention periods.</li>
               </ul>
               <p>
-                To exercise any of these rights, email our data desk at <a href="mailto:privacy@foodninja.com" className="text-emerald-700 font-bold hover:underline">privacy@foodninja.com</a>.
+                To exercise any of these rights, email our data desk at <a href="mailto:foodninja@gmail.com" className="text-emerald-700 font-bold hover:underline">foodninja@gmail.com</a>.
               </p>
             </div>
           </article>
@@ -210,7 +210,7 @@ const Privacy = () => {
               <div className="mt-3 rounded-xl bg-white p-4 border border-emerald-200 text-xs space-y-1 text-slate-700">
                 <p><strong>Designation:</strong> Data Protection & Grievance Redressal Officer</p>
                 <p><strong>Entity:</strong> FoodNinja Technologies</p>
-                <p><strong>Official Email:</strong> <a href="mailto:privacy@foodninja.com" className="text-emerald-700 font-bold hover:underline">privacy@foodninja.com</a></p>
+                <p><strong>Official Email:</strong> <a href="mailto:foodninja@gmail.com" className="text-emerald-700 font-bold hover:underline">foodninja@gmail.com</a></p>
                 <p><strong>Corporate Address:</strong> FoodNinja Corporate Hub, Connaught Place, New Delhi 110001, India</p>
                 <p><strong>Turnaround Time:</strong> Formal response within 48 business hours.</p>
               </div>
