@@ -372,9 +372,19 @@ const OrderDetail = () => {
                                                     <h4 className="text-sm font-semibold text-slate-800">
                                                         {it.name || it.title}
                                                     </h4>
-                                                    <p className="text-xs text-slate-400">
-                                                        {itemQty} × ₹{itemPrice}
-                                                    </p>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <p className="text-xs text-slate-400">
+                                                            {itemQty} × ₹{itemPrice}
+                                                        </p>
+                                                        {order.status === "Delivered" && (
+                                                            <Link
+                                                                to={`/restaurant/${it.id || it._id}#customer-reviews`}
+                                                                className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-800 hover:bg-emerald-100 transition"
+                                                            >
+                                                                Rate & Review ⭐
+                                                            </Link>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
 

@@ -29,6 +29,24 @@ const ProductView = () => {
       return "";
     }
   });
+  const [userEmail] = useState(() => {
+    try {
+      const logged = JSON.parse(localStorage.getItem("loggedUser") || "{}");
+      return (logged.email || "").trim().toLowerCase();
+    } catch {
+      return "";
+    }
+  });
+
+  // Delivered Order Eligibility State
+  const [eligibility, setEligibility] = useState({
+    checking: true,
+    eligible: false,
+    reason: "not_logged_in",
+    message: "",
+    orderId: null,
+  });
+
   const [reviewComment, setReviewComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState("");
@@ -88,9 +106,76 @@ const ProductView = () => {
     }
   };
 
+  // Check Delivered Order eligibility
+  const checkEligibility = async () => {
+    if (!product?.id) return;
+    try {
+      // 1. Check local storage orders first
+      try {
+        const savedOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+        const localDelivered = savedOrders.find(
+          (o) =>
+            o.status === "Delivered" &&
+            Array.isArray(o.items) &&
+            o.items.some((it) => String(it.id) === String(product.id))
+        );
+        if (localDelivered) {
+          setEligibility({
+            checking: false,
+            eligible: true,
+            orderId: localDelivered.id,
+            message: "Verified Buyer: Order delivered! You can write a review.",
+          });
+          return;
+        }
+      } catch (err) {
+        // ignore localStorage parsing errors
+      }
+
+      // 2. Check backend MongoDB delivered orders
+      if (userEmail) {
+        const res = await fetch(
+          `${API_BASE_URL}/recipes/${product.id}/review-eligibility?email=${encodeURIComponent(userEmail)}`
+        );
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success) {
+            setEligibility({
+              checking: false,
+              eligible: json.eligible,
+              reason: json.reason || (json.eligible ? "" : "not_ordered"),
+              message: json.message,
+              orderId: json.orderId || null,
+            });
+            return;
+          }
+        }
+      }
+
+      setEligibility({
+        checking: false,
+        eligible: false,
+        reason: userEmail ? "not_ordered" : "not_logged_in",
+        message: userEmail
+          ? "Only verified customers who have ordered and received this dish can write a review."
+          : "Log in with your registered email to check review eligibility.",
+        orderId: null,
+      });
+    } catch (err) {
+      setEligibility({
+        checking: false,
+        eligible: false,
+        reason: "error",
+        message: "Only verified buyers with a delivered order can write a review.",
+        orderId: null,
+      });
+    }
+  };
+
   useEffect(() => {
     fetchReviews();
-  }, [product?.id]);
+    checkEligibility();
+  }, [product?.id, userEmail]);
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
@@ -113,6 +198,8 @@ const ProductView = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userName: reviewName.trim(),
+          userEmail: userEmail || "",
+          orderId: eligibility.orderId || null,
           rating: reviewRating,
           comment: reviewComment.trim(),
         }),
@@ -120,7 +207,7 @@ const ProductView = () => {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        setReviewSuccess("Thank you! Your review has been submitted.");
+        setReviewSuccess("Thank you! Your verified review has been submitted.");
         setReviewComment("");
         if (data.review) {
           setReviews((prev) => [data.review, ...prev]);
@@ -520,17 +607,23 @@ const ProductView = () => {
                 <p className="font-semibold text-slate-800">
                   Customer Feedback ({displayReviewCount} {displayReviewCount === 1 ? "review" : "reviews"}):
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const el = document.getElementById("customer-reviews");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                    setShowReviewForm(true);
-                  }}
-                  className="text-emerald-700 hover:underline font-bold text-xs cursor-pointer"
-                >
-                  + Add Review
-                </button>
+                {eligibility.eligible ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const el = document.getElementById("customer-reviews");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                      setShowReviewForm(true);
+                    }}
+                    className="text-emerald-700 hover:underline font-bold text-xs cursor-pointer"
+                  >
+                    + Write Verified Review
+                  </button>
+                ) : (
+                  <span className="text-[11px] text-slate-400 italic">
+                    (Reviews unlocked after delivery)
+                  </span>
+                )}
               </div>
 
               {reviews.length > 0 ? (
@@ -544,7 +637,7 @@ const ProductView = () => {
                 </div>
               ) : (
                 <p className="italic text-slate-400">
-                  No customer reviews yet. Be the first to share your experience below!
+                  No customer reviews yet. Customers who receive this dish can share their review!
                 </p>
               )}
             </div>
@@ -564,25 +657,108 @@ const ProductView = () => {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setShowReviewForm(!showReviewForm);
-                setReviewError("");
-                setReviewSuccess("");
-              }}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs cursor-pointer self-start sm:self-auto"
-            >
-              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-              </svg>
-              <span>{showReviewForm ? "Close Form" : "Write a Review"}</span>
-            </button>
+            {/* Delivered Order Verification Check */}
+            {eligibility.eligible ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowReviewForm(!showReviewForm);
+                  setReviewError("");
+                  setReviewSuccess("");
+                }}
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs cursor-pointer self-start sm:self-auto"
+              >
+                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+                <span>{showReviewForm ? "Close Form" : "✍️ Rate & Review (Verified Buyer)"}</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-semibold">
+                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  <span>Review unlocked on Delivery</span>
+                </span>
+              </div>
+            )}
           </div>
 
-          {/* Inline Write a Review Form */}
-          {showReviewForm && (
+          {/* Delivered Order Verification Notice (when user hasn't had order delivered) */}
+          {!eligibility.eligible && !eligibility.checking && (
+            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-linear-to-r from-slate-50 to-emerald-50/20 p-4 sm:p-5 text-xs">
+              {eligibility.reason === "not_logged_in" && (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 text-slate-700">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 shrink-0 font-bold">
+                      🔒
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900">Have you received this dish?</p>
+                      <p className="text-slate-500 text-[11px]">Log in with your registered email to write a verified review.</p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/login"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-xs shrink-0 self-start sm:self-auto"
+                  >
+                    Log In to Review →
+                  </Link>
+                </div>
+              )}
+
+              {eligibility.reason === "order_pending" && (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 text-amber-900">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-800 shrink-0 font-bold">
+                      ⏳
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900">Your order is on the way!</p>
+                      <p className="text-slate-500 text-[11px]">{eligibility.message}</p>
+                    </div>
+                  </div>
+                  {eligibility.orderId && (
+                    <Link
+                      to={`/order/${eligibility.orderId}`}
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition shadow-xs shrink-0 self-start sm:self-auto"
+                    >
+                      Track Order →
+                    </Link>
+                  )}
+                </div>
+              )}
+
+              {eligibility.reason === "not_ordered" && (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 text-slate-700">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 shrink-0 font-bold">
+                      🍽️
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900">Taste it before reviewing!</p>
+                      <p className="text-slate-500 text-[11px]">
+                        To keep reviews 100% authentic, reviews unlock once your order for this dish is <strong>Delivered</strong>.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-xs shrink-0 self-start sm:self-auto cursor-pointer"
+                  >
+                    Order Now (₹{price})
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Inline Write a Review Form (Enabled only for Delivered Verified Buyers) */}
+          {showReviewForm && eligibility.eligible && (
             <form onSubmit={handleSubmitReview} className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/40 p-5 sm:p-6 space-y-4">
               <h3 className="text-sm font-bold text-slate-900">Write your review for {product.name}</h3>
 
