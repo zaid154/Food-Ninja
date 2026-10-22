@@ -46,7 +46,7 @@ const App = () => {
   return (
     <Provider store={appStore}>
       <UseContext.Provider value={{ user, setUser }}>
-        <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+        <div className="flex min-h-screen flex-col bg-white text-slate-900">
           {!isAdminRoute && <Header />}
           <main className="flex-1">
             <Outlet />

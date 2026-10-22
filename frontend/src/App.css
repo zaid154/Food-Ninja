@@ -5,16 +5,21 @@ html {
 }
 
 body {
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  background-color: #ffffff;
+}
+
+.font-doodle {
+  font-family: 'Caveat', cursive;
 }
 
 /* Skeleton loader with a moving shimmer sweep */
 .skeleton {
   position: relative;
   overflow: hidden;
-  background-color: #e2e8f0;
+  background-color: #f1f5f9;
 }
 
 .skeleton::after {
@@ -43,7 +48,6 @@ body {
   }
 }
 
-/* Hide scrollbar for category pills on Chrome/Safari/Firefox */
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
