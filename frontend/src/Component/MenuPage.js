@@ -197,29 +197,29 @@ const MenuPage = () => {
   const endItem = Math.min(currentPage * pagination.limit, pagination.totalItems);
 
   return (
-    <div className="bg-white min-h-[85vh] py-8 sm:py-12" ref={menuTopRef}>
+    <div className="bg-white min-h-[85vh] pt-2 sm:pt-4 pb-12" ref={menuTopRef}>
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         
         {/* ========================================================
-            1. UNIFIED PAGE HEADER & CONTROLS (Compact & Clean)
+            1. UNIFIED PAGE HEADER & CONTROLS (Compact & Above Fold)
         ======================================================== */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 mb-4 sm:mb-5">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                 Explore Our Menu
               </h1>
-              <span className="rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-0.5 text-xs font-bold border border-emerald-200/60">
+              <span className="rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-xs font-bold border border-emerald-200/60">
                 {pagination.totalItems || 38} Dishes
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
               Select a cuisine or search below to discover freshly prepared recipes
             </p>
           </div>
 
           {/* Sort Dropdown & Quick Reset */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 shrink-0">
             <div className="flex items-center gap-2">
               <label htmlFor="sort-select" className="text-xs font-bold text-slate-600">
                 Sort by:
@@ -228,7 +228,7 @@ const MenuPage = () => {
                 id="sort-select"
                 value={currentSort}
                 onChange={handleSortChange}
-                className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 shadow-2xs focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
               >
                 {SORT_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -242,7 +242,7 @@ const MenuPage = () => {
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 transition cursor-pointer"
+                className="rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 transition cursor-pointer"
                 title="Reset all filters"
               >
                 Reset All
@@ -252,10 +252,10 @@ const MenuPage = () => {
         </div>
 
         {/* ========================================================
-            2. 7 CATEGORY CARDS (Exact Mockup Row)
+            2. 7 CATEGORY CARDS (Responsive: Swipe on mobile, 7-col on laptop/desktop)
         ======================================================== */}
-        <div className="mb-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
+        <div className="mb-4 sm:mb-5">
+          <div className="flex sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-3.5 overflow-x-auto pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
             {MENU_CATEGORIES.map((cat) => {
               const isActive = currentCategory.toLowerCase() === cat.name.toLowerCase();
 
@@ -264,14 +264,14 @@ const MenuPage = () => {
                   key={cat.name}
                   type="button"
                   onClick={() => handleCategorySelect(isActive ? "All" : cat.name)}
-                  className={`group relative flex flex-col items-center justify-between p-3.5 sm:p-4 rounded-2xl transition-all duration-200 border text-center cursor-pointer ${cat.bg} ${
+                  className={`group relative flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl transition-all duration-200 border text-center cursor-pointer min-w-[100px] sm:min-w-0 shrink-0 sm:shrink ${cat.bg} ${
                     isActive
                       ? "border-emerald-600 shadow-md ring-2 ring-emerald-500/30 scale-[1.02]"
                       : "border-transparent hover:border-slate-200 hover:shadow-md hover:-translate-y-0.5"
                   }`}
                 >
                   {/* Circular Image */}
-                  <div className="h-14 w-14 sm:h-18 sm:w-18 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-2.5 shrink-0">
+                  <div className="h-13 w-13 sm:h-16 sm:w-16 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-2 shrink-0">
                     <img
                       src={cat.img}
                       alt={cat.name}
@@ -280,13 +280,13 @@ const MenuPage = () => {
                   </div>
 
                   {/* Category Name */}
-                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 mb-2 tracking-tight">
+                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 mb-1.5 tracking-tight whitespace-nowrap">
                     {cat.name}
                   </span>
 
                   {/* Circular Arrow Indicator */}
                   <div
-                    className={`flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full shadow-xs transition duration-200 ${
+                    className={`flex h-5 w-5 sm:h-5.5 sm:w-5.5 items-center justify-center rounded-full shadow-xs transition duration-200 ${
                       isActive
                         ? "bg-emerald-700 text-white"
                         : "bg-white text-slate-600 group-hover:bg-emerald-700 group-hover:text-white"
@@ -312,12 +312,12 @@ const MenuPage = () => {
             3. ACTIVE FILTERS STATUS BAR (Single, Clean, Not Duplicated)
         ======================================================== */}
         {(currentSearch || currentCategory !== "All") && (
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-6 p-2.5 px-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-5 p-2 px-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-bold text-slate-500">Active Filter:</span>
 
               {currentCategory !== "All" && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-900 px-3 py-1 font-bold border border-emerald-200 shadow-2xs">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-900 px-2.5 py-0.5 font-bold border border-emerald-200 shadow-2xs">
                   <span>Category: <strong>{currentCategory}</strong></span>
                   <button
                     type="button"
@@ -331,7 +331,7 @@ const MenuPage = () => {
               )}
 
               {currentSearch && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white text-slate-800 px-3 py-1 font-bold border border-slate-200 shadow-2xs">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white text-slate-800 px-2.5 py-0.5 font-bold border border-slate-200 shadow-2xs">
                   <span>Search: "<strong>{currentSearch}</strong>"</span>
                   <button
                     type="button"
