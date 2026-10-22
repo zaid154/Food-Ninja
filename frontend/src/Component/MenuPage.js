@@ -50,6 +50,81 @@ const SORT_OPTIONS = [
   { value: "rating", label: "Highest Rated" },
 ];
 
+const getSortOptionIcon = (value, isSelected) => {
+  const iconClass = `h-3.5 w-3.5 shrink-0 transition-colors ${
+    isSelected ? "text-emerald-600" : "text-slate-400 group-hover:text-slate-600"
+  }`;
+
+  switch (value) {
+    case "recommended":
+      return (
+        <svg
+          className={iconClass}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+        </svg>
+      );
+    case "price_asc":
+      return (
+        <svg
+          className={iconClass}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m3 16 4 4 4-4" />
+          <path d="M7 20V4" />
+          <path d="M11 4h4" />
+          <path d="M11 8h7" />
+          <path d="M11 12h10" />
+        </svg>
+      );
+    case "price_desc":
+      return (
+        <svg
+          className={iconClass}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m3 8 4-4 4 4" />
+          <path d="M7 4v16" />
+          <path d="M11 12h10" />
+          <path d="M11 16h7" />
+          <path d="M11 20h4" />
+        </svg>
+      );
+    case "rating":
+      return (
+        <svg
+          className={iconClass}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+};
+
 const MenuPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -273,47 +348,46 @@ const MenuPage = () => {
               <button
                 type="button"
                 onClick={() => setSortOpen((prev) => !prev)}
-                className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all duration-200 cursor-pointer shadow-xs ${
+                className={`group flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs transition-all duration-150 cursor-pointer shadow-xs ${
                   sortOpen
-                    ? "border-emerald-600 bg-white ring-2 ring-emerald-500/20 text-emerald-800"
+                    ? "border-emerald-600 bg-white ring-2 ring-emerald-500/15 text-slate-900"
                     : currentSort !== "recommended"
-                    ? "border-emerald-500 bg-emerald-50/70 text-emerald-900 hover:border-emerald-600"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50/80"
+                    ? "border-emerald-500/70 bg-emerald-50/60 text-emerald-950 font-semibold hover:border-emerald-600"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                 }`}
                 aria-haspopup="listbox"
                 aria-expanded={sortOpen}
                 title="Sort dishes"
               >
-                {/* Sliders / Sort Filter Icon */}
+                {/* Universal Sort Icon */}
                 <svg
-                  className="h-3.5 w-3.5 text-emerald-600 shrink-0"
+                  className={`h-3.5 w-3.5 shrink-0 transition-colors ${
+                    sortOpen || currentSort !== "recommended"
+                      ? "text-emerald-600"
+                      : "text-slate-400 group-hover:text-slate-600"
+                  }`}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2.2"
+                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  <line x1="4" y1="21" x2="4" y2="14" />
-                  <line x1="4" y1="10" x2="4" y2="3" />
-                  <line x1="12" y1="21" x2="12" y2="12" />
-                  <line x1="12" y1="8" x2="12" y2="3" />
-                  <line x1="20" y1="21" x2="20" y2="16" />
-                  <line x1="20" y1="12" x2="20" y2="3" />
-                  <line x1="1" y1="14" x2="7" y2="14" />
-                  <line x1="9" y1="8" x2="15" y2="8" />
-                  <line x1="17" y1="16" x2="23" y2="16" />
+                  <path d="m21 16-4 4-4-4" />
+                  <path d="M17 20V4" />
+                  <path d="m3 8 4-4 4 4" />
+                  <path d="M7 4v16" />
                 </svg>
 
-                <span className="text-slate-400 font-medium hidden sm:inline">Sort by:</span>
-                <span className="font-extrabold text-slate-900 tracking-tight">
+                <span className="text-slate-400 font-normal hidden sm:inline">Sort:</span>
+                <span className="font-semibold text-slate-800 tracking-tight">
                   {SORT_OPTIONS.find((o) => o.value === currentSort)?.label || "Recommended"}
                 </span>
 
                 {/* Rotating Chevron */}
                 <svg
                   className={`h-3 w-3 text-slate-400 transition-transform duration-200 shrink-0 ${
-                    sortOpen ? "rotate-180 text-emerald-600" : ""
+                    sortOpen ? "rotate-180 text-emerald-600" : "group-hover:text-slate-600"
                   }`}
                   viewBox="0 0 24 24"
                   fill="none"
@@ -326,12 +400,9 @@ const MenuPage = () => {
                 </svg>
               </button>
 
-              {/* Floating Themed Popover Menu */}
+              {/* Floating Popover Menu */}
               {sortOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-slate-100 bg-white p-1.5 shadow-xl shadow-slate-900/10 z-50">
-                  <div className="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
-                    Sort Dishes By
-                  </div>
+                <div className="absolute right-0 top-full mt-1.5 w-52 rounded-xl border border-slate-200 bg-white p-1 shadow-lg shadow-slate-900/10 z-50 overflow-hidden">
                   <div className="space-y-0.5" role="listbox">
                     {SORT_OPTIONS.map((opt) => {
                       const isSelected = currentSort === opt.value;
@@ -345,27 +416,24 @@ const MenuPage = () => {
                             updateQuery({ sort: opt.value, page: 1 });
                             setSortOpen(false);
                           }}
-                          className={`flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-xs transition duration-150 cursor-pointer text-left ${
+                          className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-xs transition duration-150 cursor-pointer text-left ${
                             isSelected
-                              ? "bg-emerald-50 text-emerald-900 font-extrabold"
+                              ? "bg-emerald-50 text-emerald-950 font-semibold"
                               : "text-slate-700 hover:bg-slate-50 hover:text-slate-900 font-medium"
                           }`}
                         >
-                          <div className="flex items-center gap-2">
-                            {opt.value === "recommended" && <span className="text-xs">✨</span>}
-                            {opt.value === "price_asc" && <span className="text-xs">📈</span>}
-                            {opt.value === "price_desc" && <span className="text-xs">📉</span>}
-                            {opt.value === "rating" && <span className="text-xs">⭐</span>}
+                          <div className="flex items-center gap-2.5">
+                            {getSortOptionIcon(opt.value, isSelected)}
                             <span>{opt.label}</span>
                           </div>
 
                           {isSelected && (
                             <svg
-                              className="h-3.5 w-3.5 text-emerald-700 shrink-0"
+                              className="h-3.5 w-3.5 text-emerald-600 shrink-0"
                               viewBox="0 0 24 24"
                               fill="none"
                               stroke="currentColor"
-                              strokeWidth="3"
+                              strokeWidth="2.5"
                               strokeLinecap="round"
                               strokeLinejoin="round"
                             >
@@ -385,22 +453,22 @@ const MenuPage = () => {
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="flex items-center gap-1.5 rounded-xl border border-rose-200/80 bg-rose-50/70 hover:bg-rose-100 px-3 py-1.5 text-xs font-bold text-rose-700 transition cursor-pointer shadow-2xs"
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/70 px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-700 transition cursor-pointer shadow-xs"
                 title="Reset all filters"
               >
                 <svg
-                  className="h-3 w-3"
+                  className="h-3 w-3 shrink-0"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2.5"
+                  strokeWidth="2.2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
                   <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                   <path d="M3 3v5h5" />
                 </svg>
-                <span>Reset All</span>
+                <span>Reset</span>
               </button>
             )}
           </div>
