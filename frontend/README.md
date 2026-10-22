@@ -1,108 +1,72 @@
-# 🍔 Food Ninja — Frontend Web App
+# Food Ninja - Frontend Client
 
-[![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.11-764ABC?logo=redux&logoColor=white)](https://redux-toolkit.js.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.2-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Parcel](https://img.shields.io/badge/Bundled_with-Parcel_2-85D3C9?logo=parcel&logoColor=black)](https://parceljs.org/)
-
-> **Food Ninja** is a fast, responsive restaurant food delivery single-page web application. Built with React 18, Redux Toolkit, and Tailwind CSS, it features real-time dish discovery, instant checkout flows, persistent wishlist & cart management, and seamless communication with the Express/MongoDB backend.
+This is the frontend single-page application for Food Ninja, built with **React 18**, **Redux Toolkit**, and **Tailwind CSS**, bundled with **Parcel**.
 
 ---
 
-## ✨ Features
+## Features
 
-### 🍲 1. Recipe & Food Discovery
-- **Restaurant Menu Catalog:** Live restaurant dish browsing fetched directly from MongoDB Atlas backend via Express REST endpoints.
-- **Detailed Dish View (`/restaurant/:id`):** Full ingredient list, nutritional details, preparation times, veg/non-veg tags, and direct cart actions.
-
-### 🔍 2. Dynamic Search & Smart Filtering
-- **Live Search:** Instant search filter across dish titles and categories.
-- **Multi-criteria Filters:** Filter by category (Biryani, North Indian, Pizza, Chinese, etc.) and pure vegetarian toggle.
-
-### 🛒 3. Cart & Instant "Buy Now" Checkout
-- **Redux-Powered Cart:** Add/remove items, adjust quantities with automatic price recalculation, and persist data in `localStorage`.
-- **Fast "Buy Now" Mode:** Skip the cart and jump straight to checkout for single-item instant purchasing.
-- **Cart Summary:** Live price breakdown including subtotal, delivery fee, taxes, and grand total.
-
-### ❤️ 4. Persistent Wishlist
-- **Save Favorites:** One-click heart toggle on any recipe dish.
-- **Header Badge Sync:** Real-time badge counter in the navigation header.
-
-### 🔐 5. User Authentication & Protected Routes
-- **Registration & Login:** Full backend user authentication against MongoDB with session hydration via React Context and `localStorage`.
-- **Protected Routes:** Route guards on `/checkout` ensuring safe transactions for authenticated users.
-
-### 📦 6. Order History & Management (`/orders`)
-- **Order Placement:** Integrated checkout with address, phone, and payment options saved directly to MongoDB Atlas.
-- **Live Order History:** View past orders, placed dates, itemized invoices, and order status tracking.
+- **Menu & Food Catalog:** Dynamic dish cards with dietary badges (Veg/Non-Veg), price, ratings, and instant "Add to Cart".
+- **Search & Filters:** Real-time search across categories (Fast Food, North Indian, Biryani, Chinese, etc.) and pure-veg filters.
+- **Cart & Wishlist:** Redux Toolkit slices (`cartSlice`, `wishlistSlice`) with automatic price recalculation and `localStorage` persistence.
+- **Checkout & Tracking:** Form validation for address and payment method, order summary preview, and real-time status tracking.
+- **Admin Dashboard:** Routes under `/admin` for restaurant owners to manage food items, customer orders, and inquiries.
+- **Responsive Layout:** Clean mobile-first design using Tailwind CSS utility classes.
 
 ---
 
-## 🛠️ Tech Stack
+## Project Structure
 
-| Category | Technology / Library |
-|---|---|
-| **Core Framework** | React 18 (Hooks, Context, Lazy, Suspense) |
-| **Routing** | React Router v6 (`createBrowserRouter`, `RouterProvider`, `Outlet`) |
-| **State Management** | Redux Toolkit (`@reduxjs/toolkit`), `react-redux` |
-| **Styling** | Tailwind CSS v4, PostCSS, Custom responsive styling |
-| **Icons** | Lucide React |
-| **Bundler & Build Tool** | Parcel 2, Babel |
-| **Testing** | Jest, React Testing Library |
-
----
-
-## 🚦 Getting Started
-
-### Prerequisites
-- Node.js (version 18.x or higher recommended)
-- Backend running on `http://localhost:5000`
-
-### 1. Install Dependencies
-```bash
-npm install
+```
+frontend/
+├── src/
+│   ├── Component/           # UI components and pages
+│   │   ├── admin/           # AdminOverview, AdminOrders, AdminFoods, AdminInquiries
+│   │   ├── food/            # FoodCard component
+│   │   ├── __tests__/       # Header, Cart, and Contact unit tests
+│   │   ├── Header.js        # Global navigation header
+│   │   ├── Footer.js        # Global footer
+│   │   ├── FoodMenu.js      # Main restaurant menu view
+│   │   ├── Cart.js          # Cart page
+│   │   ├── Checkout.js      # Order checkout form
+│   │   ├── Orders.js        # Customer orders list
+│   │   └── OrderDetail.js   # Single order invoice & tracking
+│   ├── mockData/            # JSON fixtures for Jest tests
+│   ├── utils/               # Redux store, slices, and constants
+│   │   ├── Store.js         # Configured Redux store
+│   │   ├── cartSlice.js     # Cart state logic
+│   │   ├── wishlistSlice.js # Wishlist state logic
+│   │   └── Constants.js     # API endpoints and static assets
+│   ├── App.css              # Global styles & Tailwind directives
+│   └── App.js               # Router configuration & root layout
+├── index.html               # Main HTML template
+├── jest.config.js           # Jest configuration
+└── package.json
 ```
 
-### 2. Configure Environment
-Create or verify `.env`:
+---
+
+## Available Scripts
+
+In the frontend directory, you can run:
+
+### `npm start`
+Starts the Parcel development server on [http://localhost:1234](http://localhost:1234).  
+Hot-reloading is enabled by default.
+
+### `npm test`
+Runs the Jest test suite using React Testing Library in band mode.
+
+### `npm run build`
+Compiles and bundles the application for production inside the `dist/` folder.
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the `frontend/` directory if you need to override the backend API URL:
+
 ```env
-REACT_APP_API_URL=http://localhost:5000/api
+API_BASE_URL=http://localhost:5005/api
 ```
-
-### 3. Start Development Server
-```bash
-npm start
-# Development server running at: http://localhost:1234
-```
-
----
-
-## 🗺️ Application Routes
-
-| Route | Access | Description |
-|---|---|---|
-| `/` | Public | Home / Food menu explore page with search, filters, and cards |
-| `/restaurant/:id` | Public | Dish details, ingredients, nutrition, and ordering |
-| `/cart` | Public | Cart items, quantity controls, and pricing breakdown |
-| `/wishlist` | Public | Favorited items with 1-click cart transfer |
-| `/checkout` | **Protected** | Shipping address, payment method selection, order placement |
-| `/orders` | Public/Auth | Order history, status badges, and invoice breakdown |
-| `/login` | Public | User authentication login |
-| `/register` | Public | New account registration |
-| `/about` | Public | About the platform and story |
-| `/contact` | Public | Contact support form |
-| `/admin` | Admin | Store inventory and orders dashboard |
-
----
-
-## 👨‍💻 Author
-
-**Mohd Zaid**
-- GitHub: [@zaid154](https://github.com/zaid154)
-- Portfolio: [portfolio-zeta-drab-97.vercel.app](https://portfolio-zeta-drab-97.vercel.app/)
-
----
-
-## 📄 License
-
-This project is licensed under the [ISC License](LICENSE).
+*(Defaults to `http://localhost:5005/api` in development).*

@@ -1,149 +1,81 @@
-# 🍔 Food Ninja — Full-Stack MERN Food Delivery Platform
+# Food Ninja - Full Stack Food Delivery Web App
 
-> A full-stack **MERN (MongoDB, Express.js, React, Node.js)** restaurant food ordering and delivery application. Features interactive dining menus, Redux Toolkit state architecture, live order status progression, and an administrative restaurant catalog control suite.
-
----
-
-## 👨‍💻 Author & Developer
-
-* **Developer Name**: Mohd Zaid
-* **Portfolio**: [portfolio-zeta-drab-97.vercel.app](https://portfolio-zeta-drab-97.vercel.app/)
-* **GitHub**: [github.com/zaid154](https://github.com/zaid154)
-* **LinkedIn**: [linkedin.com/in/mohd-zaid-794090231/](https://www.linkedin.com/in/mohd-zaid-794090231/)
-* **Email**: [zaidm1323@gmail.com](mailto:zaidm1323@gmail.com)
+Food Ninja is a full-stack food ordering platform built using the MERN stack (MongoDB, Express, React, Node.js). It includes a customer-facing ordering experience with real-time cart and order tracking, alongside an admin dashboard for managing dishes, orders, and customer inquiries.
 
 ---
 
-## 🌟 Key Features & Capabilities
+## Live Demo & Links
 
-### 🍕 1. Restaurant Food Ordering & 38-Dish Catalog
-- **Interactive Multi-Cuisine Menu**: 38 curated restaurant dishes categorized by Fast Food, North Indian, Chinese, Italian, and Healthy Bowls.
-- **Detailed Nutritional Profiles**: Calorie counter per serving, preparation times, dietary tags (Pure Veg / Non-Veg badges), ingredient checklists, and step-by-step chef instructions.
-- **Dynamic Multi-Parameter Filters**: Real-time filtering by price range, star ratings (4.5★+), prep time (<25 mins), and cuisine tags.
-
-### ⚡ 2. Redux Toolkit Centralized State Management
-- **Cart & Wishlist Slices**: Real-time quantity recalculation, promotional coupon discounts, delivery fee thresholds, and persistent state across reloads.
-- **Optimistic UI**: Instant cart addition and badge updates without interface lag.
-
-### 📦 3. Real-Time Order Lifecycle & Status Progression
-- **Order State Machine**:
-  $$\text{Placed} \longrightarrow \text{Preparing in Kitchen} \longrightarrow \text{Out for Delivery} \longrightarrow \text{Delivered}$$
-- **Interactive Tracking Visualizer**: Live stepper timeline displaying real-time delivery estimates, delivery partner contact, and order summary invoices.
-
-### 🛡️ 4. Role-Based Admin Management Console
-- **Restaurant Catalog CRUD**: Admins can add new recipes, adjust real-time pricing, toggle in-stock status, and manage incoming customer orders.
+- **Frontend:** [food-ninja.vercel.app](https://portfolio-zeta-drab-97.vercel.app/)
+- **Backend API:** [food-ninja-api.onrender.com](https://food-ninja-backend.onrender.com)
+- **Author:** Mohd Zaid ([GitHub](https://github.com/zaid154) | [LinkedIn](https://www.linkedin.com/in/mohd-zaid-794090231/))
 
 ---
 
-## 🛠️ Technology Stack
+## Features
 
-| Layer | Technologies Used |
-|---|---|
-| **Frontend Framework** | React 18, React Router v6, Parcel Bundler 2.x |
-| **State Management** | Redux Toolkit (`@reduxjs/toolkit`), React-Redux |
-| **Styling & UI** | Tailwind CSS v4, Lucide React Icons |
-| **Backend API** | Node.js, Express.js 5.x REST API Architecture |
-| **Database & ODM** | MongoDB Atlas Cloud, Mongoose ODM 9.x |
-| **Testing Suite** | Jest, React Testing Library (`@testing-library/react`), Babel |
-| **Security & Utilities** | CORS, Dotenv, Bcryptjs, JSON Web Tokens |
+### Customer Experience
+- **Menu Browsing & Search:** Explore restaurant dishes across categories (Biryani, North Indian, Fast Food, Chinese, Desserts) with instant text search and pure-veg filters.
+- **Dish Details:** View detailed nutritional info, ingredients, delivery estimates, and price per dish.
+- **Cart & Wishlist:** Redux Toolkit-backed cart with quantity controls, subtotal calculations, and `localStorage` persistence so cart items remain saved on page refresh.
+- **Order Placement & Tracking:** Seamless checkout with address and payment details. Dedicated order history and tracking page with live status updates (`Placed` -> `Preparing` -> `Out for Delivery` -> `Delivered`).
+- **User Authentication:** Simple signup and login with role management (`user` / `admin`).
+
+### Admin Dashboard (`/admin`)
+- **Menu Management:** Add new dishes, edit pricing and descriptions, or remove items.
+- **Order Management:** View all incoming orders, customer details, and update live delivery status.
+- **Inquiry Management:** Review customer contact messages with direct one-click email and phone call actions.
 
 ---
 
-## 📁 Project Architecture & Layout
+## Tech Stack
+
+- **Frontend:** React 18, React Router v6, Redux Toolkit, Tailwind CSS v4, Parcel
+- **Backend:** Node.js, Express.js 5, Mongoose ODM
+- **Database:** MongoDB Atlas Cloud
+- **Testing:** Jest, React Testing Library (100% pass)
+
+---
+
+## Project Structure
 
 ```
 Food Ninja/
 ├── backend/
 │   ├── config/
-│   │   └── connectionDb.js      # MongoDB Atlas connection handler
-│   ├── controller/
-│   │   ├── order.js             # Order placement & status updates
-│   │   ├── recipe.js            # Restaurant recipe CRUD controller
-│   │   └── user.js              # User authentication & profile controller
-│   ├── models/
-│   │   ├── Order.js             # Mongoose schema for orders & tracking
-│   │   ├── Recipe.js            # Mongoose schema for dishes & nutrition
-│   │   └── User.js              # Mongoose schema for users & RBAC roles
-│   ├── routes/
-│   │   ├── order.js             # /api/orders endpoints
-│   │   ├── recipe.js            # /api/recipes endpoints
-│   │   └── user.js              # /api/users endpoints
-│   ├── server.js                # Express 5 server initialization
-│   ├── package.json             # Backend dependencies
-│   └── .env                     # MongoDB URI & server secrets
+│   │   └── connectionDb.js     # MongoDB connection setup
+│   ├── controller/             # Business logic
+│   │   ├── inquiry.js          # Contact messages controller
+│   │   ├── order.js            # Orders & status progression
+│   │   ├── recipe.js           # Menu dishes CRUD
+│   │   └── user.js             # Registration & login
+│   ├── models/                 # Mongoose schemas (User, Recipe, Order, Inquiry)
+│   ├── routes/                 # Express route definitions
+│   ├── seedData.js             # Initial database seeder script
+│   └── server.js               # Express application entry point
 ├── frontend/
 │   ├── src/
-│   │   ├── Component/           # UI components, cards, navigation & modals
-│   │   ├── Store/               # Redux Toolkit store, cartSlice, userSlice
-│   │   ├── utils/               # Constants, mock data, API wrappers
-│   │   └── App.js               # React Router layout & routes
-│   ├── package.json             # Frontend dependencies & Parcel scripts
-│   └── index.html
-└── README.md                    # Technical documentation
+│   │   ├── Component/          # UI views, pages, and components
+│   │   │   ├── admin/          # Admin dashboard pages
+│   │   │   ├── food/           # Food cards and list items
+│   │   │   └── __tests__/      # Jest & React Testing Library test suite
+│   │   ├── mockData/           # Test fixtures
+│   │   ├── utils/              # Redux store, slices, and constants
+│   │   ├── App.css             # Tailwind imports & custom utilities
+│   │   └── App.js              # Root router & layout
+│   ├── index.html              # Parcel HTML entry point
+│   ├── jest.config.js          # Jest unit test configuration
+│   └── package.json
+└── README.md
 ```
 
 ---
 
-## 🗄️ Database Schemas & Models
-
-### 1. Recipe Model (`Recipe.js`)
-- `id` (Number, unique)
-- `name` (String, required)
-- `category` (String, default "Fast Food")
-- `price` (Number, required)
-- `image` (String, CDN URL)
-- `isVeg` (Boolean, default true)
-- `rating` (Number, default 4.5)
-- `reviewCount` (Number)
-- `deliveryTime` (String, e.g., "25-30 mins")
-- `cuisine` (String, e.g., "Indian", "Italian")
-- `caloriesPerServing` (Number)
-- `ingredients` (Array of Strings)
-- `instructions` (Array of Strings)
-
-### 2. Order Model (`Order.js`)
-- `id` (Number, unique)
-- `userEmail` (String)
-- `customerName` (String)
-- `phone` (String)
-- `address` (String)
-- `payment` (String, e.g., "Cash on Delivery", "UPI")
-- `items` (Array of order item snapshots)
-- `total` (Number)
-- `status` (Enum: `Placed`, `Preparing`, `Out for Delivery`, `Delivered`, `Cancelled`)
-- `date` (String / Timestamps)
-
----
-
-## 🔌 API Endpoints Reference
-
-| Method | Endpoint | Description | Access |
-|---|---|---|---|
-| `GET` | `/api/recipes` | Fetch all 38 restaurant menu dishes | Public |
-| `GET` | `/api/recipes/:id` | Fetch detailed dish information & recipe | Public |
-| `POST` | `/api/recipes` | Add new recipe dish to catalog | Admin |
-| `PUT` | `/api/recipes/:id` | Update recipe price, details, or stock | Admin |
-| `DELETE` | `/api/recipes/:id` | Remove dish from restaurant menu | Admin |
-| `POST` | `/api/orders` | Create and place a new food order | Customer |
-| `GET` | `/api/orders` | Fetch customer orders or all orders | Customer / Admin |
-| `PUT` | `/api/orders/:id/status`| Update order status progression | Admin / Rider |
-| `POST` | `/api/users/login` | User/Admin authentication | Public |
-| `POST` | `/api/users/register` | Register customer account | Public |
-
----
-
-## 🔑 Pre-Seeded Accounts
-
-- **Store Admin**: `admin@foodninja.com` / `admin123`
-- **Customer User**: `zaid@foodninja.com` / `password123`
-
----
-
-## 🚀 Quick Start & Installation
+## Getting Started Locally
 
 ### Prerequisites
-- Node.js v18.0.0 or higher
-- MongoDB Atlas cluster or local MongoDB instance
+- Node.js (v18 or higher)
+- MongoDB Atlas URI or local MongoDB
 
 ### 1. Backend Setup
 ```bash
@@ -151,60 +83,71 @@ cd backend
 npm install
 ```
 
-Configure `backend/.env`:
+Create a `.env` file inside `backend/`:
 ```env
 PORT=5005
-MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/food_ninja?retryWrites=true&w=majority
+MONGO_URI=your_mongodb_connection_string
+```
+
+Seed the database with sample dishes and accounts:
+```bash
+npm run seed
 ```
 
 Start the backend server:
 ```bash
-npm run dev
-# Server running at: http://localhost:5005
+npm start
+# Server running at http://localhost:5005
 ```
 
 ### 2. Frontend Setup
-Open a new terminal window:
+In a separate terminal:
 ```bash
 cd frontend
 npm install
 npm start
-# Parcel application running at: http://localhost:1234
+# Application running at http://localhost:1234
+```
+
+### Running Tests
+To run frontend unit and integration tests:
+```bash
+cd frontend
+npm test
 ```
 
 ---
 
-## 🌐 Production Deployment Guide
+## Default Demo Accounts
 
-### A. Deploy Backend on Render (Web Service)
-1. Go to [render.com](https://render.com/) and click **New +** ➔ **Web Service**.
-2. Connect your GitHub repository (`Food-Ninja`).
-3. Set the following configuration:
-   - **Name**: `food-ninja-backend`
-   - **Root Directory**: `backend`
-   - **Environment**: `Node`
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-4. Add **Environment Variables**:
-   - `MONGO_URI` = `mongodb+srv://<username>:<password>@cluster0.mongodb.net/food_ninja?retryWrites=true&w=majority`
-5. Click **Deploy Web Service**.
-6. Copy your live backend URL (e.g., `https://food-ninja-backend.onrender.com`).
-
-### B. Deploy Frontend on Vercel
-1. Go to [vercel.com](https://vercel.com/) and click **Add New** ➔ **Project**.
-2. Import the `Food-Ninja` repository.
-3. In **Project Configuration**:
-   - **Root Directory**: Click edit and select `frontend`.
-   - **Framework Preset**: `Other` (or auto-detected Parcel)
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-4. Add **Environment Variable**:
-   - `REACT_APP_API_URL` = `https://<your-render-backend-url>/api`
-5. Click **Deploy**.
-6. Your Food Ninja web application is now 100% live and globally accessible!
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@foodninja.com` | `admin123` |
+| User | `zaid@foodninja.com` | `password123` |
 
 ---
 
-## 📄 License
+## API Endpoints
 
-Engineered and maintained by **Mohd Zaid**. Released under the [MIT License](LICENSE).
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/recipes` | Get all menu dishes |
+| `GET` | `/api/recipes/:id` | Get single dish by ID |
+| `POST` | `/api/recipes` | Add new dish (Admin) |
+| `PUT` | `/api/recipes/:id` | Update dish details (Admin) |
+| `DELETE`| `/api/recipes/:id` | Delete dish (Admin) |
+| `GET` | `/api/orders` | Get orders (filtered by user or all for admin) |
+| `POST` | `/api/orders` | Place a new order |
+| `PUT` | `/api/orders/:id/status` | Update order delivery status |
+| `POST` | `/api/users/register` | Register new user account |
+| `POST` | `/api/users/login` | Login user |
+| `GET` | `/api/contact` | Get all customer inquiries (Admin) |
+| `POST` | `/api/contact` | Submit contact form inquiry |
+| `PUT` | `/api/contact/:id/reply` | Record reply to customer inquiry |
+| `DELETE`| `/api/contact/:id` | Delete inquiry (Admin) |
+
+---
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
