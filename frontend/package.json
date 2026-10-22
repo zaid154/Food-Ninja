@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Food Ninja Frontend Web Application",
   "scripts": {
-    "postinstall": "node scripts/fix-native-dll.cjs",
     "start": "parcel index.html",
     "dev": "parcel index.html",
     "build": "parcel build index.html --dist-dir dist",

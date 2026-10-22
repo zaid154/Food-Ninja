@@ -2,31 +2,31 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import "./App.css";
 
-import Header from "./src/Component/Header";
-import FoodMenu from "./src/Component/FoodMenu";
-import Cart from "./src/Component/Cart";
-import Footer from "./src/Component/Footer";
-import About from "./src/Component/About";
-import Contact from "./src/Component/Contact";
-import Error from "./src/Component/Error";
-import ProductView from "./src/Component/ProductView";
-import UseContext from "./src/Component/Usercontext";
-import Login from "./src/Component/Login";
-import Register from "./src/Component/Register";
-import Wishlist from "./src/Component/Wishlist";
-import Checkout from "./src/Component/Checkout";
-import Orders from "./src/Component/Orders";
-import OrderDetail from "./src/Component/OrderDetail";
-import ProtectedRoute from "./src/Component/ProtectedRoute";
-import Admin from "./src/Component/Admin";
-import AdminOverview from "./src/Component/admin/AdminOverview";
-import AdminOrders from "./src/Component/admin/AdminOrders";
-import AdminFoods from "./src/Component/admin/AdminFoods";
-import AdminInquiries from "./src/Component/admin/AdminInquiries";
+import Header from "./Component/Header";
+import FoodMenu from "./Component/FoodMenu";
+import Cart from "./Component/Cart";
+import Footer from "./Component/Footer";
+import About from "./Component/About";
+import Contact from "./Component/Contact";
+import Error from "./Component/Error";
+import ProductView from "./Component/ProductView";
+import UseContext from "./Component/Usercontext";
+import Login from "./Component/Login";
+import Register from "./Component/Register";
+import Wishlist from "./Component/Wishlist";
+import Checkout from "./Component/Checkout";
+import Orders from "./Component/Orders";
+import OrderDetail from "./Component/OrderDetail";
+import ProtectedRoute from "./Component/ProtectedRoute";
+import Admin from "./Component/Admin";
+import AdminOverview from "./Component/admin/AdminOverview";
+import AdminOrders from "./Component/admin/AdminOrders";
+import AdminFoods from "./Component/admin/AdminFoods";
+import AdminInquiries from "./Component/admin/AdminInquiries";
 
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
-import appStore from "./src/utils/Store";
+import appStore from "./utils/Store";
 
 const App = () => {
   const [user, setUser] = useState(() => {
