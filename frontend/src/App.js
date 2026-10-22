@@ -10,6 +10,8 @@ import Cart from "./Component/Cart";
 import Footer from "./Component/Footer";
 import About from "./Component/About";
 import Contact from "./Component/Contact";
+import Terms from "./Component/Terms";
+import Privacy from "./Component/Privacy";
 import Error from "./Component/Error";
 import ProductView from "./Component/ProductView";
 import UseContext from "./Component/Usercontext";
@@ -70,6 +72,9 @@ const appRouter = createBrowserRouter([
       { path: "/menu", element: <MenuPage /> },
       { path: "/about", element: <About /> },
       { path: "/contact", element: <Contact /> },
+      { path: "/help", element: <Contact /> },
+      { path: "/terms", element: <Terms /> },
+      { path: "/privacy", element: <Privacy /> },
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
       { path: "/wishlist", element: <Wishlist /> },

@@ -23,7 +23,7 @@ const Footer = () => {
                 <Link to="/" className="hover:text-emerald-400 transition-colors">Home</Link>
               </li>
               <li>
-                <a href="#menu" className="hover:text-emerald-400 transition-colors">Menu</a>
+                <Link to="/menu" className="hover:text-emerald-400 transition-colors">Menu</Link>
               </li>
               <li>
                 <Link to="/about" className="hover:text-emerald-400 transition-colors">About</Link>
@@ -36,16 +36,16 @@ const Footer = () => {
 
           {/* Col 3: Support */}
           <div>
-            <h4 className="text-sm font-semibold text-white mb-4">Support</h4>
+            <h4 className="text-sm font-semibold text-white mb-4">Support & Legal</h4>
             <ul className="space-y-2.5 text-xs text-slate-400">
               <li>
-                <Link to="/contact" className="hover:text-emerald-400 transition-colors">Help Center</Link>
+                <Link to="/contact" className="hover:text-emerald-400 transition-colors">Help Center & Support</Link>
               </li>
               <li>
-                <Link to="/about" className="hover:text-emerald-400 transition-colors">Terms & Conditions</Link>
+                <Link to="/terms" className="hover:text-emerald-400 transition-colors">Terms & Conditions</Link>
               </li>
               <li>
-                <Link to="/about" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link>
+                <Link to="/privacy" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link>
               </li>
             </ul>
           </div>
