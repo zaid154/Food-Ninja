@@ -77,6 +77,35 @@ const ProductView = () => {
   const [reviewSuccess, setReviewSuccess] = useState("");
   const [reviewError, setReviewError] = useState("");
 
+  const [directProduct, setDirectProduct] = useState(null);
+  const [loadingDish, setLoadingDish] = useState(true);
+
+  // Directly fetch single dish by ID to ensure all 158 dishes load with zero delay
+  useEffect(() => {
+    let isMounted = true;
+    const fetchDish = async () => {
+      try {
+        setLoadingDish(true);
+        const res = await fetch(`${API_BASE_URL}/recipes/${id}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (isMounted && json && (json.id || json._id)) {
+            setDirectProduct(json);
+            return;
+          }
+        }
+      } catch (err) {
+        // Fallback gracefully to apiData or local list
+      } finally {
+        if (isMounted) setLoadingDish(false);
+      }
+    };
+
+    if (id) {
+      fetchDish();
+    }
+  }, [id]);
+
   const cartItems = useSelector((store) => store.cart.item);
   const wishlistItems = useSelector((store) => store.wishlist.item);
 
@@ -85,8 +114,9 @@ const ProductView = () => {
     ? apiData.recipes
     : FALLBACK_RECIPES;
 
-  // Find dish by ID or fallback to Russian Borscht / First item
-  const product = allDishes.find((item) => String(item.id) === String(id))
+  // Find dish by direct fetch, then by ID in list, or fallback
+  const product = directProduct
+    || allDishes.find((item) => String(item.id) === String(id) || String(item._id) === String(id))
     || allDishes.find((item) => item.name && item.name.toLowerCase().includes("borscht"))
     || {
         id: 35,

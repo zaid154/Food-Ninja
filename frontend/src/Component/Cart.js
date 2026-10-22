@@ -69,19 +69,31 @@ const Cart = () => {
                 className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md"
               >
                 <div className="flex flex-col gap-4 sm:flex-row">
-                  <div className="h-28 w-full sm:w-36 shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                  <Link
+                    to={`/restaurant/${item.id}`}
+                    className="group/img block h-28 w-full sm:w-36 shrink-0 overflow-hidden rounded-xl bg-slate-100 cursor-pointer"
+                    title={`View ${item.name} details`}
+                  >
                     <img
                       src={item.image}
                       alt={item.name}
                       loading="lazy"
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover/img:scale-105"
                     />
-                  </div>
+                  </Link>
 
                   <div className="flex flex-1 flex-col justify-between">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <h2 className="text-base font-bold text-slate-900">{item.name}</h2>
+                        <Link
+                          to={`/restaurant/${item.id}`}
+                          className="block group/title"
+                          title={`View ${item.name} details`}
+                        >
+                          <h2 className="text-base font-bold text-slate-900 group-hover/title:text-emerald-700 transition cursor-pointer">
+                            {item.name}
+                          </h2>
+                        </Link>
                         <span className="text-xs font-semibold text-emerald-600">{item.cuisine || item.category}</span>
                       </div>
                       <p className="text-base font-black text-slate-900">
