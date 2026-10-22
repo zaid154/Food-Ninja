@@ -391,8 +391,14 @@ const MenuPage = () => {
           </div>
         ) : dishes.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-16 text-center my-6">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-3 text-2xl">
-              🍽️
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-3">
+              <svg viewBox="0 0 24 24" className="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                <line x1="6" y1="6" x2="6" y2="4" />
+                <line x1="10" y1="6" x2="10" y2="4" />
+                <line x1="14" y1="6" x2="14" y2="4" />
+              </svg>
             </div>
             <h3 className="text-base font-bold text-slate-800">No Dishes Found</h3>
             <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">

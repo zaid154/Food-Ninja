@@ -514,19 +514,27 @@ const ProductView = () => {
                   <h3 className="text-sm font-black text-slate-900 mb-2.5">Key Features</h3>
                   <ul className="space-y-2 text-xs text-slate-600">
                     <li className="flex items-center gap-2">
-                      <span className="text-emerald-600 font-bold">✓</span>
+                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
                       <span>{isBorscht ? "Authentic Russian recipe" : `Authentic ${product.cuisine || "chef"} recipe`}</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-emerald-600 font-bold">✓</span>
+                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
                       <span>Made with fresh ingredients</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-emerald-600 font-bold">✓</span>
+                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
                       <span>Rich in authentic taste & nutrients</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-emerald-600 font-bold">✓</span>
+                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
                       <span>{isBorscht ? "Served with sour cream and herbs" : "Prepared fresh to order"}</span>
                     </li>
                   </ul>
@@ -672,11 +680,11 @@ const ProductView = () => {
                   <path d="M12 20h9" />
                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                 </svg>
-                <span>{showReviewForm ? "Close Form" : "✍️ Rate & Review (Verified Buyer)"}</span>
+                <span>{showReviewForm ? "Close Form" : "Rate & Review (Verified Buyer)"}</span>
               </button>
             ) : (
               <div className="flex items-center gap-2 self-start sm:self-auto">
-                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-semibold">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-semibold">
                   <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -693,8 +701,11 @@ const ProductView = () => {
               {eligibility.reason === "not_logged_in" && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3 text-slate-700">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 shrink-0 font-bold">
-                      🔒
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 shrink-0">
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
                     </div>
                     <div>
                       <p className="font-bold text-slate-900">Have you received this dish?</p>
@@ -713,8 +724,11 @@ const ProductView = () => {
               {eligibility.reason === "order_pending" && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3 text-amber-900">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-800 shrink-0 font-bold">
-                      ⏳
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-800 shrink-0">
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                      </svg>
                     </div>
                     <div>
                       <p className="font-bold text-slate-900">Your order is on the way!</p>
@@ -735,8 +749,14 @@ const ProductView = () => {
               {eligibility.reason === "not_ordered" && (
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3 text-slate-700">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 shrink-0 font-bold">
-                      🍽️
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 shrink-0">
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                        <line x1="6" y1="6" x2="6" y2="4" />
+                        <line x1="10" y1="6" x2="10" y2="4" />
+                        <line x1="14" y1="6" x2="14" y2="4" />
+                      </svg>
                     </div>
                     <div>
                       <p className="font-bold text-slate-900">Taste it before reviewing!</p>
@@ -764,14 +784,20 @@ const ProductView = () => {
 
               {reviewSuccess && (
                 <div className="rounded-xl bg-emerald-100 border border-emerald-300 px-3.5 py-2 text-xs font-semibold text-emerald-800 flex items-center gap-2">
-                  <span>✓</span>
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
                   <span>{reviewSuccess}</span>
                 </div>
               )}
 
               {reviewError && (
                 <div className="rounded-xl bg-rose-100 border border-rose-300 px-3.5 py-2 text-xs font-semibold text-rose-800 flex items-center gap-2">
-                  <span>⚠</span>
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 text-rose-700 shrink-0" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
                   <span>{reviewError}</span>
                 </div>
               )}

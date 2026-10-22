@@ -235,7 +235,7 @@ const OrderDetail = () => {
                             <div className="flex items-center gap-2.5">
                                 <h1 className="text-xl font-bold tracking-tight text-slate-900">
                                     {isDelivered
-                                        ? "Order Delivered 🎉"
+                                        ? "Order Delivered"
                                         : isCancelled
                                         ? "Order Cancelled"
                                         : "Order Confirmed & Preparing"}
@@ -381,7 +381,7 @@ const OrderDetail = () => {
                                                                 to={`/restaurant/${it.id || it._id}#customer-reviews`}
                                                                 className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-800 hover:bg-emerald-100 transition"
                                                             >
-                                                                Rate & Review ⭐
+                                                                Rate & Review
                                                             </Link>
                                                         )}
                                                     </div>
