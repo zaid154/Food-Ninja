@@ -105,18 +105,18 @@ const Privacy = () => {
                 04
               </span>
               <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                Authorized Disclosures to Essential Service Partners
+                Internal Kitchen Preparation & Fulfillment Disclosures
               </h2>
             </div>
             <div className="text-xs sm:text-sm text-slate-600 space-y-3 leading-relaxed">
               <p>
-                We disclose limited personal data strictly on a need-to-know operational basis:
+                FoodNinja is a direct restaurant and kitchen; we do not share your customer profile with third-party restaurant networks. Data is utilized strictly within our operations:
               </p>
               <ul className="list-disc pl-5 space-y-1.5">
-                <li><strong>Restaurant Kitchens:</strong> Receive order items, special cooking instructions, and customer first name.</li>
-                <li><strong>Dispatch Drivers & Couriers:</strong> Receive delivery address, contact name, and masked phone number solely to execute physical handover.</li>
-                <li><strong>Payment Processors:</strong> Transaction tokens are transmitted via 256-bit encrypted channels to authorized payment gateways.</li>
-                <li><strong>Legal Authorities:</strong> We disclose data only when legally compelled by subpoena, court order, or official governmental investigation under Indian law.</li>
+                <li><strong>Internal Kitchen Culinary Staff:</strong> Receives meal selections and customer special dietary notes to cook your order fresh.</li>
+                <li><strong>Dispatch Riders & Couriers:</strong> Receives delivery address, recipient name, and contact number solely to execute physical delivery.</li>
+                <li><strong>Payment Processors:</strong> Transaction tokens are transmitted via 256-bit encrypted channels to certified payment gateways.</li>
+                <li><strong>Statutory Compliance:</strong> Data is disclosed only when legally mandated by Indian law enforcement or official court directives.</li>
               </ul>
             </div>
           </article>

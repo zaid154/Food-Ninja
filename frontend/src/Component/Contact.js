@@ -4,23 +4,23 @@ import { API_BASE_URL } from "../utils/Constants";
 const FAQS = [
   {
     q: "How do I cancel or modify my food order?",
-    a: "Because our restaurant kitchens prepare ingredients immediately upon receipt, orders can be canceled within 60 seconds of placement directly from your Order Details page. After 60 seconds, kitchen preparation commences and cancellations cannot be accepted."
+    a: "Because our kitchen starts preparing your meals fresh on order immediately, cancellations or modifications are permitted within 60 seconds of placing your order. After 60 seconds, our chefs commence active cooking to ensure your food arrives hot, fresh, and on time."
   },
   {
     q: "What if an item is missing, incorrect, or damaged in my delivery?",
-    a: "Please report any discrepancy within 2 hours of delivery. Submit a photo of the damaged seal or packaging through this Help Center or email support@foodninja.com. Verified claims receive an immediate item replacement or pro-rata refund to your original payment method."
+    a: "Please report any discrepancy within 2 hours of delivery. Submit a photo of the damaged seal or incorrect dish through this Help Center or email support@foodninja.com. Our support team will promptly dispatch a fresh replacement or issue an instant refund to your original payment method."
   },
   {
     q: "How long does a payment refund take to reach my bank?",
     a: "Approved refunds are initiated immediately by our billing desk. Depending on your bank or payment provider (UPI, Net Banking, Credit/Debit card), funds typically reflect within 3 to 5 business days."
   },
   {
-    q: "Are allergen and dietary markers (Veg/Non-Veg) verified?",
-    a: "Restaurant Partners certify their dietary designations in good faith. However, food is prepared in shared commercial kitchens where airborne cross-contact with gluten, nuts, dairy, or seafood can occur. If you have severe anaphylactic allergies, please review our Terms of Service and contact the kitchen directly before ordering."
+    q: "Are allergen and dietary markers (Veg/Non-Veg/Vegan) verified?",
+    a: "Yes! At FoodNinja Kitchen, our chefs prepare 100% authentic Vegetarian (Green marker), Non-Vegetarian (Red marker), and Vegan dishes in dedicated, hygienic preparation zones. Every dish's ingredients, allergens (gluten, nuts, dairy), and calories are carefully listed on the menu. If you have specific dietary preferences or allergies, please include instructions with your order."
   },
   {
     q: "How do I reach the Statutory Grievance Redressal Officer?",
-    a: "In compliance with the Consumer Protection (E-Commerce) Rules 2020 and IT Intermediary Rules 2021, you can escalate unresolved disputes directly to our designated Grievance Officer at grievance@foodninja.com. Every formal ticket receives an acknowledgment within 24-48 hours and formal redressal within 15 business days."
+    a: "In compliance with the Consumer Protection (E-Commerce) Rules 2020 and IT Rules 2021, you can escalate unresolved concerns directly to our designated Grievance Officer at grievance@foodninja.com. Every formal ticket receives an acknowledgment within 24-48 hours and formal redressal within 15 business days."
   }
 ];
 
@@ -296,8 +296,8 @@ const Contact = () => {
                   FN
                 </span>
                 <div>
-                  <h3 className="text-sm font-black text-slate-900">FoodNinja Technologies</h3>
-                  <p className="text-[11px] text-slate-400">Licensed Food Delivery Marketplace</p>
+                  <h3 className="text-sm font-black text-slate-900">FoodNinja Restaurant & Kitchen</h3>
+                  <p className="text-[11px] text-slate-400">Direct Restaurant Food Delivery</p>
                 </div>
               </div>
 
