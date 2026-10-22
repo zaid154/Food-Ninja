@@ -13,7 +13,6 @@ const ProductView = () => {
   const dispatch = useDispatch();
 
   const [activeTab, setActiveTab] = useState("description");
-  const [selectedImageIdx, setSelectedImageIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
   const cartItems = useSelector((store) => store.cart.item);
@@ -51,13 +50,19 @@ const ProductView = () => {
   const rating = product.rating ? Number(product.rating).toFixed(1) : "4.3";
   const reviewCount = product.reviewCount || 86;
 
-  // 4 Gallery thumbnails matching the mockup strip
-  const gallery = [
-    mainDishImg,
-    "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80",
-  ];
+  const ingredientsList = product.ingredients
+    ? (Array.isArray(product.ingredients)
+        ? product.ingredients
+        : product.ingredients.split(/(?=[A-Z])|,\s*|\s{2,}/).map((s) => s.trim()).filter(Boolean))
+    : [
+        "Fresh Farm Red Beets",
+        "Cabbage & Carrots",
+        "Potatoes",
+        "Sour Cream",
+        "Aromatic Dill & Parsley",
+        "Garlic & Bay Leaves",
+        "Cold-pressed Olive Oil"
+      ];
 
   const handleAddToCart = () => {
     // Add the selected quantity to cart
@@ -78,49 +83,14 @@ const ProductView = () => {
     <div className="bg-white min-h-screen pt-4 sm:pt-6 pb-16 text-slate-800">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
 
-        {/* Top Product Showcase (Gallery on left, Details on right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-10">
+        {/* Top Product Showcase (Single Hero Dish Image on left, Details on right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mb-10">
           
-          {/* Left Column (Thumbnails Strip + Large Main Dish Image) */}
-          <div className="lg:col-span-7 flex flex-col sm:flex-row gap-4 items-start">
-            
-            {/* Vertical Thumbnail Column */}
-            <div className="flex sm:flex-col gap-2.5 order-2 sm:order-1 overflow-x-auto sm:overflow-visible shrink-0">
-              {gallery.map((img, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setSelectedImageIdx(idx)}
-                  className={`h-16 w-16 sm:h-[72px] sm:w-[72px] rounded-xl overflow-hidden border-2 transition shrink-0 cursor-pointer ${
-                    selectedImageIdx === idx
-                      ? "border-emerald-600 ring-1 ring-emerald-500/30"
-                      : "border-slate-200/80 hover:border-slate-300"
-                  }`}
-                >
-                  <img src={img} alt="" className="h-full w-full object-cover" />
-                </button>
-              ))}
-
-              {/* Down Arrow Button at Bottom of Thumbnail Strip */}
-              <button
-                type="button"
-                onClick={() => setSelectedImageIdx((prev) => (prev + 1) % gallery.length)}
-                className="hidden sm:flex h-9 w-9 mx-auto items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 hover:text-slate-700 hover:border-slate-300 transition cursor-pointer"
-                title="Next image"
-              >
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </button>
-
-              {/* Subtle Scroll Placeholder */}
-              <div className="hidden sm:block h-6 w-9 mx-auto rounded-md bg-slate-100/60" />
-            </div>
-
-            {/* Large Square Featured Image */}
-            <div className="relative flex-1 w-full aspect-square rounded-3xl overflow-hidden bg-slate-50 border border-slate-100 shadow-xs order-1 sm:order-2">
+          {/* Left Column: Prominent Single Authentic Dish Image */}
+          <div className="lg:col-span-6 w-full">
+            <div className="relative w-full aspect-square rounded-3xl overflow-hidden bg-slate-50 border border-slate-100 shadow-sm">
               <img
-                src={gallery[selectedImageIdx]}
+                src={mainDishImg}
                 alt={product.name}
                 className="h-full w-full object-cover transition-all duration-300"
               />
@@ -149,7 +119,7 @@ const ProductView = () => {
           </div>
 
           {/* Right Column: Dish Info & Purchasing Actions */}
-          <div className="lg:col-span-5 space-y-4">
+          <div className="lg:col-span-6 space-y-4">
             
             {/* Cuisine Pill Tag */}
             <div>
@@ -339,7 +309,9 @@ const ProductView = () => {
               {/* Left Column Description + Key Features */}
               <div className="lg:col-span-8 space-y-5">
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  A traditional Russian soup made with fresh beets, vegetables and aromatic herbs. Our Russian Borscht is cooked to perfection and served with a dollop of sour cream for an authentic taste.
+                  {isBorscht
+                    ? "A traditional Russian soup made with fresh beets, vegetables and aromatic herbs. Our Russian Borscht is cooked to perfection and served with a dollop of sour cream for an authentic taste."
+                    : (product.description || `A traditional ${product.cuisine || ""} specialty, prepared fresh to order with aromatic herbs and premium quality ingredients.`)}
                 </p>
 
                 <div>
@@ -347,19 +319,19 @@ const ProductView = () => {
                   <ul className="space-y-2 text-xs text-slate-600">
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-600 font-bold">✓</span>
-                      <span>Authentic Russian recipe</span>
+                      <span>{isBorscht ? "Authentic Russian recipe" : `Authentic ${product.cuisine || "chef"} recipe`}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-600 font-bold">✓</span>
-                      <span>Made with fresh vegetables</span>
+                      <span>Made with fresh ingredients</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-600 font-bold">✓</span>
-                      <span>Rich in vitamins and nutrients</span>
+                      <span>Rich in authentic taste & nutrients</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-emerald-600 font-bold">✓</span>
-                      <span>Served with sour cream and herbs</span>
+                      <span>{isBorscht ? "Served with sour cream and herbs" : "Prepared fresh to order"}</span>
                     </li>
                   </ul>
                 </div>
@@ -423,15 +395,7 @@ const ProductView = () => {
             <div className="space-y-4 max-w-2xl text-xs text-slate-600">
               <p className="font-medium text-slate-700">Fresh Ingredients used in this preparation:</p>
               <div className="flex flex-wrap gap-2">
-                {[
-                  "Fresh Farm Red Beets",
-                  "Cabbage & Carrots",
-                  "Potatoes",
-                  "Sour Cream",
-                  "Aromatic Dill & Parsley",
-                  "Garlic & Bay Leaves",
-                  "Cold-pressed Olive Oil"
-                ].map((ing, i) => (
+                {ingredientsList.map((ing, i) => (
                   <span key={i} className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-1.5 font-medium text-slate-800">
                     • {ing}
                   </span>
@@ -496,7 +460,9 @@ const ProductView = () => {
                 </div>
                 <div className="text-amber-500 text-xs">★★★★★</div>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Great quality and portion size. The sour cream added a perfect touch.
+                  {isBorscht
+                    ? "Great quality and portion size. The sour cream added a perfect touch."
+                    : "Great quality and portion size. Packaging was fresh and tamper-proof."}
                 </p>
               </div>
               <div className="h-16 w-16 rounded-xl overflow-hidden shrink-0 border border-slate-200">
