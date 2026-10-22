@@ -192,6 +192,26 @@ const MenuPage = () => {
     setSearchParams(new URLSearchParams());
   };
 
+  // Smart truncated pagination with ellipsis (prevents long row of 14+ buttons)
+  const getPaginationItems = () => {
+    const total = pagination.totalPages;
+    const current = currentPage;
+
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    if (current <= 3) {
+      return [1, 2, 3, 4, "...", total];
+    }
+
+    if (current >= total - 2) {
+      return [1, "...", total - 3, total - 2, total - 1, total];
+    }
+
+    return [1, "...", current - 1, current, current + 1, "...", total];
+  };
+
   // Pagination bounds calculation
   const startItem = pagination.totalItems === 0 ? 0 : (currentPage - 1) * pagination.limit + 1;
   const endItem = Math.min(currentPage * pagination.limit, pagination.totalItems);
@@ -431,41 +451,60 @@ const MenuPage = () => {
               </div>
 
               {pagination.totalPages > 1 && (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap justify-center">
                   {/* Previous Button */}
                   <button
                     type="button"
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage <= 1}
-                    className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 font-bold text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 font-bold text-xs text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
                   >
-                    ← Prev
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                    <span>Prev</span>
                   </button>
 
-                  {/* Page Numbers */}
-                  {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
-                    <button
-                      key={pageNum}
-                      type="button"
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`h-8 w-8 rounded-lg font-bold text-xs transition ${
-                        pageNum === currentPage
-                          ? "bg-emerald-600 text-white shadow-xs"
-                          : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ))}
+                  {/* Smart Truncated Page Numbers */}
+                  {getPaginationItems().map((item, idx) => {
+                    if (item === "...") {
+                      return (
+                        <span
+                          key={`ellipsis-${idx}`}
+                          className="h-8 w-8 flex items-center justify-center font-bold text-xs text-slate-400 select-none"
+                        >
+                          •••
+                        </span>
+                      );
+                    }
+                    const pageNum = item;
+                    return (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`h-8 min-w-[32px] px-2 rounded-lg font-bold text-xs transition ${
+                          pageNum === currentPage
+                            ? "bg-emerald-600 text-white shadow-xs"
+                            : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
 
                   {/* Next Button */}
                   <button
                     type="button"
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage >= pagination.totalPages}
-                    className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 font-bold text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 font-bold text-xs text-slate-700 shadow-2xs hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
                   >
-                    Next →
+                    <span>Next</span>
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
                   </button>
                 </div>
               )}
