@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import useResipe from "./useRecipes";
@@ -7,28 +7,53 @@ import { addWishlist, removeWishlist } from "../utils/wishlistSlice";
 import { FALLBACK_RECIPES } from "../utils/fallbackDishes";
 import { DISH_BORSCHT } from "../assets/mockupImages";
 import { API_BASE_URL } from "../utils/Constants";
+import UserContext from "./Usercontext";
 
 const ProductView = () => {
   const { id } = useParams();
   const apiData = useResipe();
   const dispatch = useDispatch();
+  const { user } = useContext(UserContext);
 
   const [activeTab, setActiveTab] = useState("description");
   const [quantity, setQuantity] = useState(1);
 
-  // Real Database Reviews State
-  const [reviews, setReviews] = useState([]);
-  const [loadingReviews, setLoadingReviews] = useState(true);
-  const [showReviewForm, setShowReviewForm] = useState(false);
-  const [reviewRating, setReviewRating] = useState(5);
-  const [reviewName, setReviewName] = useState(() => {
+  // Automatically pick and format name from logged-in user account
+  const rawName = user?.name || (() => {
     try {
       const logged = JSON.parse(localStorage.getItem("loggedUser") || "{}");
       return logged.name || "";
     } catch {
       return "";
     }
-  });
+  })() || "Mohd Zaid";
+
+  // Fix unspaced PascalCase names like "MohdZaid" -> "Mohd Zaid"
+  const displayName = rawName.includes(" ")
+    ? rawName.trim()
+    : rawName.replace(/([a-z])([A-Z])/g, "$1 $2").trim();
+
+  // Sanitize localStorage if it held "MohdZaid"
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("loggedUser");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.name && !parsed.name.includes(" ") && /([a-z])([A-Z])/.test(parsed.name)) {
+          parsed.name = parsed.name.replace(/([a-z])([A-Z])/g, "$1 $2").trim();
+          localStorage.setItem("loggedUser", JSON.stringify(parsed));
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // Real Database Reviews State
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
   const [userEmail] = useState(() => {
     try {
       const logged = JSON.parse(localStorage.getItem("loggedUser") || "{}");
@@ -182,10 +207,6 @@ const ProductView = () => {
     setReviewError("");
     setReviewSuccess("");
 
-    if (!reviewName.trim()) {
-      setReviewError("Please enter your name.");
-      return;
-    }
     if (!reviewComment.trim()) {
       setReviewError("Please enter your review comment.");
       return;
@@ -197,8 +218,8 @@ const ProductView = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userName: reviewName.trim(),
-          userEmail: userEmail || "",
+          userName: displayName,
+          userEmail: userEmail || user?.email || "",
           orderId: eligibility.orderId || null,
           rating: reviewRating,
           comment: reviewComment.trim(),
@@ -829,17 +850,25 @@ const ProductView = () => {
                 </div>
               </div>
 
-              {/* Name Input */}
+              {/* Verified Reviewer Identity (Automatically picked from logged-in account) */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Your Name</label>
-                <input
-                  type="text"
-                  value={reviewName}
-                  onChange={(e) => setReviewName(e.target.value)}
-                  placeholder="e.g. Mohd Zaid"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                  required
-                />
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Reviewing as</label>
+                <div className="flex items-center gap-3 rounded-xl border border-emerald-100 bg-white px-3.5 py-2.5 shadow-2xs">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white uppercase shrink-0">
+                    {(displayName || "U").charAt(0)}
+                  </div>
+                  <div className="leading-tight">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-900">{displayName}</span>
+                      <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[9px] font-semibold text-emerald-800">
+                        Verified Buyer
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-0.5">
+                      Posting review with verified purchase badge
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Comment Textarea */}
