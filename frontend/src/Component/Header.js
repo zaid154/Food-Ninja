@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../utils/cartSlice";
@@ -7,8 +7,11 @@ import UserContext from "./Usercontext";
 import { LOGO } from "../utils/Constants";
 
 const Header = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userDropdown, setUserDropdown] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -21,6 +24,17 @@ const Header = () => {
     setIsAdmin(adminSession || isUserAdmin);
   }, [user, location.pathname]);
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setUserDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
     sessionStorage.removeItem("adminAuth");
@@ -28,136 +42,186 @@ const Header = () => {
     dispatch(clearCart());
     dispatch(clearWishlist());
     setUser(null);
+    setUserDropdown(false);
     navigate("/login");
   };
 
   const cartItem = useSelector((state) => state.cart.item);
   const cartCount = cartItem.reduce((n, i) => n + (i.quantity || 1), 0);
 
-  const wishlistItem = useSelector((state) => state.wishlist.item);
-  const wishlistCount = wishlistItem.length;
-
-  const linkClass = ({ isActive }) =>
-    `px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+  const navLinkClass = ({ isActive }) =>
+    `relative text-sm font-medium transition-colors py-1 ${
       isActive
-        ? "text-emerald-700 bg-emerald-50/80 font-semibold"
-        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+        ? "text-slate-900 font-semibold after:absolute after:bottom-[-18px] after:left-0 after:right-0 after:h-[2.5px] after:bg-emerald-700 after:rounded-full"
+        : "text-slate-600 hover:text-slate-900"
     }`;
 
+  // Get first letter of username or "M"
+  const userInitial = user ? (user.name ? user.name[0].toUpperCase() : "M") : "M";
+
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5">
+    <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Brand Logo */}
-        <Link to="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 p-1">
-            <img src={LOGO} alt="Food Ninja" className="h-full w-full object-contain" />
+        <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white p-2 shadow-xs group-hover:bg-emerald-700 transition">
+            {/* Bowl with sprout leaf icon */}
+            <svg viewBox="0 0 24 24" className="h-6 w-6 fill-current">
+              <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V15a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7zm-1 16h2v3a1 1 0 0 1-1 1h0a1 1 0 0 1-1-1v-3z" opacity="0.3" />
+              <path d="M4 12c0 4.42 3.58 8 8 8s8-3.58 8-8H4z" />
+              <path d="M11 6a3 3 0 0 1 3-3c1.66 0 3 1.34 3 3 0 2.21-3 6-3 6s-3-3.79-3-6z" />
+            </svg>
           </div>
-          <div className="leading-none">
-            <span className="text-lg font-bold tracking-tight text-slate-900">
-              Food<span className="text-emerald-600">Ninja</span>
+          <div className="leading-tight">
+            <span className="text-xl font-extrabold tracking-tight text-slate-900">
+              Food<span className="text-emerald-700">Ninja</span>
             </span>
-            <span className="hidden sm:block text-[10px] font-medium text-slate-400 tracking-wider uppercase mt-0.5">
+            <span className="block text-[10px] font-medium text-slate-400 tracking-wider">
               Restaurant Food Delivery
             </span>
           </div>
         </Link>
 
-        {/* Primary Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1">
-          <NavLink to="/" end className={linkClass}>
-            Food Menu
+        {/* Center Navigation Links */}
+        <nav className="hidden md:flex items-center gap-8">
+          <NavLink to="/" end className={navLinkClass}>
+            Home
           </NavLink>
-          <NavLink to="/about" className={linkClass}>
+          <a
+            href="#menu"
+            onClick={(e) => {
+              if (location.pathname !== "/") {
+                navigate("/#menu");
+              } else {
+                const el = document.getElementById("menu");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors py-1 cursor-pointer"
+          >
+            Menu
+          </a>
+          <NavLink to="/about" className={navLinkClass}>
             About
           </NavLink>
-          <NavLink to="/contact" className={linkClass}>
+          <NavLink to="/contact" className={navLinkClass}>
             Contact
-          </NavLink>
-          <NavLink to="/orders" className={linkClass}>
-            My Orders
           </NavLink>
         </nav>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Subtle Wishlist Button */}
-          <Link
-            to="/wishlist"
-            className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-900 transition"
-            title="Wishlist"
-            aria-label="Wishlist"
+        {/* Right Action Icons */}
+        <div className="flex items-center gap-4">
+          {/* Search trigger icon */}
+          <button
+            type="button"
+            onClick={() => {
+              const input = document.getElementById("hero-search-input");
+              if (input) {
+                input.focus();
+                input.scrollIntoView({ behavior: "smooth", block: "center" });
+              }
+            }}
+            className="flex h-9 w-9 items-center justify-center text-slate-600 hover:text-slate-900 transition"
+            title="Search dishes"
+            aria-label="Search"
           >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z" />
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            {wishlistCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-slate-900 px-1 text-[10px] font-bold text-white">
-                {wishlistCount}
-              </span>
-            )}
-          </Link>
+          </button>
 
-          {/* Primary Cart Action */}
+          {/* Cart Icon with Counter Badge */}
           <Link
             to="/cart"
-            className="flex h-9 items-center gap-2 rounded-lg bg-emerald-600 px-3.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition"
+            className="relative flex h-9 w-9 items-center justify-center text-slate-600 hover:text-slate-900 transition"
+            title="Cart"
+            aria-label="Cart"
           >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="9" cy="21" r="1" />
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
-            <span className="hidden sm:inline">Cart</span>
+            <span className="sr-only">Cart</span>
             {cartCount > 0 && (
-              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-white px-1.5 text-xs font-bold text-emerald-700">
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-emerald-700 px-1 text-[10px] font-bold text-white shadow-xs">
                 {cartCount}
               </span>
             )}
           </Link>
 
-          {/* Admin Dashboard Quick Access */}
-          {isAdmin && (
-            <Link
-              to="/admin"
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-slate-900 text-white hover:bg-slate-800 transition"
-              title="Admin Console"
-            >
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-            </Link>
-          )}
-
-          {/* User Profile / Auth */}
+          {/* User Profile Avatar with Dropdown */}
           {user ? (
-            <div className="flex h-9 items-center gap-2 pl-2 border-l border-slate-200">
-              <span className="hidden sm:inline text-xs font-medium text-slate-700 max-w-[110px] truncate">
-                {user.name || user.email}
-              </span>
+            <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
-                onClick={handleLogout}
-                className="text-xs font-medium text-slate-500 hover:text-rose-600 transition"
+                onClick={() => setUserDropdown(!userDropdown)}
+                className="flex items-center gap-1.5 focus:outline-none"
+                aria-expanded={userDropdown}
               >
-                Logout
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white shadow-xs">
+                  {userInitial}
+                </div>
+                <svg viewBox="0 0 20 20" className="h-4 w-4 text-slate-400" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
               </button>
+
+              {userDropdown && (
+                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-slate-100 bg-white py-1.5 shadow-lg z-50">
+                  <div className="px-4 py-2 border-b border-slate-100">
+                    <p className="text-xs font-bold text-slate-900 truncate">{user.name || "Customer"}</p>
+                    <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
+                  </div>
+                  <Link
+                    to="/orders"
+                    onClick={() => setUserDropdown(false)}
+                    className="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50"
+                  >
+                    My Orders
+                  </Link>
+                  <Link
+                    to="/wishlist"
+                    onClick={() => setUserDropdown(false)}
+                    className="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50"
+                  >
+                    My Wishlist
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setUserDropdown(false)}
+                      className="block px-4 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 border-t border-slate-100"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <Link
               to="/login"
-              className="flex h-9 items-center rounded-lg border border-slate-200 px-3.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition"
+              className="inline-flex items-center justify-center rounded-lg bg-emerald-700 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-emerald-800 transition"
             >
               Sign In
             </Link>
           )}
 
-          {/* Mobile hamburger toggle */}
+          {/* Mobile Menu Button */}
           <button
             type="button"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-            className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600"
+            aria-label="Toggle mobile menu"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M4 6h16M4 12h16M4 18h16" />
@@ -167,17 +231,27 @@ const Header = () => {
       </div>
 
       {/* Mobile Menu Dropdown */}
-      {menuOpen && (
-        <div className="md:hidden border-t border-slate-100 bg-white px-4 py-3 space-y-1">
-          <NavLink to="/" end onClick={() => setMenuOpen(false)} className={linkClass}>Food Menu</NavLink>
-          <NavLink to="/about" onClick={() => setMenuOpen(false)} className={linkClass}>About</NavLink>
-          <NavLink to="/contact" onClick={() => setMenuOpen(false)} className={linkClass}>Contact</NavLink>
-          <NavLink to="/orders" onClick={() => setMenuOpen(false)} className={linkClass}>My Orders</NavLink>
-          {isAdmin && (
-            <Link to="/admin" onClick={() => setMenuOpen(false)} className="block px-3 py-1.5 text-sm font-semibold text-emerald-600">
-              Admin Dashboard
-            </Link>
-          )}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-slate-100 bg-white px-6 py-4 space-y-3">
+          <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-slate-800">
+            Home
+          </Link>
+          <a
+            href="#menu"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-sm font-medium text-slate-800"
+          >
+            Menu
+          </a>
+          <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-slate-800">
+            About
+          </Link>
+          <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-slate-800">
+            Contact
+          </Link>
+          <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-slate-800">
+            My Orders
+          </Link>
         </div>
       )}
     </header>

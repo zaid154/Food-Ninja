@@ -1,79 +1,108 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { LOGO } from "../utils/Constants";
 
 const Footer = () => {
   return (
-    <footer className="bg-slate-950 text-slate-400 mt-12 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 text-xs">
-        {/* Brand Col */}
-        <div className="space-y-3">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 p-1 shadow-xs">
-              <img src={LOGO} alt="Food Ninja" className="h-full w-full object-contain" />
-            </div>
-            <div className="leading-none">
-              <span className="text-lg font-bold tracking-tight text-white">
-                Food<span className="text-emerald-400">Ninja</span>
-              </span>
-              <span className="block text-[10px] font-medium text-slate-400 tracking-wider uppercase mt-0.5">
-                Restaurant Food Delivery
-              </span>
-            </div>
-          </Link>
-          <p className="text-slate-400 leading-relaxed">
-            Order chef-crafted restaurant dishes online. Fast delivery and fresh quality guaranteed.
-          </p>
-          <p className="text-slate-500 pt-1">
-            © 2026 Food Ninja Technologies Pvt Ltd.
-          </p>
-        </div>
-
-        {/* Explore Links */}
-        <div>
-          <h4 className="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Explore</h4>
-          <ul className="space-y-2">
-            <li><Link to="/" className="hover:text-emerald-400 transition-colors">Food Menu</Link></li>
-            <li><Link to="/orders" className="hover:text-emerald-400 transition-colors">My Orders</Link></li>
-            <li><Link to="/wishlist" className="hover:text-emerald-400 transition-colors">Wishlist</Link></li>
-            <li><Link to="/cart" className="hover:text-emerald-400 transition-colors">Shopping Cart</Link></li>
-          </ul>
-        </div>
-
-        {/* Company Links */}
-        <div>
-          <h4 className="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Company</h4>
-          <ul className="space-y-2">
-            <li><Link to="/about" className="hover:text-emerald-400 transition-colors">About Us</Link></li>
-            <li><Link to="/contact" className="hover:text-emerald-400 transition-colors">Contact Support</Link></li>
-            <li><Link to="/about" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link></li>
-            <li><Link to="/about" className="hover:text-emerald-400 transition-colors">Terms of Service</Link></li>
-          </ul>
-        </div>
-
-        {/* Store Location */}
-        <div>
-          <h4 className="text-white font-bold mb-3 uppercase tracking-wider text-[11px]">Store Hub</h4>
-          <div className="rounded-lg overflow-hidden border border-slate-800 bg-slate-900">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2665.642120207283!2d77.13818217409751!3d28.704311180820017!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d017cd13394f5%3A0x811f2d3fe616d07a!2sPC%20Training%20Institute%20Limited%20(PCTIL)!5e1!3m2!1sen!2sin!4v1769801846833!5m2!1sen!2sin"
-              width="100%"
-              height="120"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+    <footer className="bg-[#111928] text-slate-300 mt-20 pt-14 pb-8">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
+          {/* Col 1: Brand Info */}
+          <div>
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-700 text-white p-2">
+                <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current">
+                  <path d="M4 12c0 4.42 3.58 8 8 8s8-3.58 8-8H4z" />
+                  <path d="M11 6a3 3 0 0 1 3-3c1.66 0 3 1.34 3 3 0 2.21-3 6-3 6s-3-3.79-3-6z" />
+                </svg>
+              </div>
+              <div className="leading-tight">
+                <span className="text-xl font-bold tracking-tight text-white">
+                  Food<span className="text-emerald-500">Ninja</span>
+                </span>
+                <span className="block text-[10px] font-medium text-slate-400 tracking-wider">
+                  Restaurant Food Delivery
+                </span>
+              </div>
+            </Link>
+            <p className="mt-4 text-xs text-slate-400 leading-relaxed max-w-xs">
+              Delicious meals crafted with fresh ingredients, delivered hot and fresh directly to your doorstep.
+            </p>
           </div>
-          <p className="mt-2 text-slate-400 text-[11px]">
-            New Delhi, Delhi 110034, India
-          </p>
-        </div>
-      </div>
 
-      {/* Bottom Legal bar */}
-      <div className="border-t border-slate-900 bg-slate-950 py-4 text-center text-[11px] text-slate-500">
-        <p>Food Ninja Delivery Platform • Single Store Model • All Rights Reserved</p>
+          {/* Col 2: Quick Links */}
+          <div>
+            <h4 className="text-sm font-semibold text-white mb-4">Quick Links</h4>
+            <ul className="space-y-2.5 text-xs text-slate-400">
+              <li>
+                <Link to="/" className="hover:text-emerald-400 transition-colors">Home</Link>
+              </li>
+              <li>
+                <a href="#menu" className="hover:text-emerald-400 transition-colors">Menu</a>
+              </li>
+              <li>
+                <Link to="/about" className="hover:text-emerald-400 transition-colors">About</Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-emerald-400 transition-colors">Contact</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 3: Support */}
+          <div>
+            <h4 className="text-sm font-semibold text-white mb-4">Support</h4>
+            <ul className="space-y-2.5 text-xs text-slate-400">
+              <li>
+                <Link to="/contact" className="hover:text-emerald-400 transition-colors">Help Center</Link>
+              </li>
+              <li>
+                <Link to="/about" className="hover:text-emerald-400 transition-colors">Terms & Conditions</Link>
+              </li>
+              <li>
+                <Link to="/about" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 4: Follow Us */}
+          <div>
+            <h4 className="text-sm font-semibold text-white mb-4">Follow Us</h4>
+            <div className="flex items-center gap-3 text-slate-400">
+              {/* Facebook */}
+              <a href="https://facebook.com" target="_blank" rel="noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 hover:bg-emerald-700 hover:text-white transition">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                  <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/>
+                </svg>
+              </a>
+              {/* Instagram */}
+              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 hover:bg-emerald-700 hover:text-white transition">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                </svg>
+              </a>
+              {/* YouTube */}
+              <a href="https://youtube.com" target="_blank" rel="noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 hover:bg-emerald-700 hover:text-white transition">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.016 3.016 0 0 0-2.122 2.136C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.55 9.376.55 9.376.55s7.505 0 9.377-.55a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+              </a>
+              {/* X / Twitter */}
+              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 hover:bg-emerald-700 hover:text-white transition">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Legal / Copyright Row */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 text-[11px] text-slate-500">
+          <p>© 2025 FoodNinja. All rights reserved.</p>
+          <p className="font-medium text-slate-400">Good Food • Happy People</p>
+        </div>
       </div>
     </footer>
   );
