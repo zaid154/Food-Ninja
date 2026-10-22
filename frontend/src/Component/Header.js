@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../utils/cartSlice";
 import { clearWishlist } from "../utils/wishlistSlice";
 import UserContext from "./Usercontext";
-import brandLogoImg from "../assets/mockup/brand_logo.png";
+import { BRAND_LOGO } from "../assets/mockupImages";
 
 const Header = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -65,7 +65,7 @@ const Header = () => {
         {/* Brand Logo: Clean Bowl + Leaves on white bg (Exact Mockup Match) */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
           <img
-            src={brandLogoImg}
+            src={BRAND_LOGO}
             alt="FoodNinja"
             className="h-9 w-auto object-contain transition-transform group-hover:scale-105"
           />

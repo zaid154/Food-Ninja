@@ -3,31 +3,31 @@ import Shimmer from "./Shimmer";
 import useResipe from "./useRecipes";
 import FoodCard from "./food/FoodCard";
 
-// Mockup Assets
-import heroCompositionImg from "../assets/mockup/hero_composition.png";
-import bannerCompositionImg from "../assets/mockup/banner_composition.png";
-import catBiryaniImg from "../assets/mockup/icon_cat_biryani.png";
-import catPizzaImg from "../assets/mockup/icon_cat_pizza.png";
-import catBurgerImg from "../assets/mockup/icon_cat_burger.png";
-import catChineseImg from "../assets/mockup/icon_cat_chinese.png";
-import catIndianImg from "../assets/mockup/icon_cat_indian.png";
-import catItalianImg from "../assets/mockup/icon_cat_italian.png";
-import catBeveragesImg from "../assets/mockup/icon_cat_beverages.png";
-
-// Mockup 4 Popular Dishes images
-import dishBorschtImg from "../assets/mockup/dish_img_borscht.png";
-import dishFalafelImg from "../assets/mockup/dish_img_falafel.png";
-import dishDosaImg from "../assets/mockup/dish_img_dosa.png";
-import dishCaipirinhaImg from "../assets/mockup/dish_img_caipirinha.png";
+// Guaranteed Mockup Base64 Assets (Instant, 0ms load, immune to 404/bundler resolution issues)
+import {
+  HERO_COMPOSITION,
+  BANNER_COMPOSITION,
+  ICON_CAT_BIRYANI,
+  ICON_CAT_PIZZA,
+  ICON_CAT_BURGER,
+  ICON_CAT_CHINESE,
+  ICON_CAT_INDIAN,
+  ICON_CAT_ITALIAN,
+  ICON_CAT_BEVERAGES,
+  DISH_BORSCHT,
+  DISH_FALAFEL,
+  DISH_DOSA,
+  DISH_CAIPIRINHA,
+} from "../assets/mockupImages";
 
 const PRESET_CATEGORIES = [
-  { name: "Biryani", bg: "bg-[#f2f9ed]", icon: catBiryaniImg },
-  { name: "Pizza", bg: "bg-[#fff1e8]", icon: catPizzaImg },
-  { name: "Burgers", bg: "bg-[#ffede6]", icon: catBurgerImg },
-  { name: "Chinese", bg: "bg-[#f7f1ee]", icon: catChineseImg },
-  { name: "Indian", bg: "bg-[#fff7e6]", icon: catIndianImg },
-  { name: "Italian", bg: "bg-[#fbeff5]", icon: catItalianImg },
-  { name: "Beverages", bg: "bg-[#edf4ff]", icon: catBeveragesImg },
+  { name: "Biryani", bg: "bg-[#f2f9ed]", icon: ICON_CAT_BIRYANI },
+  { name: "Pizza", bg: "bg-[#fff1e8]", icon: ICON_CAT_PIZZA },
+  { name: "Burgers", bg: "bg-[#ffede6]", icon: ICON_CAT_BURGER },
+  { name: "Chinese", bg: "bg-[#f7f1ee]", icon: ICON_CAT_CHINESE },
+  { name: "Indian", bg: "bg-[#fff7e6]", icon: ICON_CAT_INDIAN },
+  { name: "Italian", bg: "bg-[#fbeff5]", icon: ICON_CAT_ITALIAN },
+  { name: "Beverages", bg: "bg-[#edf4ff]", icon: ICON_CAT_BEVERAGES },
 ];
 
 const FoodMenu = () => {
@@ -56,10 +56,10 @@ const FoodMenu = () => {
     let caipirinha = list.find((i) => i.id === 38 || i.name.toLowerCase().includes("caipirinha"));
 
     // Map exact visuals if found
-    if (borscht) borscht = { ...borscht, image: dishBorschtImg, rating: 4.3, price: 150 };
-    if (falafel) falafel = { ...falafel, image: dishFalafelImg, rating: 4.7, price: 160 };
-    if (dosa) dosa = { ...dosa, image: dishDosaImg, rating: 4.4, price: 160 };
-    if (caipirinha) caipirinha = { ...caipirinha, image: dishCaipirinhaImg, rating: 4.2, price: 170 };
+    if (borscht) borscht = { ...borscht, image: DISH_BORSCHT, rating: 4.3, price: 150 };
+    if (falafel) falafel = { ...falafel, image: DISH_FALAFEL, rating: 4.7, price: 160 };
+    if (dosa) dosa = { ...dosa, image: DISH_DOSA, rating: 4.4, price: 160 };
+    if (caipirinha) caipirinha = { ...caipirinha, image: DISH_CAIPIRINHA, rating: 4.2, price: 170 };
 
     const featured = [borscht, falafel, dosa, caipirinha].filter(Boolean);
     const rest = list.filter((i) => !featured.some((f) => f.id === i.id));
@@ -205,7 +205,7 @@ const FoodMenu = () => {
             {/* Right Graphic: Exact Mockup Roasted Chicken Salad Bowl + "Healthy Tasty Fresh" Doodle */}
             <div className="lg:col-span-5 relative flex items-center justify-center">
               <img
-                src={heroCompositionImg}
+                src={HERO_COMPOSITION}
                 alt="Good Food Brings People Together"
                 className="w-full max-w-[500px] h-auto object-contain select-none pointer-events-none drop-shadow-sm"
               />
@@ -321,7 +321,7 @@ const FoodMenu = () => {
                   setSearch("");
                   setSelectedCategory("All");
                 }}
-                className="mt-3 text-xs font-bold text-emerald-700 underline"
+                className="mt-3 text-xs font-bold text-emerald-700 underline cursor-pointer"
               >
                 Clear all filters
               </button>
@@ -377,7 +377,7 @@ const FoodMenu = () => {
             {/* Right Graphic: Platter + "Eat Good Feel Good" Doodle */}
             <div className="relative shrink-0 max-w-md">
               <img
-                src={bannerCompositionImg}
+                src={BANNER_COMPOSITION}
                 alt="Eat Good Feel Good"
                 className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-xs"
               />
