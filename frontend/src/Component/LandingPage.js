@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import FoodCard from "./food/FoodCard";
 import Shimmer from "./Shimmer";
@@ -29,12 +29,12 @@ const PRESET_CATEGORIES = [
   {
     name: "Indian",
     bg: "bg-[#fef9c3]",
-    img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=300&auto=format&fit=crop&q=80",
+    img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300&auto=format&fit=crop&q=80",
   },
   {
     name: "Italian",
     bg: "bg-[#fdf2f8]",
-    img: "https://images.unsplash.com/photo-1621996346565-e3d5d6281691?w=300&auto=format&fit=crop&q=80",
+    img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=300&auto=format&fit=crop&q=80",
   },
   {
     name: "Beverages",
@@ -45,32 +45,32 @@ const PRESET_CATEGORIES = [
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [popularDishes, setPopularDishes] = useState([]);
+  const [addressQuery, setAddressQuery] = useState("");
+  const [rawDishes, setRawDishes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch only curated 4 popular dishes from the API
+  // Fetch dishes from API
   useEffect(() => {
     let isMounted = true;
     const fetchPopular = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE_URL}/recipes?limit=4`);
+        const res = await fetch(`${API_BASE_URL}/recipes?all=true`);
         if (res.ok) {
           const json = await res.json();
           if (isMounted && json && Array.isArray(json.recipes) && json.recipes.length > 0) {
-            setPopularDishes(json.recipes);
+            setRawDishes(json.recipes);
             setLoading(false);
             return;
           }
         }
-        // Fallback to top 4 fallback recipes if server unreachable
         if (isMounted) {
-          setPopularDishes(FALLBACK_RECIPES.slice(0, 4));
+          setRawDishes(FALLBACK_RECIPES);
           setLoading(false);
         }
-      } catch (err) {
+      } catch {
         if (isMounted) {
-          setPopularDishes(FALLBACK_RECIPES.slice(0, 4));
+          setRawDishes(FALLBACK_RECIPES);
           setLoading(false);
         }
       }
@@ -82,6 +82,33 @@ const LandingPage = () => {
     };
   }, []);
 
+  // Guarantee exact 4 mockup popular dishes in exact order:
+  // 1. Russian Borscht (#35)
+  // 2. Lebanese Falafel Wrap (#37)
+  // 3. South Indian Masala Dosa (#36)
+  // 4. Brazilian Caipirinha (#38)
+  const popularDishes = useMemo(() => {
+    const list = rawDishes.length > 0 ? rawDishes : FALLBACK_RECIPES;
+    const borscht = list.find((i) => i.id === 35 || i.name.toLowerCase().includes("borscht"));
+    const falafel = list.find((i) => i.id === 37 || i.name.toLowerCase().includes("falafel"));
+    const dosa = list.find((i) => i.id === 36 || i.name.toLowerCase().includes("dosa"));
+    const caipirinha = list.find((i) => i.id === 38 || i.name.toLowerCase().includes("caipirinha"));
+
+    const curated = [borscht, falafel, dosa, caipirinha].filter(Boolean);
+    if (curated.length === 4) return curated;
+    return list.slice(0, 4);
+  }, [rawDishes]);
+
+  const handleHeroSearch = (e) => {
+    e.preventDefault();
+    const q = addressQuery.trim();
+    if (q) {
+      navigate(`/menu?search=${encodeURIComponent(q)}`);
+    } else {
+      navigate("/menu");
+    }
+  };
+
   const handleCategoryClick = (categoryName) => {
     navigate(`/menu?category=${encodeURIComponent(categoryName)}`);
   };
@@ -89,9 +116,9 @@ const LandingPage = () => {
   return (
     <div className="bg-white">
       {/* ========================================================
-          1. HERO SECTION (Clean, human-designed, no badges/labels)
+          1. HERO SECTION (1:1 with Official Mockup)
       ======================================================== */}
-      <section className="relative overflow-hidden bg-white pt-8 pb-14 sm:pt-14 sm:pb-20">
+      <section className="relative overflow-hidden bg-white pt-6 pb-12 sm:pt-10 sm:pb-16">
         <div className="mx-auto max-w-7xl px-6 sm:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             
@@ -105,32 +132,38 @@ const LandingPage = () => {
               </h1>
 
               {/* Subtitle */}
-              <p className="text-sm sm:text-base text-slate-600 max-w-lg leading-relaxed">
-                Discover handcrafted meals, authentic recipes, and chef specialties delivered piping hot to your doorstep in under 30 minutes.
+              <p className="text-sm sm:text-base text-slate-500 max-w-md leading-relaxed">
+                Explore a wide variety of delicious dishes, prepared with fresh ingredients and delivered to your door.
               </p>
 
-              {/* Call to Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3.5 pt-1">
-                <Link
-                  to="/menu"
-                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-emerald-700 transition"
-                >
-                  <span>Explore Menu</span>
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
+              {/* Delivery Address Search Pill */}
+              <form
+                onSubmit={handleHeroSearch}
+                className="relative flex items-center rounded-full bg-white border border-slate-200 shadow-md p-1.5 max-w-lg"
+              >
+                <div className="pl-3.5 text-emerald-600 shrink-0">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+                    <circle cx="12" cy="10" r="3" />
                   </svg>
-                </Link>
-
-                <a
-                  href="#categories"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter your delivery address"
+                  value={addressQuery}
+                  onChange={(e) => setAddressQuery(e.target.value)}
+                  className="flex-1 bg-transparent px-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="rounded-full bg-emerald-700 px-7 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 transition shadow-xs shrink-0 cursor-pointer"
                 >
-                  Browse Categories
-                </a>
-              </div>
+                  Search
+                </button>
+              </form>
 
               {/* 3 Trust Highlights */}
-              <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-4 max-w-lg text-slate-700 border-t border-slate-100">
+              <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-4 max-w-lg text-slate-700">
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 shrink-0">
                     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
@@ -174,9 +207,9 @@ const LandingPage = () => {
             </div>
 
             {/* Right Graphic: Round Food Bowl with Healthy Tasty Fresh Doodle */}
-            <div className="lg:col-span-5 relative flex items-center justify-center">
-              {/* Healthy Tasty Fresh Doodle */}
-              <div className="absolute top-2 left-6 z-10 text-emerald-700 font-doodle rotate-[-12deg] select-none pointer-events-none">
+            <div className="lg:col-span-5 relative flex items-center justify-center pt-6 lg:pt-0">
+              {/* Healthy Tasty Fresh Doodle (positioned to the top-left of the bowl, exactly like mockup) */}
+              <div className="absolute -top-2 left-0 sm:-left-8 z-10 text-emerald-700 font-doodle rotate-[-12deg] select-none pointer-events-none">
                 <span className="text-3xl sm:text-4xl font-bold leading-none block">
                   Healthy <br />
                   &nbsp;&nbsp;Tasty <br />
@@ -203,25 +236,25 @@ const LandingPage = () => {
       </section>
 
       {/* ========================================================
-          2. BROWSE BY CATEGORY SECTION
+          2. BROWSE BY CATEGORY SECTION (1:1 from Mockup)
       ======================================================== */}
-      <section id="categories" className="py-12 bg-white border-t border-slate-100">
+      <section id="categories" className="py-10 bg-white border-t border-slate-100">
         <div className="mx-auto max-w-7xl px-6 sm:px-10">
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="text-2xl font-black text-slate-900 tracking-tight">Browse by Category</h2>
-              <p className="text-xs text-slate-400 mt-1">Select a category to view matching dishes</p>
+              <p className="text-xs text-slate-400 mt-1">Find your favorite cuisine</p>
             </div>
             <Link
               to="/menu"
               className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition"
             >
-              <span>View All Menu</span>
+              <span>View All</span>
               <span>→</span>
             </Link>
           </div>
 
-          {/* 7 Pastel Category Cards */}
+          {/* 7 Pastel Category Cards in exact order */}
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
             {PRESET_CATEGORIES.map((cat) => (
               <button
@@ -246,29 +279,29 @@ const LandingPage = () => {
       </section>
 
       {/* ========================================================
-          3. CURATED POPULAR DISHES (Only 4 items, not the full menu)
+          3. POPULAR DISHES (1:1 from Mockup Left Screen)
       ======================================================== */}
-      <section className="py-12 bg-slate-50/50">
+      <section className="py-12 bg-white">
         <div className="mx-auto max-w-7xl px-6 sm:px-10">
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="text-2xl font-black text-slate-900 tracking-tight">Popular Dishes</h2>
-              <p className="text-xs text-slate-400 mt-1">Our customers' top-rated favorites</p>
+              <p className="text-xs text-slate-400 mt-1">Our customers' favorites</p>
             </div>
             <Link
               to="/menu"
               className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition"
             >
-              <span>Explore Complete Menu</span>
+              <span>View All</span>
               <span>→</span>
             </Link>
           </div>
 
-          {/* Grid of 4 Dish Cards */}
+          {/* Grid of 4 Curated Dish Cards */}
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4].map((n) => (
-                <div key={n} className="h-80 rounded-2xl bg-slate-200/60" />
+                <div key={n} className="h-80 rounded-2xl bg-slate-100 animate-pulse border border-slate-100" />
               ))}
             </div>
           ) : (
@@ -278,24 +311,13 @@ const LandingPage = () => {
               ))}
             </div>
           )}
-
-          {/* Bottom Explore Button */}
-          <div className="mt-10 text-center">
-            <Link
-              to="/menu"
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-7 py-3 text-xs font-bold text-white shadow-sm hover:bg-slate-800 transition"
-            >
-              <span>View Full Menu Catalogue ({popularDishes.length > 0 ? "30+ Dishes" : "Explore"})</span>
-              <span>→</span>
-            </Link>
-          </div>
         </div>
       </section>
 
       {/* ========================================================
-          4. BETTER FOOD BETTER MOOD BANNER
+          4. BETTER FOOD BETTER MOOD BANNER (1:1 from Mockup)
       ======================================================== */}
-      <section className="py-12 pb-16">
+      <section className="py-8 pb-16">
         <div className="mx-auto max-w-7xl px-6 sm:px-10">
           <div className="relative overflow-hidden rounded-3xl bg-[#eaf6ee] border border-emerald-100/70 p-8 sm:p-14">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -306,20 +328,20 @@ const LandingPage = () => {
                   Better Mood
                 </h3>
                 <p className="text-sm text-slate-600">
-                  Freshly prepared restaurant-grade meals, crafted just for you.
+                  Freshly prepared meals, just for you.
                 </p>
                 <div className="pt-2">
                   <Link
                     to="/menu"
                     className="inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-6 py-3 text-xs font-bold text-white shadow-xs hover:bg-emerald-800 transition"
                   >
-                    <span>Order Now</span>
+                    <span>Explore Menu</span>
                     <span>→</span>
                   </Link>
                 </div>
               </div>
 
-              {/* Right Dish Banner with Doodle */}
+              {/* Right Dish Banner with "Eat Good Feel Good" Doodle */}
               <div className="lg:col-span-5 relative flex items-center justify-end">
                 <div className="relative h-44 sm:h-52 w-full max-w-md rounded-2xl overflow-hidden shadow-md">
                   <img
@@ -327,6 +349,7 @@ const LandingPage = () => {
                     alt="Eat Good Feel Good"
                     className="h-full w-full object-cover"
                   />
+                  {/* Eat Good Feel Good Doodle overlay */}
                   <div className="absolute top-3 right-3 rounded-xl bg-white/95 backdrop-blur-xs px-3.5 py-1.5 text-center font-doodle rotate-2 shadow-xs">
                     <span className="text-sm font-bold text-emerald-800 block leading-tight">
                       Eat Good <br />
