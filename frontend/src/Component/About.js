@@ -13,35 +13,25 @@ const About = () => {
   }, []);
 
   return (
-    <div className="bg-white min-h-[85vh] pt-4 sm:pt-6 pb-16 text-slate-800">
+    <div className="bg-white min-h-[85vh] pt-6 sm:pt-10 pb-16 text-slate-800">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         
-        {/* Top Header Row */}
-        <div className="pb-5 border-b border-slate-100 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              About FoodNinja
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Our Story • Flagship Kitchen & Artisanal Dining • Connaught Place, New Delhi
-            </p>
-          </div>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#f4faee] border border-emerald-200/80 px-3.5 py-1 text-xs font-bold text-emerald-800 self-start sm:self-auto">
-            <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
-            <span>Single Commercial Kitchen • 100% In-House Fresh Cooking</span>
-          </div>
-        </div>
-
         {/* Hero Section: Story & Plated Kitchen Visual */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-14">
           <div className="lg:col-span-7">
-            <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-800 mb-3">
-              Direct Kitchen To Doorstep
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+            <div className="flex flex-wrap items-center gap-2 mb-3.5">
+              <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-800">
+                Direct Kitchen To Doorstep
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f4faee] border border-emerald-200/80 px-3 py-1 text-[11px] font-bold text-emerald-800">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                <span>Single Kitchen • 100% In-House Fresh Cooking</span>
+              </span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
               Fresh Restaurant Food. <br />
               <span className="text-emerald-700">Crafted on Order, Delivered Fast.</span>
-            </h2>
+            </h1>
             <p className="mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
               FoodNinja is our flagship artisanal restaurant and dedicated cloud kitchen based in Connaught Place, New Delhi. Unlike third-party marketplace aggregators, we don&apos;t outsource your food. Every meal on our menu is prepared in-house by our master chefs using fresh morning produce, cold-pressed oils, and authentic regional spice blends.
             </p>
