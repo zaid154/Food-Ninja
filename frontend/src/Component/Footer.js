@@ -4,7 +4,7 @@ import BrandLogo from "./BrandLogo";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#111928] text-slate-300 mt-20 pt-14 pb-8">
+    <footer className="bg-[#111928] text-slate-300 mt-10 sm:mt-12 pt-10 sm:pt-12 pb-8">
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
           {/* Col 1: Brand Info */}

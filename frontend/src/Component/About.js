@@ -13,11 +13,11 @@ const About = () => {
   }, []);
 
   return (
-    <div className="bg-white min-h-[85vh] pt-3 sm:pt-5 pb-10 text-slate-800">
+    <div className="bg-white pt-2 sm:pt-4 text-slate-800">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         
         {/* Hero Section: Story & Plated Kitchen Visual */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-10 sm:mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-8 sm:mb-10">
           <div className="lg:col-span-7">
             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
               Fresh Restaurant Food. <br />
@@ -162,7 +162,7 @@ const About = () => {
         </div>
 
         {/* 2-Column Section: Food Safety Certification + Founder Story */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* Left Column: Food Safety & Statutory Credentials (6 Cols) */}
           <div className="lg:col-span-6 rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-xs">
