@@ -48,7 +48,7 @@ const Admin = () => {
       setLoading(true);
       const [ordRes, foodRes, inqRes] = await Promise.all([
         fetch(`${API_BASE_URL}/orders`).then((r) => r.json()).catch(() => ({ orders: [] })),
-        fetch(`${API_BASE_URL}/recipes`).then((r) => r.json()).catch(() => ({ recipes: [] })),
+        fetch(`${API_BASE_URL}/recipes?all=true`).then((r) => r.json()).catch(() => ({ recipes: [] })),
         fetch(`${API_BASE_URL}/contact`).then((r) => r.json()).catch(() => ({ inquiries: [] })),
       ]);
       setOrders(ordRes.orders || []);

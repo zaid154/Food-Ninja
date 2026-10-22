@@ -21,4 +21,11 @@ const recipeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Indexes for high-frequency queries, sorting, and search
+recipeSchema.index({ category: 1 });
+recipeSchema.index({ cuisine: 1 });
+recipeSchema.index({ price: 1 });
+recipeSchema.index({ rating: -1 });
+recipeSchema.index({ name: "text", category: "text", cuisine: "text", description: "text" });
+
 module.exports = mongoose.model("Recipe", recipeSchema);

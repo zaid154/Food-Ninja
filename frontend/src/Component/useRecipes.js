@@ -12,7 +12,7 @@ const useResipe = () => {
 
         const fetchData = async () => {
             try {
-                const res = await fetch(`${API_BASE_URL}/recipes`, {
+                const res = await fetch(`${API_BASE_URL}/recipes?all=true`, {
                     signal: controller.signal
                 });
                 clearTimeout(timeoutId);

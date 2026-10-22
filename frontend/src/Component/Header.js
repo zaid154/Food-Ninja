@@ -10,7 +10,11 @@ const Header = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
+  const searchRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -18,22 +22,69 @@ const Header = () => {
 
   const { user, setUser } = useContext(UserContext);
 
+  // Sync search query from URL when on /menu
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get("search") || "";
+    setSearchQuery(q);
+    if (q) {
+      setSearchOpen(true);
+    }
+  }, [location.search]);
+
   useEffect(() => {
     const adminSession = sessionStorage.getItem("adminAuth") === "true";
     const isUserAdmin = user && user.email === "admin@foodninja.com";
     setIsAdmin(adminSession || isUserAdmin);
   }, [user, location.pathname]);
 
-  // Close dropdown on outside click
+  // Close dropdown & search on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setUserDropdown(false);
       }
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        if (!searchQuery) {
+          setSearchOpen(false);
+        }
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setUserDropdown(false);
+        setSearchOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [searchQuery]);
+
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    const trimmed = searchQuery.trim();
+    if (trimmed) {
+      navigate(`/menu?search=${encodeURIComponent(trimmed)}`);
+    } else {
+      navigate("/menu");
+    }
+    setMobileMenuOpen(false);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    if (location.pathname === "/menu") {
+      const params = new URLSearchParams(location.search);
+      params.delete("search");
+      const newQuery = params.toString();
+      navigate(newQuery ? `/menu?${newQuery}` : "/menu");
+    }
+    setSearchOpen(false);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
@@ -70,20 +121,9 @@ const Header = () => {
           <NavLink to="/" end className={navLinkClass}>
             Home
           </NavLink>
-          <a
-            href="#menu"
-            onClick={(e) => {
-              if (location.pathname !== "/") {
-                navigate("/#menu");
-              } else {
-                const el = document.getElementById("menu");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-            className="text-[15px] font-semibold text-slate-600 hover:text-slate-900 transition-colors py-1 cursor-pointer"
-          >
+          <NavLink to="/menu" className={navLinkClass}>
             Menu
-          </a>
+          </NavLink>
           <NavLink to="/about" className={navLinkClass}>
             About
           </NavLink>
@@ -93,26 +133,60 @@ const Header = () => {
         </nav>
 
         {/* Right Actions (Search, Cart with badge, User Avatar 'M') */}
-        <div className="flex items-center gap-5">
-          {/* Search Icon */}
-          <button
-            type="button"
-            onClick={() => {
-              const input = document.getElementById("hero-search-input");
-              if (input) {
-                input.focus();
-                input.scrollIntoView({ behavior: "smooth", block: "center" });
-              }
-            }}
-            className="text-slate-700 hover:text-slate-950 transition p-1"
-            title="Search dishes"
-            aria-label="Search"
-          >
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-          </button>
+        <div className="flex items-center gap-4 sm:gap-5">
+          {/* Search Bar / Icon */}
+          <div ref={searchRef} className="relative">
+            {searchOpen ? (
+              <form onSubmit={handleSearchSubmit} className="flex items-center">
+                <div className="relative flex items-center">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Search dishes..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-44 sm:w-64 rounded-full border border-emerald-500 bg-slate-50 py-1.5 pl-3.5 pr-8 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      className="absolute right-2.5 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                      title="Clear"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  className="ml-1.5 rounded-full bg-emerald-600 p-1.5 text-white hover:bg-emerald-700 transition shadow-xs"
+                  title="Search"
+                >
+                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </button>
+              </form>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchOpen(true);
+                  setTimeout(() => searchInputRef.current?.focus(), 50);
+                }}
+                className="text-slate-700 hover:text-slate-950 transition p-1"
+                title="Search dishes"
+                aria-label="Search"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </button>
+            )}
+          </div>
 
           {/* Cart Icon with Circular Green Badge */}
           <Link
@@ -229,16 +303,33 @@ const Header = () => {
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-100 bg-white px-6 py-4 space-y-3">
+          {/* Mobile Search Bar */}
+          <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 pb-2">
+            <input
+              type="text"
+              placeholder="Search dishes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
+            <button
+              type="submit"
+              className="rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white shadow-xs"
+            >
+              Search
+            </button>
+          </form>
+
           <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-semibold text-slate-800">
             Home
           </Link>
-          <a
-            href="#menu"
+          <Link
+            to="/menu"
             onClick={() => setMobileMenuOpen(false)}
             className="block text-sm font-semibold text-slate-800"
           >
             Menu
-          </a>
+          </Link>
           <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-semibold text-slate-800">
             About
           </Link>

@@ -1,12 +1,107 @@
 const Recipe = require("../models/recipe");
 
-// Get all food items
+// Get food items with server-side pagination, search, category filtering, and sorting
 const getRecipes = async (req, res) => {
   try {
-    const recipes = await Recipe.find().sort({ id: -1 });
-    return res.status(200).json({ recipes });
+    const {
+      page: rawPage,
+      limit: rawLimit,
+      category,
+      search,
+      sort,
+      all,
+      popular
+    } = req.query;
+
+    // 1. Build Query Filter
+    const filter = {};
+
+    // Category / Cuisine filter
+    if (category && category.trim() && category.toLowerCase() !== "all") {
+      const catRegex = new RegExp(`^${category.trim()}$`, "i");
+      filter.$or = [
+        { category: catRegex },
+        { cuisine: catRegex }
+      ];
+    }
+
+    // Text Search filter (name, category, cuisine, description)
+    if (search && search.trim()) {
+      const sRegex = new RegExp(search.trim(), "i");
+      const searchConditions = [
+        { name: sRegex },
+        { category: sRegex },
+        { cuisine: sRegex },
+        { description: sRegex }
+      ];
+
+      if (filter.$or) {
+        // If both category and search are present, combine with $and
+        filter.$and = [
+          { $or: filter.$or },
+          { $or: searchConditions }
+        ];
+        delete filter.$or;
+      } else {
+        filter.$or = searchConditions;
+      }
+    }
+
+    // 2. Build Sorting
+    let sortObj = { id: -1 };
+    if (sort === "price_asc") {
+      sortObj = { price: 1, id: 1 };
+    } else if (sort === "price_desc") {
+      sortObj = { price: -1, id: -1 };
+    } else if (sort === "rating" || sort === "rating_desc") {
+      sortObj = { rating: -1, id: -1 };
+    }
+
+    // 3. Admin / Full bypass check
+    if (all === "true") {
+      const recipes = await Recipe.find(filter).sort(sortObj);
+      return res.status(200).json({
+        success: true,
+        recipes,
+        foods: recipes,
+        pagination: {
+          currentPage: 1,
+          limit: recipes.length,
+          totalItems: recipes.length,
+          totalPages: 1
+        }
+      });
+    }
+
+    // 4. Server-Side Pagination
+    const page = Math.max(1, parseInt(rawPage, 10) || 1);
+    const limit = Math.min(24, Math.max(1, parseInt(rawLimit, 10) || 12));
+    const skip = (page - 1) * limit;
+
+    const [totalItems, recipes] = await Promise.all([
+      Recipe.countDocuments(filter),
+      Recipe.find(filter).sort(sortObj).skip(skip).limit(limit)
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limit) || 1;
+
+    return res.status(200).json({
+      success: true,
+      recipes,
+      foods: recipes,
+      pagination: {
+        currentPage: page,
+        limit,
+        totalItems,
+        totalPages
+      }
+    });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to fetch food items", error: error.message });
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch food items",
+      error: error.message
+    });
   }
 };
 

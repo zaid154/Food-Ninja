@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import "./App.css";
 
 import Header from "./Component/Header";
+import LandingPage from "./Component/LandingPage";
+import MenuPage from "./Component/MenuPage";
 import FoodMenu from "./Component/FoodMenu";
 import Cart from "./Component/Cart";
 import Footer from "./Component/Footer";
@@ -64,7 +66,8 @@ const appRouter = createBrowserRouter([
     element: <App />,
     errorElement: <Error />,
     children: [
-      { path: "/", element: <FoodMenu /> },
+      { path: "/", element: <LandingPage /> },
+      { path: "/menu", element: <MenuPage /> },
       { path: "/about", element: <About /> },
       { path: "/contact", element: <Contact /> },
       { path: "/login", element: <Login /> },
