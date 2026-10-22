@@ -299,10 +299,10 @@ const MenuPage = () => {
                   key={cat.name}
                   type="button"
                   onClick={() => handleCategorySelect(isActive ? "All" : cat.name)}
-                  className={`group relative flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl transition-all duration-200 border text-center cursor-pointer min-w-[100px] sm:min-w-0 shrink-0 sm:shrink ${cat.bg} ${
+                  className={`group relative flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl transition-all duration-200 border-2 text-center cursor-pointer min-w-[100px] sm:min-w-0 shrink-0 sm:shrink ${cat.bg} ${
                     isActive
-                      ? "border-emerald-600 shadow-md ring-2 ring-emerald-500/30 scale-[1.02]"
-                      : "border-transparent hover:border-slate-200 hover:shadow-md hover:-translate-y-0.5"
+                      ? "border-emerald-600 shadow-md bg-white/90"
+                      : "border-transparent hover:border-slate-300/80 hover:shadow-md hover:-translate-y-0.5"
                   }`}
                 >
                   {/* Circular Image */}
@@ -319,7 +319,7 @@ const MenuPage = () => {
                     {cat.name}
                   </span>
 
-                  {/* Circular Arrow Indicator */}
+                  {/* Circular Indicator */}
                   <div
                     className={`flex h-5 w-5 sm:h-5.5 sm:w-5.5 items-center justify-center rounded-full shadow-xs transition duration-200 ${
                       isActive
@@ -327,15 +327,31 @@ const MenuPage = () => {
                         : "bg-white text-slate-600 group-hover:bg-emerald-700 group-hover:text-white"
                     }`}
                   >
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="h-3 w-3"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    >
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
+                    {isActive ? (
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-3 w-3"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    ) : (
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-3 w-3"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                      </svg>
+                    )}
                   </div>
                 </button>
               );
