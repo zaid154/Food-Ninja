@@ -1,11 +1,4 @@
-let logoUrl = "/logo.png";
-try {
-  logoUrl = new URL("../../logo.png", import.meta.url).href;
-} catch (e) {
-  logoUrl = "/logo.png";
-}
-
-export const LOGO = logoUrl;
+export const LOGO = "/logo.png";
 
 const defaultUrl =
   typeof window !== "undefined" && window.location.hostname === "localhost"

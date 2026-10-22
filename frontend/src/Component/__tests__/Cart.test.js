@@ -1,44 +1,18 @@
-import { render, screen, waitFor } from "@testing-library/react";  // Add waitFor
+import React from "react";
+import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Cart from "../Cart";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import appStore from "../../utils/Store";
-import { act } from "react";  
+import { addCart, clearCart } from "../../utils/cartSlice";
 
-jest.mock("../useRecipes", () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
+describe("Cart Component Tests", () => {
+  beforeEach(() => {
+    appStore.dispatch(clearCart());
+  });
 
-import useRecipes from "../useRecipes";
-
-// Mock data must match the structure the component expects
-const mockData = {
-  recipes: [  // Wrap in recipes object
-    {
-      id: 1,
-      name: "Classic Margherita Pizza",  // Fixed typo: Margherita
-      ingredients: ["Pizza dough", "Tomato sauce", "Fresh mozzarella cheese", "Fresh basil leaves", "Olive oil", "Salt and pepper to taste"],
-      instructions: ["Bake it"],
-      image: "test.jpg",
-      rating: 4.5,
-      caloriesPerServing: 300,
-      cuisine: "Italian",
-      mealType: ["Dinner"],
-      cookTimeMinutes: 15,
-      reviewCount: 98,
-      difficulty: "Easy",
-    },
-  ],
-};
-
-beforeEach(() => {
-  useRecipes.mockReturnValue(mockData); 
-});
-
-test("renders cart items from mocked useRecipes", async () => {
-  await act(async () => {
+  test("renders empty cart state when no items exist", () => {
     render(
       <Provider store={appStore}>
         <MemoryRouter>
@@ -46,10 +20,31 @@ test("renders cart items from mocked useRecipes", async () => {
         </MemoryRouter>
       </Provider>
     );
+
+    const emptyMsg = screen.getByText(/Your Cart is Empty/i);
+    expect(emptyMsg).toBeInTheDocument();
   });
 
-  await waitFor(() => {
-    const item = screen.getByText(/classic margherita pizza/i);
-    expect(item).toBeInTheDocument();
+  test("renders added dish in cart when item is in Redux store", () => {
+    appStore.dispatch(
+      addCart({
+        id: 1,
+        name: "Classic Margherita Pizza",
+        price: 299,
+        quantity: 1,
+        image: "https://example.com/pizza.jpg"
+      })
+    );
+
+    render(
+      <Provider store={appStore}>
+        <MemoryRouter>
+          <Cart />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const dishName = screen.getByText(/Classic Margherita Pizza/i);
+    expect(dishName).toBeInTheDocument();
   });
-}); 
+});

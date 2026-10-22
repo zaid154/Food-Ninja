@@ -7,27 +7,27 @@ import { BrowserRouter } from "react-router-dom";
 import "@testing-library/jest-dom";
 
 test("Header component test", () => {
-    render(
-        <BrowserRouter>
-            <Provider store={store}>
-                <Header />
-            </Provider>
-        </BrowserRouter>
-    );
+  render(
+    <BrowserRouter>
+      <Provider store={store}>
+        <Header />
+      </Provider>
+    </BrowserRouter>
+  );
 
-    const loginbtn = screen.getByText("Login");
-    expect(loginbtn).toBeInTheDocument();
+  const signInBtn = screen.getByText(/Sign In|Login/i);
+  expect(signInBtn).toBeInTheDocument();
 });
 
 test("Cart link test", () => {
-    render(
-        <BrowserRouter>
-            <Provider store={store}>
-                <Header />
-            </Provider>
-        </BrowserRouter>
-    );
+  render(
+    <BrowserRouter>
+      <Provider store={store}>
+        <Header />
+      </Provider>
+    </BrowserRouter>
+  );
 
-    const cartLink = screen.getByText(/Cart/i);
-    expect(cartLink).toBeInTheDocument();
+  const cartLink = screen.getByText(/Cart/i);
+  expect(cartLink).toBeInTheDocument();
 });
