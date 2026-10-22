@@ -1,4 +1,5 @@
-export const LOGO = "/logo.png";
+import logo from "../../logo.png";
+export const LOGO = logo;
 
 const defaultUrl =
   typeof window !== "undefined" && window.location.hostname === "localhost"
