@@ -201,79 +201,61 @@ const MenuPage = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         
         {/* ========================================================
-            1. PAGE HEADER
+            1. UNIFIED PAGE HEADER & CONTROLS (Compact & Clean)
         ======================================================== */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 mb-6">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Explore Our Menu
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">
-              Browse through handcrafted recipes, fresh salads, gourmet specialties, and beverages prepared fresh on order.
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                Explore Our Menu
+              </h1>
+              <span className="rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-0.5 text-xs font-bold border border-emerald-200/60">
+                {pagination.totalItems || 38} Dishes
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Select a cuisine or search below to discover freshly prepared recipes
             </p>
           </div>
 
-          {/* Sort Dropdown */}
-          <div className="flex items-center gap-2.5 shrink-0 self-start md:self-end">
-            <label htmlFor="sort-select" className="text-xs font-bold text-slate-600">
-              Sort by:
-            </label>
-            <select
-              id="sort-select"
-              value={currentSort}
-              onChange={handleSortChange}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 shadow-2xs focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
-            >
-              {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+          {/* Sort Dropdown & Quick Reset */}
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-2">
+              <label htmlFor="sort-select" className="text-xs font-bold text-slate-600">
+                Sort by:
+              </label>
+              <select
+                id="sort-select"
+                value={currentSort}
+                onChange={handleSortChange}
+                className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {(currentCategory !== "All" || currentSearch || currentSort !== "recommended") && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 transition cursor-pointer"
+                title="Reset all filters"
+              >
+                Reset All
+              </button>
+            )}
           </div>
         </div>
 
         {/* ========================================================
-            2. BROWSE BY CATEGORY (7 Pastel Cards - Exact Mockup)
+            2. 7 CATEGORY CARDS (Exact Mockup Row)
         ======================================================== */}
-        <div className="py-6 sm:py-8 border-b border-slate-100">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                Browse by Category
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                Select a cuisine to explore matching dishes
-              </p>
-            </div>
-
-            {/* Quick Status / Reset Pill */}
-            <div className="flex items-center gap-2">
-              {currentCategory !== "All" ? (
-                <button
-                  type="button"
-                  onClick={() => handleCategorySelect("All")}
-                  className="group inline-flex items-center gap-2 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-3.5 py-1.5 text-xs font-bold text-emerald-800 transition shadow-2xs cursor-pointer"
-                  title="Click to reset to All Categories"
-                >
-                  <span>
-                    Category: <strong className="text-emerald-900">{currentCategory}</strong>
-                  </span>
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 group-hover:bg-emerald-700 text-white text-[10px] transition">
-                    ✕
-                  </span>
-                </button>
-              ) : (
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3.5 py-1.5 text-xs font-semibold text-slate-600">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
-                  <span>All Dishes ({pagination.totalItems || 38})</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* 7 Spacious Category Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 sm:gap-5">
+        <div className="mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
             {MENU_CATEGORIES.map((cat) => {
               const isActive = currentCategory.toLowerCase() === cat.name.toLowerCase();
 
@@ -282,14 +264,14 @@ const MenuPage = () => {
                   key={cat.name}
                   type="button"
                   onClick={() => handleCategorySelect(isActive ? "All" : cat.name)}
-                  className={`group relative flex flex-col items-center justify-between p-4 sm:p-5 rounded-2xl transition-all duration-200 border text-center cursor-pointer ${cat.bg} ${
+                  className={`group relative flex flex-col items-center justify-between p-3.5 sm:p-4 rounded-2xl transition-all duration-200 border text-center cursor-pointer ${cat.bg} ${
                     isActive
                       ? "border-emerald-600 shadow-md ring-2 ring-emerald-500/30 scale-[1.02]"
-                      : "border-transparent hover:border-slate-200 hover:shadow-md hover:-translate-y-1"
+                      : "border-transparent hover:border-slate-200 hover:shadow-md hover:-translate-y-0.5"
                   }`}
                 >
                   {/* Circular Image */}
-                  <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-3 shrink-0">
+                  <div className="h-14 w-14 sm:h-18 sm:w-18 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-2.5 shrink-0">
                     <img
                       src={cat.img}
                       alt={cat.name}
@@ -298,13 +280,13 @@ const MenuPage = () => {
                   </div>
 
                   {/* Category Name */}
-                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 mb-3 tracking-tight">
+                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 mb-2 tracking-tight">
                     {cat.name}
                   </span>
 
                   {/* Circular Arrow Indicator */}
                   <div
-                    className={`flex h-6 w-6 items-center justify-center rounded-full shadow-xs transition duration-200 ${
+                    className={`flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full shadow-xs transition duration-200 ${
                       isActive
                         ? "bg-emerald-700 text-white"
                         : "bg-white text-slate-600 group-hover:bg-emerald-700 group-hover:text-white"
@@ -327,46 +309,48 @@ const MenuPage = () => {
         </div>
 
         {/* ========================================================
-            3. ACTIVE FILTERS STATUS BAR
+            3. ACTIVE FILTERS STATUS BAR (Single, Clean, Not Duplicated)
         ======================================================== */}
         {(currentSearch || currentCategory !== "All") && (
-          <div className="flex flex-wrap items-center gap-2 mb-6 p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
-            <span className="font-bold text-slate-600">Active Filters:</span>
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6 p-2.5 px-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-bold text-slate-500">Active Filter:</span>
 
-            {currentSearch && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 font-semibold text-slate-800 border border-slate-200 shadow-2xs">
-                <span>Search: "{currentSearch}"</span>
-                <button
-                  type="button"
-                  onClick={() => updateQuery({ search: "", page: 1 })}
-                  className="text-slate-400 hover:text-slate-700 font-bold ml-1"
-                  title="Remove search filter"
-                >
-                  ✕
-                </button>
-              </span>
-            )}
+              {currentCategory !== "All" && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-900 px-3 py-1 font-bold border border-emerald-200 shadow-2xs">
+                  <span>Category: <strong>{currentCategory}</strong></span>
+                  <button
+                    type="button"
+                    onClick={() => updateQuery({ category: "All", page: 1 })}
+                    className="hover:text-emerald-950 font-black text-xs cursor-pointer ml-0.5"
+                    title="Remove category filter"
+                  >
+                    ✕
+                  </button>
+                </span>
+              )}
 
-            {currentCategory !== "All" && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 font-bold text-emerald-800 border border-emerald-200 shadow-2xs">
-                <span>Category: {currentCategory}</span>
-                <button
-                  type="button"
-                  onClick={() => updateQuery({ category: "All", page: 1 })}
-                  className="text-emerald-600 hover:text-emerald-900 font-bold ml-1"
-                  title="Remove category filter"
-                >
-                  ✕
-                </button>
-              </span>
-            )}
+              {currentSearch && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white text-slate-800 px-3 py-1 font-bold border border-slate-200 shadow-2xs">
+                  <span>Search: "<strong>{currentSearch}</strong>"</span>
+                  <button
+                    type="button"
+                    onClick={() => updateQuery({ search: "", page: 1 })}
+                    className="hover:text-slate-950 font-black text-xs cursor-pointer ml-0.5"
+                    title="Clear search"
+                  >
+                    ✕
+                  </button>
+                </span>
+              )}
+            </div>
 
             <button
               type="button"
               onClick={handleResetFilters}
-              className="ml-auto text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:underline"
+              className="font-bold text-emerald-700 hover:text-emerald-900 underline transition cursor-pointer text-xs"
             >
-              Reset All Filters
+              Clear All
             </button>
           </div>
         )}
