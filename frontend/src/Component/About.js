@@ -1,135 +1,282 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const About = () => {
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetch("https://api.github.com/users/zaid154")
+      .then((res) => res.json())
+      .then((data) => setProfile(data))
+      .catch(() => {});
+  }, []);
+
   return (
-    <section className="bg-gray-50 min-h-[85vh]">
-      <div className="mx-auto max-w-6xl px-4 py-12 md:py-16">
-        {/* Hero Section */}
-        <div className="grid items-center gap-10 lg:grid-cols-2">
+    <div className="bg-white min-h-[85vh] pt-4 sm:pt-6 pb-16 text-slate-800">
+      <div className="mx-auto max-w-7xl px-4 sm:px-8">
+        
+        {/* Top Header Row */}
+        <div className="pb-5 border-b border-slate-100 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-700">
-              About Food Ninja
-            </span>
-            <h1 className="mt-3 text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">
-              Fresh Restaurant Food — Delivered Ninja Fast.
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              About FoodNinja
             </h1>
-            <p className="mt-4 text-sm sm:text-base leading-relaxed text-gray-600">
-              Food Ninja is designed to provide quick, chef-crafted meals at lightning speed. We partner with top-rated local kitchens and restaurants to ensure every order arrives fresh, piping hot, and right on time.
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Our Story • Flagship Kitchen & Artisanal Dining • Connaught Place, New Delhi
+            </p>
+          </div>
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#f4faee] border border-emerald-200/80 px-3.5 py-1 text-xs font-bold text-emerald-800 self-start sm:self-auto">
+            <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span>Single Commercial Kitchen • 100% In-House Fresh Cooking</span>
+          </div>
+        </div>
+
+        {/* Hero Section: Story & Plated Kitchen Visual */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-14">
+          <div className="lg:col-span-7">
+            <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-800 mb-3">
+              Direct Kitchen To Doorstep
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+              Fresh Restaurant Food. <br />
+              <span className="text-emerald-700">Crafted on Order, Delivered Fast.</span>
+            </h2>
+            <p className="mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              FoodNinja is our flagship artisanal restaurant and dedicated cloud kitchen based in Connaught Place, New Delhi. Unlike third-party marketplace aggregators, we don&apos;t outsource your food. Every meal on our menu is prepared in-house by our master chefs using fresh morning produce, cold-pressed oils, and authentic regional spice blends.
+            </p>
+            <p className="mt-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
+              We maintain strictly segregated, hygienic preparation zones for Vegetarian, Non-Vegetarian, and Vegan dishes. No frozen pre-cooked gravies — only piping hot food delivered within 25–30 minutes flat.
             </p>
 
-            {/* Redesigned Modern Stats Grid */}
-            <div className="mt-7 grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm text-center sm:text-left">
-                <p className="text-2xl font-black text-emerald-600">38+</p>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Dishes
+            {/* Quick Metrics Bar */}
+            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-3.5 text-center sm:text-left">
+                <p className="text-2xl font-black text-emerald-700">38+</p>
+                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  Signature Dishes
                 </p>
               </div>
-              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm text-center sm:text-left">
-                <p className="text-2xl font-black text-emerald-600">10+</p>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Cuisines
+              <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-3.5 text-center sm:text-left">
+                <p className="text-2xl font-black text-emerald-700">100%</p>
+                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  Cooked Fresh
                 </p>
               </div>
-              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm text-center sm:text-left">
-                <p className="text-2xl font-black text-emerald-600">25–30m</p>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Delivery
+              <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-3.5 text-center sm:text-left">
+                <p className="text-2xl font-black text-emerald-700">25–30m</p>
+                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  Express Delivery
                 </p>
               </div>
-              <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm text-center sm:text-left">
-                <p className="text-2xl font-black text-emerald-600">Delhi NCR</p>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Coverage
+              <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-3.5 text-center sm:text-left">
+                <p className="text-2xl font-black text-emerald-700">Delhi NCR</p>
+                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  Central Kitchen Hub
                 </p>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="mt-7 flex flex-wrap items-center gap-3">
+            {/* Actions */}
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <Link
-                to="/"
-                className="rounded-lg bg-emerald-600 px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-emerald-700"
+                to="/menu"
+                className="rounded-full bg-emerald-700 px-6 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-800"
               >
-                Browse Food Menu
+                Browse Our Menu →
               </Link>
               <Link
                 to="/contact"
-                className="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-xs font-bold text-gray-700 shadow-sm transition hover:bg-gray-50 hover:text-gray-900"
+                className="rounded-full border border-slate-200 bg-white px-5 py-2.5 text-xs font-bold text-slate-700 shadow-2xs transition hover:bg-slate-50 hover:text-slate-900"
               >
-                Contact Support
+                Contact Kitchen Desk
               </Link>
             </div>
           </div>
 
-          {/* Right Image Card */}
-          <div className="relative">
-            <div className="overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-200">
+          {/* Right Visual Image Card */}
+          <div className="lg:col-span-5">
+            <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white">
               <img
-                src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=70"
-                alt="Plated meal"
-                className="h-72 w-full object-cover md:h-88"
+                src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80"
+                alt="FoodNinja Master Chefs in Kitchen"
+                className="h-72 sm:h-80 w-full object-cover"
                 loading="lazy"
               />
-              <div className="p-5">
-                <p className="text-xs font-bold uppercase tracking-wider text-emerald-600">
-                  Our Mission
-                </p>
-                <p className="mt-1 text-sm text-gray-600 leading-relaxed">
-                  Delivering chef-crafted recipes effortlessly with exceptional speed, authentic hygiene, and premium quality.
+              <div className="p-5 bg-white border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700">
+                      Culinary Standard
+                    </span>
+                    <h3 className="text-sm font-black text-slate-900">Connaught Place Central Kitchen</h3>
+                  </div>
+                  <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">
+                    FSSAI Verified
+                  </span>
+                </div>
+                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                  Every dish is cooked in small artisanal batches using authentic cast-iron woks, clay tandoors, and stone-ground spices.
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Values Section */}
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {[
-            {
-              title: "Quality & Hygiene",
-              body: "Every recipe is prepared with fresh ingredients, authentic spices, and inspected for highest safety standards.",
-              icon: (
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 mb-3">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-              )
-            },
-            {
-              title: "Ninja Speed Delivery",
-              body: "State-of-the-art delivery routing gets your food from kitchen to doorstep in 25–30 minutes flat.",
-              icon: (
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 mb-3">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-              )
-            },
-            {
-              title: "Transparent Pricing",
-              body: "Zero hidden charges. Clear, fair pricing with live order tracking and instant order support.",
-              icon: (
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 mb-3">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                  </svg>
-                </div>
-              )
-            }
-          ].map((v) => (
-            <div key={v.title} className="rounded-2xl bg-white p-6 border border-gray-200 shadow-sm">
-              {v.icon}
-              <p className="text-base font-bold text-gray-900">{v.title}</p>
-              <p className="mt-2 text-xs leading-relaxed text-gray-600">{v.body}</p>
+        {/* 4-Step Kitchen Process: How FoodNinja Works */}
+        <div className="mb-14">
+          <div className="mb-6">
+            <span className="text-xs font-black uppercase tracking-widest text-emerald-700">
+              Kitchen Philosophy
+            </span>
+            <h2 className="mt-1 text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              How FoodNinja Prepares Your Meal
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              From morning farm sourcing to hot, tamper-evident doorstep dispatch.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-700 text-white text-xs font-mono font-bold mb-3">
+                01
+              </span>
+              <h3 className="text-sm font-black text-slate-900 mb-1.5">Fresh Farm Sourcing</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Vegetables, dairy, and poultry are procured fresh every morning from verified local suppliers. Zero preservatives or artificial coloring.
+              </p>
             </div>
-          ))}
+
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-700 text-white text-xs font-mono font-bold mb-3">
+                02
+              </span>
+              <h3 className="text-sm font-black text-slate-900 mb-1.5">Dedicated Kitchen Zones</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                100% strictly segregated cutting boards, utensils, and cooking stations for Vegetarian (Green), Non-Vegetarian (Red), and Vegan meals.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-700 text-white text-xs font-mono font-bold mb-3">
+                03
+              </span>
+              <h3 className="text-sm font-black text-slate-900 mb-1.5">Tamper-Evident Thermal Seals</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Hot dishes are packed in biodegradable, food-grade thermal containers sealed with security labels to guarantee hygiene.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-700 text-white text-xs font-mono font-bold mb-3">
+                04
+              </span>
+              <h3 className="text-sm font-black text-slate-900 mb-1.5">Direct Express Delivery</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Dispatched directly from our Connaught Place kitchen via our dedicated delivery fleet within 25–30 minutes flat.
+              </p>
+            </div>
+          </div>
         </div>
+
+        {/* 2-Column Section: Food Safety Certification + Founder Story */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mb-12">
+          
+          {/* Left Column: Food Safety & Statutory Credentials (6 Cols) */}
+          <div className="lg:col-span-6 rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-xs">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-600"></span>
+              <h3 className="text-base font-black text-slate-900">
+                Food Safety, Hygiene & Statutory Verification
+              </h3>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">
+              We operate under strict compliance with the Food Safety and Standards Act of India (FSSAI).
+            </p>
+
+            <div className="space-y-3 text-xs text-slate-600 border-t border-slate-100 pt-3.5">
+              <div>
+                <strong className="text-slate-900 block font-bold">FSSAI Central Kitchen Registration:</strong>
+                <span className="text-slate-500">License No. 13324001000452 (Single Commercial Restaurant & Cloud Kitchen)</span>
+              </div>
+
+              <div>
+                <strong className="text-slate-900 block font-bold">Registered Office & Kitchen Address:</strong>
+                <span className="text-slate-500">FoodNinja Central Kitchen, Connaught Place, New Delhi 110001, India</span>
+              </div>
+
+              <div>
+                <strong className="text-slate-900 block font-bold">Direct Customer & Order Support:</strong>
+                <a href="mailto:foodninja@gmail.com" className="text-emerald-700 font-semibold hover:underline">foodninja@gmail.com</a>
+                <span className="text-slate-400 block mt-0.5">Helpline: +91 98765 43210 (Mon–Sun, 9:00 AM – 11:30 PM)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Founder & Engineering Lead (6 Cols) */}
+          <div className="lg:col-span-6 rounded-2xl border border-slate-200/80 bg-[#f8fafc] p-6 sm:p-7 shadow-xs">
+            <div className="flex items-center gap-3 mb-3">
+              {profile ? (
+                <img
+                  src={profile.avatar_url}
+                  alt={profile.name || "Mohd Zaid"}
+                  className="h-12 w-12 rounded-full object-cover border-2 border-emerald-600 shadow-xs"
+                />
+              ) : (
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-700 text-white font-black text-lg">
+                  MZ
+                </div>
+              )}
+              <div>
+                <h3 className="text-sm font-black text-slate-900">
+                  {profile ? profile.name : "Mohd Zaid"}
+                </h3>
+                <p className="text-[11px] font-semibold text-emerald-700">
+                  Founder & Engineering Lead • github.com/zaid154
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed italic border-t border-slate-200/60 pt-3.5">
+              &quot;We founded FoodNinja with a simple commitment: exceptional, chef-crafted meals without compromising on kitchen hygiene, authentic ingredients, or speed. Every line of code on this web platform and every recipe cooked in our kitchen is crafted with genuine passion.&quot;
+            </p>
+
+            <div className="mt-4 flex items-center justify-between text-[11px] text-slate-400">
+              <span>Full-Stack Architecture (MERN)</span>
+              <a
+                href={profile ? profile.html_url : "https://github.com/zaid154"}
+                target="_blank"
+                rel="noreferrer"
+                className="text-emerald-700 font-bold hover:underline"
+              >
+                View GitHub Profile →
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Bottom Banner CTA */}
+        <div className="rounded-2xl border border-emerald-200/80 bg-[#f4faee] p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-black text-emerald-950">
+              Ready to taste the FoodNinja difference?
+            </h3>
+            <p className="text-xs text-emerald-800 mt-1">
+              Explore 38+ handcrafted pizzas, bowls, burgers, biryanis, and chef specialties prepared fresh on order.
+            </p>
+          </div>
+          <Link
+            to="/menu"
+            className="rounded-full bg-emerald-700 px-7 py-2.5 text-xs font-bold text-white hover:bg-emerald-800 transition shadow-xs whitespace-nowrap self-start sm:self-auto"
+          >
+            Explore Food Menu →
+          </Link>
+        </div>
+
       </div>
-    </section>
+    </div>
   );
 };
 
