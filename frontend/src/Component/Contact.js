@@ -81,30 +81,20 @@ const Contact = () => {
     <div className="bg-white min-h-[85vh] pt-4 sm:pt-6 pb-16 text-slate-800">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         
-        {/* Breadcrumb & Meta Status */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100 mb-8">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-            <a href="/" className="text-emerald-700 hover:underline">Home</a>
-            <span className="text-slate-300">/</span>
-            <span className="text-slate-900 font-bold">Help Center & Customer Support</span>
+        {/* Clean Header Row (No Breadcrumb, No Clutter) */}
+        <div className="pb-5 border-b border-slate-100 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Help Center & Customer Support
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              FoodNinja Customer Care • 24/7 Priority Resolution Desk
+            </p>
           </div>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#f4faee] border border-emerald-200/80 px-3.5 py-1 text-xs font-bold text-emerald-800">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#f4faee] border border-emerald-200/80 px-3.5 py-1 text-xs font-bold text-emerald-800 self-start sm:self-auto">
             <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
-            <span>Customer Helpdesk Active • 24/7 Priority Resolution</span>
+            <span>Support Online • Avg Response &lt; 2 hrs</span>
           </div>
-        </div>
-
-        {/* Page Header (Matches FoodNinja Brand Header) */}
-        <div className="mb-10 max-w-3xl">
-          <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-emerald-800 mb-2">
-            Customer Support & Grievance Portal
-          </span>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-            How Can We Help You Today?
-          </h1>
-          <p className="mt-2 text-xs sm:text-sm text-slate-500 leading-relaxed">
-            Fast resolution for delivery tracking, refund claims, order discrepancies, food quality issues, and statutory consumer inquiries.
-          </p>
         </div>
 
         {/* 4 Pastel Quick Support Category Cards (Identical to FoodNinja Category Theme) */}
