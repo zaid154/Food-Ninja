@@ -15,8 +15,10 @@ Food Ninja is a full-stack food ordering platform built using the MERN stack (Mo
 ## Features
 
 ### Customer Experience
-- **Menu Browsing & Search:** Explore restaurant dishes across categories (Biryani, North Indian, Fast Food, Chinese, Desserts) with instant text search and pure-veg filters.
-- **Dish Details:** View detailed nutritional info, ingredients, delivery estimates, and price per dish.
+- **Extensive Menu Browsing (158 Dishes):** Explore 158 authentic dishes across 24 regional Indian and international categories (Biryani, North Indian, South Indian, Street Food, Rolls, Chinese, Momos, Italian, Desserts, Beverages, etc.) with verified authentic photos, instant search, and pure-veg filters.
+- **Smart Truncated Pagination:** Clean, responsive pagination with ellipsis (`•••`) and smooth navigation arrows across 14 pages (12 dishes per page).
+- **Dish Details & Nutrition:** View detailed nutritional info, calories per serving, ingredients, preparation steps, delivery time estimates, and pricing.
+- **Customer Reviews & Badges:** Real-time customer feedback on dishes, featuring dynamic "Verified Customer - Delivered Order" badges.
 - **Cart & Wishlist:** Redux Toolkit-backed cart with quantity controls, subtotal calculations, and `localStorage` persistence so cart items remain saved on page refresh.
 - **Order Placement & Tracking:** Seamless checkout with address and payment details. Dedicated order history and tracking page with live status updates (`Placed` -> `Preparing` -> `Out for Delivery` -> `Delivered`).
 - **User Authentication:** Simple signup and login with role management (`user` / `admin`).
@@ -120,10 +122,11 @@ npm test
 
 ## Default Demo Accounts
 
-| Role | Email | Password |
-|---|---|---|
-| Admin | `admin@foodninja.com` | `admin123` |
-| User | `zaid@foodninja.com` | `password123` |
+| Role | Email | Password | Details |
+|---|---|---|---|
+| Admin | `admin@foodninja.com` | `admin123` | Full administrative control over menu, inquiries, and orders |
+| Customer 1 | `zaid@foodninja.com` | `password123` | Customer account with historical delivered orders & verified reviews |
+| Customer 2 | `sara@foodninja.com` | `password123` | Customer account with delivered orders & feedback |
 
 ---
 
@@ -131,11 +134,13 @@ npm test
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/recipes` | Get all menu dishes |
+| `GET` | `/api/recipes` | Get paginated menu dishes (supports `?page=1&limit=12&all=true`) |
 | `GET` | `/api/recipes/:id` | Get single dish by ID |
 | `POST` | `/api/recipes` | Add new dish (Admin) |
 | `PUT` | `/api/recipes/:id` | Update dish details (Admin) |
 | `DELETE`| `/api/recipes/:id` | Delete dish (Admin) |
+| `GET` | `/api/reviews/:recipeId` | Get all reviews for a specific dish |
+| `POST` | `/api/reviews` | Submit new customer review (auto-checks delivered order status) |
 | `GET` | `/api/orders` | Get orders (filtered by user or all for admin) |
 | `POST` | `/api/orders` | Place a new order |
 | `PUT` | `/api/orders/:id/status` | Update order delivery status |
