@@ -101,7 +101,9 @@ const appRouter = createBrowserRouter([
           { path: "inquiries", element: <AdminInquiries /> }
         ]
       },
-      { path: "/restaurant/:id", element: <ProductView /> }
+      { path: "/restaurant/:id", element: <ProductView /> },
+      { path: "/food/:id", element: <ProductView /> },
+      { path: "/dish/:id", element: <ProductView /> }
     ]
   }
 ]);
