@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import useResipe from "./useRecipes";
@@ -6,6 +6,7 @@ import { addCart, removeCart } from "../utils/cartSlice";
 import { addWishlist, removeWishlist } from "../utils/wishlistSlice";
 import { FALLBACK_RECIPES } from "../utils/fallbackDishes";
 import { DISH_BORSCHT } from "../assets/mockupImages";
+import { API_BASE_URL } from "../utils/Constants";
 
 const ProductView = () => {
   const { id } = useParams();
@@ -14,6 +15,24 @@ const ProductView = () => {
 
   const [activeTab, setActiveTab] = useState("description");
   const [quantity, setQuantity] = useState(1);
+
+  // Real Database Reviews State
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewName, setReviewName] = useState(() => {
+    try {
+      const logged = JSON.parse(localStorage.getItem("loggedUser") || "{}");
+      return logged.name || "";
+    } catch {
+      return "";
+    }
+  });
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState("");
+  const [reviewError, setReviewError] = useState("");
 
   const cartItems = useSelector((store) => store.cart.item);
   const wishlistItems = useSelector((store) => store.wishlist.item);
@@ -49,6 +68,96 @@ const ProductView = () => {
   const price = product.price || 150;
   const rating = product.rating ? Number(product.rating).toFixed(1) : "4.3";
   const reviewCount = product.reviewCount || 86;
+
+  // Fetch real reviews from MongoDB
+  const fetchReviews = async () => {
+    if (!product?.id) return;
+    try {
+      setLoadingReviews(true);
+      const res = await fetch(`${API_BASE_URL}/recipes/${product.id}/reviews`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.reviews)) {
+          setReviews(json.reviews);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load reviews:", err);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews();
+  }, [product?.id]);
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    setReviewError("");
+    setReviewSuccess("");
+
+    if (!reviewName.trim()) {
+      setReviewError("Please enter your name.");
+      return;
+    }
+    if (!reviewComment.trim()) {
+      setReviewError("Please enter your review comment.");
+      return;
+    }
+
+    try {
+      setSubmittingReview(true);
+      const res = await fetch(`${API_BASE_URL}/recipes/${product.id}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userName: reviewName.trim(),
+          rating: reviewRating,
+          comment: reviewComment.trim(),
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setReviewSuccess("Thank you! Your review has been submitted.");
+        setReviewComment("");
+        if (data.review) {
+          setReviews((prev) => [data.review, ...prev]);
+        } else {
+          fetchReviews();
+        }
+        setTimeout(() => {
+          setShowReviewForm(false);
+          setReviewSuccess("");
+        }, 2000);
+      } else {
+        setReviewError(data.message || "Failed to submit review.");
+      }
+    } catch (err) {
+      setReviewError("Failed to submit review. Please try again.");
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const formatTimeAgo = (dateStr) => {
+    if (!dateStr) return "Recently";
+    const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
+    if (diff < 60) return "Just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+    return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  };
+
+  const displayRating = reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : (product.rating ? Number(product.rating).toFixed(1) : "4.3");
+
+  const displayReviewCount = reviews.length > 0
+    ? reviews.length
+    : (product.reviewCount || 0);
 
   const ingredientsList = product.ingredients
     ? (Array.isArray(product.ingredients)
@@ -136,8 +245,8 @@ const ProductView = () => {
             {/* Rating Row */}
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <span className="text-amber-500 font-bold text-sm">★</span>
-              <span className="font-black text-slate-800">{rating}</span>
-              <span>({reviewCount} reviews)</span>
+              <span className="font-black text-slate-800">{displayRating}</span>
+              <span>({displayReviewCount} reviews)</span>
             </div>
 
             {/* 3 Quick Attributes (Serves, Calories, Eco-sealed) */}
@@ -298,7 +407,7 @@ const ProductView = () => {
                   : "text-slate-400 hover:text-slate-700"
               }`}
             >
-              Reviews ({reviewCount})
+              Reviews ({displayReviewCount})
             </button>
           </div>
 
@@ -406,70 +515,222 @@ const ProductView = () => {
 
           {/* Reviews Tab Body */}
           {activeTab === "reviews" && (
-            <div className="space-y-3 max-w-2xl text-xs text-slate-600">
-              <p>Customer feedback from verified FoodNinja deliveries:</p>
-              <p className="italic text-slate-500">&quot;Hot, authentic taste, delivered in 25 mins with tamper-evident seal.&quot;</p>
+            <div className="space-y-4 max-w-2xl text-xs text-slate-600">
+              <div className="flex items-center justify-between">
+                <p className="font-semibold text-slate-800">
+                  Customer Feedback ({displayReviewCount} {displayReviewCount === 1 ? "review" : "reviews"}):
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById("customer-reviews");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                    setShowReviewForm(true);
+                  }}
+                  className="text-emerald-700 hover:underline font-bold text-xs cursor-pointer"
+                >
+                  + Add Review
+                </button>
+              </div>
+
+              {reviews.length > 0 ? (
+                <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3.5 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-slate-900">{reviews[0].userName}:</span>
+                    <span className="text-amber-500">{"★".repeat(reviews[0].rating)}</span>
+                    <span className="text-[10px] text-slate-400">({formatTimeAgo(reviews[0].createdAt)})</span>
+                  </div>
+                  <p className="italic text-slate-600">&quot;{reviews[0].comment}&quot;</p>
+                </div>
+              ) : (
+                <p className="italic text-slate-400">
+                  No customer reviews yet. Be the first to share your experience below!
+                </p>
+              )}
             </div>
           )}
 
         </div>
 
         {/* Customer Reviews Section */}
-        <div className="mb-10">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-base font-black text-slate-900">Customer Reviews</h2>
-            <span className="text-xs font-semibold text-slate-500">
-              {rating} out of 5 ({reviewCount} reviews)
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            {/* Review 1: Sara Khan */}
-            <div className="flex items-start justify-between gap-4 rounded-2xl border border-slate-100 bg-[#fbfbfb] p-4 shadow-2xs">
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
-                    S
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900 leading-none">Sara Khan</h4>
-                    <p className="text-[10px] text-slate-400 mt-0.5">2 days ago</p>
-                  </div>
-                </div>
-                <div className="text-amber-500 text-xs">★★★★★</div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Really loved the taste! Fresh ingredients and authentic flavor. Will definitely order again.
-                </p>
-              </div>
-              <div className="h-16 w-16 rounded-xl overflow-hidden shrink-0 border border-slate-200">
-                <img src={mainDishImg} alt="" className="h-full w-full object-cover" />
+        <div id="customer-reviews" className="mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-3 border-b border-slate-100">
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-slate-900">Customer Reviews</h2>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-amber-500 text-sm">{"★".repeat(Math.round(Number(displayRating) || 5))}</span>
+                <span className="text-xs font-bold text-slate-800">{displayRating} out of 5</span>
+                <span className="text-xs text-slate-400">({displayReviewCount} {displayReviewCount === 1 ? "review" : "reviews"})</span>
               </div>
             </div>
 
-            {/* Review 2: Aman Gupta */}
-            <div className="flex items-start justify-between gap-4 rounded-2xl border border-slate-100 bg-[#fbfbfb] p-4 shadow-2xs">
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
-                    A
+            <button
+              type="button"
+              onClick={() => {
+                setShowReviewForm(!showReviewForm);
+                setReviewError("");
+                setReviewSuccess("");
+              }}
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs cursor-pointer self-start sm:self-auto"
+            >
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+              <span>{showReviewForm ? "Close Form" : "Write a Review"}</span>
+            </button>
+          </div>
+
+          {/* Inline Write a Review Form */}
+          {showReviewForm && (
+            <form onSubmit={handleSubmitReview} className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/40 p-5 sm:p-6 space-y-4">
+              <h3 className="text-sm font-bold text-slate-900">Write your review for {product.name}</h3>
+
+              {reviewSuccess && (
+                <div className="rounded-xl bg-emerald-100 border border-emerald-300 px-3.5 py-2 text-xs font-semibold text-emerald-800 flex items-center gap-2">
+                  <span>✓</span>
+                  <span>{reviewSuccess}</span>
+                </div>
+              )}
+
+              {reviewError && (
+                <div className="rounded-xl bg-rose-100 border border-rose-300 px-3.5 py-2 text-xs font-semibold text-rose-800 flex items-center gap-2">
+                  <span>⚠</span>
+                  <span>{reviewError}</span>
+                </div>
+              )}
+
+              {/* Star Rating Selector */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Your Rating</label>
+                <div className="flex items-center gap-1.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewRating(star)}
+                      className={`text-2xl transition cursor-pointer ${
+                        star <= reviewRating ? "text-amber-400 hover:text-amber-500 scale-105" : "text-slate-300 hover:text-amber-300"
+                      }`}
+                      title={`${star} star${star > 1 ? "s" : ""}`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                  <span className="text-xs font-medium text-slate-600 ml-2">
+                    {reviewRating === 5 && "5 - Excellent"}
+                    {reviewRating === 4 && "4 - Very Good"}
+                    {reviewRating === 3 && "3 - Average"}
+                    {reviewRating === 2 && "2 - Fair"}
+                    {reviewRating === 1 && "1 - Poor"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Name Input */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Your Name</label>
+                <input
+                  type="text"
+                  value={reviewName}
+                  onChange={(e) => setReviewName(e.target.value)}
+                  placeholder="e.g. Mohd Zaid"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  required
+                />
+              </div>
+
+              {/* Comment Textarea */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Your Review</label>
+                <textarea
+                  rows={3}
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Tell us what you loved about the flavor, portion size, and presentation..."
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none"
+                  required
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="submit"
+                  disabled={submittingReview}
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold transition cursor-pointer"
+                >
+                  {submittingReview ? "Submitting..." : "Submit Review"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowReviewForm(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 text-xs font-semibold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Real Reviews List */}
+          {reviews.length > 0 ? (
+            <div className="space-y-3">
+              {reviews.map((rev, idx) => (
+                <div key={rev._id || idx} className="flex items-start justify-between gap-4 rounded-2xl border border-slate-100 bg-[#fbfbfb] p-4 shadow-2xs">
+                  <div className="space-y-1.5 flex-1">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white uppercase">
+                        {(rev.userName || "U").charAt(0)}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-xs font-bold text-slate-900 leading-none">{rev.userName}</h4>
+                          <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-semibold text-emerald-700 border border-emerald-100">
+                            Verified Customer
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 mt-0.5">{formatTimeAgo(rev.createdAt)}</p>
+                      </div>
+                    </div>
+
+                    <div className="text-amber-500 text-xs tracking-wider">
+                      {"★".repeat(rev.rating || 5)}{"☆".repeat(5 - (rev.rating || 5))}
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      {rev.comment}
+                    </p>
                   </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900 leading-none">Aman Gupta</h4>
-                    <p className="text-[10px] text-slate-400 mt-0.5">5 days ago</p>
+
+                  <div className="h-14 w-14 rounded-xl overflow-hidden shrink-0 border border-slate-200">
+                    <img src={mainDishImg} alt="" className="h-full w-full object-cover" />
                   </div>
                 </div>
-                <div className="text-amber-500 text-xs">★★★★★</div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  {isBorscht
-                    ? "Great quality and portion size. The sour cream added a perfect touch."
-                    : "Great quality and portion size. Packaging was fresh and tamper-proof."}
-                </p>
-              </div>
-              <div className="h-16 w-16 rounded-xl overflow-hidden shrink-0 border border-slate-200">
-                <img src={mainDishImg} alt="" className="h-full w-full object-cover" />
-              </div>
+              ))}
             </div>
-          </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center">
+              <div className="flex h-10 w-10 mx-auto items-center justify-center rounded-full bg-emerald-50 text-emerald-600 mb-2">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </div>
+              <h4 className="text-xs font-bold text-slate-800">No reviews yet for {product.name}</h4>
+              <p className="text-[11px] text-slate-400 max-w-sm mx-auto mt-1 mb-3">
+                Have you tasted this delicious dish? Be the first to share your experience with other foodies!
+              </p>
+              {!showReviewForm && (
+                <button
+                  type="button"
+                  onClick={() => setShowReviewForm(true)}
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition cursor-pointer"
+                >
+                  Write the First Review
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Bottom Healthy Promo Card (Exact Mockup Match) */}
