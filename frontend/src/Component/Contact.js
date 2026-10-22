@@ -78,79 +78,116 @@ const Contact = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen py-10 sm:py-14 text-slate-800">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <div className="bg-white min-h-[85vh] pt-4 sm:pt-6 pb-16 text-slate-800">
+      <div className="mx-auto max-w-7xl px-4 sm:px-8">
         
-        {/* Header Breadcrumb */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
+        {/* Breadcrumb & Meta Status */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100 mb-8">
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
             <a href="/" className="text-emerald-700 hover:underline">Home</a>
-            <span>/</span>
-            <span className="text-slate-900 font-bold">Help Center & Support</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-900 font-bold">Help Center & Customer Support</span>
           </div>
-          <span className="rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 text-[11px] font-bold">
-            24/7 Customer Helpdesk Active
-          </span>
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#f4faee] border border-emerald-200/80 px-3.5 py-1 text-xs font-bold text-emerald-800">
+            <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span>Customer Helpdesk Active • 24/7 Priority Resolution</span>
+          </div>
         </div>
 
-        {/* Hero Section */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 shadow-xs mb-10 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-emerald-50 rounded-full blur-3xl pointer-events-none"></div>
-          <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-800 mb-3">
+        {/* Page Header (Matches FoodNinja Brand Header) */}
+        <div className="mb-10 max-w-3xl">
+          <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-emerald-800 mb-2">
             Customer Support & Grievance Portal
           </span>
-          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
-            How can we assist you today?
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            How Can We Help You Today?
           </h1>
-          <p className="mt-3 text-sm sm:text-base text-slate-500 max-w-2xl mx-auto leading-relaxed">
-            Fast resolution for delivery tracking, refund claims, restaurant quality, and statutory consumer inquiries.
+          <p className="mt-2 text-xs sm:text-sm text-slate-500 leading-relaxed">
+            Fast resolution for delivery tracking, refund claims, order discrepancies, food quality issues, and statutory consumer inquiries.
           </p>
-
-          {/* Quick Support Topics */}
-          <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
-            <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 hover:border-emerald-300 transition">
-              <span className="text-2xl">🚚</span>
-              <h3 className="mt-2 text-xs font-black text-slate-900">Order Tracking</h3>
-              <p className="mt-1 text-[11px] text-slate-500">Real-time status & dispatch delays</p>
-            </div>
-            <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 hover:border-emerald-300 transition">
-              <span className="text-2xl">💳</span>
-              <h3 className="mt-2 text-xs font-black text-slate-900">Refunds & Billing</h3>
-              <p className="mt-1 text-[11px] text-slate-500">Failed payments & 3-day turnaround</p>
-            </div>
-            <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 hover:border-emerald-300 transition">
-              <span className="text-2xl">🍲</span>
-              <h3 className="mt-2 text-xs font-black text-slate-900">Food Quality</h3>
-              <p className="mt-1 text-[11px] text-slate-500">Missing items & spill protection</p>
-            </div>
-            <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 hover:border-emerald-300 transition">
-              <span className="text-2xl">⚖️</span>
-              <h3 className="mt-2 text-xs font-black text-slate-900">Legal & Privacy</h3>
-              <p className="mt-1 text-[11px] text-slate-500">Official Grievance Desk contact</p>
-            </div>
-          </div>
         </div>
 
-        {/* Main 2-Column Grid: Form & Info */}
-        <div className="grid gap-8 lg:grid-cols-12 mb-12">
+        {/* 4 Pastel Quick Support Category Cards (Identical to FoodNinja Category Theme) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
           
-          {/* Left Column: Official Contact Form (7 Cols) */}
-          <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xs">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mb-1">
-              Submit a Support Ticket
-            </h2>
+          {/* Card 1: Order Tracking (Mint Pastel) */}
+          <div className="rounded-2xl border border-slate-100 bg-[#f4faee] p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-xs text-emerald-700 mb-3.5">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="1" y="3" width="15" height="13" rx="2" />
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                <circle cx="5.5" cy="18.5" r="2.5" />
+                <circle cx="18.5" cy="18.5" r="2.5" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-extrabold text-slate-900 mb-1">Order & Delivery Tracking</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">Real-time GPS status, rider contact, and address instructions.</p>
+          </div>
+
+          {/* Card 2: Refunds & Billing (Peach Pastel) */}
+          <div className="rounded-2xl border border-slate-100 bg-[#fff3eb] p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-xs text-orange-600 mb-3.5">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+                <circle cx="7" cy="15" r="1" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-extrabold text-slate-900 mb-1">Refunds & Invoicing</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">Failed UPI charges, pro-rata refund claims, and GST invoices.</p>
+          </div>
+
+          {/* Card 3: Food Quality (Warm Cream Pastel) */}
+          <div className="rounded-2xl border border-slate-100 bg-[#fff8e7] p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-xs text-amber-700 mb-3.5">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2a8 8 0 0 0-8 8v1h16v-1a8 8 0 0 0-8-8z" />
+                <path d="M4 11v2a8 8 0 0 0 16 0v-2" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="8" y1="23" x2="16" y2="23" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-extrabold text-slate-900 mb-1">Quality & Missing Items</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">Spill reports, missing sauces, tamper-evident seal checks.</p>
+          </div>
+
+          {/* Card 4: Legal & Grievance (Sky Pastel) */}
+          <div className="rounded-2xl border border-slate-100 bg-[#f0f9ff] p-5 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-xs text-sky-700 mb-3.5">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <circle cx="12" cy="11" r="3" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-extrabold text-slate-900 mb-1">Grievance & Privacy Desk</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">Statutory dispute resolution and Data Protection queries.</p>
+          </div>
+
+        </div>
+
+        {/* 2-Column Main Section: Support Ticket Form + Corporate Credentials */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
+          
+          {/* Left Column: Official Support Ticket Form (7 Cols) */}
+          <div className="lg:col-span-7 rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-xs">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="h-2 w-2 rounded-full bg-emerald-600"></span>
+              <h2 className="text-xl font-black text-slate-900 tracking-tight">
+                Submit a Support Ticket
+              </h2>
+            </div>
             <p className="text-xs text-slate-500 mb-6">
-              Our support team reviews customer tickets around the clock. Average response time is under 2 hours.
+              Our support team reviews customer tickets around the clock. Typical response turnaround is under 2 hours.
             </p>
 
             {submitted ? (
-              <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-6 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-white text-xl font-bold mb-3">
+              <div className="rounded-2xl bg-[#f4faee] border border-emerald-200 p-6 text-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-700 text-white text-xl font-bold mb-3">
                   ✓
                 </div>
-                <h3 className="text-base font-black text-emerald-900">Support Ticket Logged!</h3>
-                <p className="mt-1.5 text-xs text-emerald-700 leading-relaxed max-w-md mx-auto">
-                  Thank you for reaching out. Your reference token has been generated and our support desk has received your details. A representative will contact you via email shortly.
+                <h3 className="text-base font-black text-emerald-950">Support Ticket Logged!</h3>
+                <p className="mt-1.5 text-xs text-emerald-800 leading-relaxed max-w-md mx-auto">
+                  Thank you for contacting FoodNinja Support. Your ticket has been registered in our database, and a support specialist will follow up via email shortly.
                 </p>
                 <button
                   type="button"
@@ -179,7 +216,7 @@ const Contact = () => {
                       value={form.name}
                       onChange={handleChange("name")}
                       placeholder="Mohd Zaid"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
                     />
                   </div>
 
@@ -193,7 +230,7 @@ const Contact = () => {
                       value={form.email}
                       onChange={handleChange("email")}
                       placeholder="you@example.com"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
                     />
                   </div>
                 </div>
@@ -208,7 +245,7 @@ const Contact = () => {
                       value={form.phone}
                       onChange={handleChange("phone")}
                       placeholder="+91 98765 43210"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
                     />
                   </div>
 
@@ -219,9 +256,9 @@ const Contact = () => {
                     <select
                       value={form.subject}
                       onChange={handleChange("subject")}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold text-slate-800 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition cursor-pointer"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition cursor-pointer"
                     >
-                      <option value="Delivery Issue">Delivery Delay / Driver Issue</option>
+                      <option value="Delivery Issue">Delivery Delay / Rider Issue</option>
                       <option value="Refund Claim">Refund / Billing Discrepancy</option>
                       <option value="Food Quality">Food Quality / Missing Item</option>
                       <option value="General Inquiry">General Question / Feedback</option>
@@ -240,84 +277,75 @@ const Contact = () => {
                     value={form.message}
                     onChange={handleChange("message")}
                     placeholder="Write your message here... Include your Order ID if applicable."
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-emerald-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
                   ></textarea>
                 </div>
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full rounded-xl bg-emerald-700 px-6 py-3 text-xs font-bold text-white hover:bg-emerald-800 disabled:opacity-50 transition shadow-xs cursor-pointer flex items-center justify-center gap-2"
+                  className="rounded-full bg-emerald-700 px-8 py-2.5 text-xs font-bold text-white hover:bg-emerald-800 disabled:opacity-50 transition shadow-xs cursor-pointer"
                 >
-                  {submitting ? "Submitting Ticket..." : "Send Message"}
+                  {submitting ? "Submitting..." : "Send Message"}
                 </button>
 
-                <p className="text-[11px] text-slate-400 text-center">
+                <p className="text-[11px] text-slate-400">
                   Protected under FoodNinja&apos;s <a href="/privacy" className="text-emerald-700 hover:underline">Privacy Policy</a> and <a href="/terms" className="text-emerald-700 hover:underline">Terms of Service</a>.
                 </p>
               </form>
             )}
           </div>
 
-          {/* Right Column: Statutory & Corporate Information (5 Cols) */}
-          <div className="lg:col-span-5 space-y-6">
+          {/* Right Column: Corporate Credentials & Legal Desk (5 Cols) */}
+          <div className="lg:col-span-5 space-y-5">
             
-            {/* Corporate & Grievance Card */}
-            <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xs">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
-                Corporate Credentials
-              </span>
-              <h2 className="mt-1 text-xl font-black text-white">
-                FoodNinja Technologies
-              </h2>
-              <p className="mt-2 text-xs text-slate-300 leading-relaxed">
-                Registered food delivery marketplace facilitator complying with Indian E-Commerce Rules and IT Intermediary Regulations.
-              </p>
-
-              <div className="mt-6 space-y-3.5 text-xs text-slate-300 border-t border-slate-800 pt-5">
-                <div className="flex items-start gap-3">
-                  <span className="text-base">📍</span>
-                  <div>
-                    <strong className="text-white block font-bold">Registered Office:</strong>
-                    <span>FoodNinja Corporate Tower, Connaught Place, New Delhi 110001, India</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <span className="text-base">✉️</span>
-                  <div>
-                    <strong className="text-white block font-bold">Priority Customer Desk:</strong>
-                    <a href="mailto:support@foodninja.com" className="text-emerald-400 hover:underline">support@foodninja.com</a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <span className="text-base">⚖️</span>
-                  <div>
-                    <strong className="text-white block font-bold">Statutory Grievance Officer:</strong>
-                    <a href="mailto:grievance@foodninja.com" className="text-emerald-400 hover:underline">grievance@foodninja.com</a>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">Acknowledgment within 24-48 hrs</span>
-                  </div>
+            {/* Corporate Box */}
+            <div className="rounded-2xl border border-slate-100 bg-[#f8fafc] p-6 shadow-2xs">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-700 text-white text-xs font-bold">
+                  FN
+                </span>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">FoodNinja Technologies</h3>
+                  <p className="text-[11px] text-slate-400">Licensed Food Delivery Marketplace</p>
                 </div>
               </div>
 
-              {/* Developer / Creator Card */}
+              <div className="mt-5 space-y-3 text-xs text-slate-600 border-t border-slate-200/60 pt-4">
+                <div>
+                  <strong className="text-slate-900 block font-bold">Registered Office:</strong>
+                  <span className="text-slate-500">FoodNinja Corporate Tower, Connaught Place, New Delhi 110001, India</span>
+                </div>
+
+                <div>
+                  <strong className="text-slate-900 block font-bold">Priority Customer Support:</strong>
+                  <a href="mailto:support@foodninja.com" className="text-emerald-700 font-semibold hover:underline">support@foodninja.com</a>
+                </div>
+
+                <div>
+                  <strong className="text-slate-900 block font-bold">Statutory Grievance Redressal Desk:</strong>
+                  <a href="mailto:grievance@foodninja.com" className="text-emerald-700 font-semibold hover:underline">grievance@foodninja.com</a>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">Turnaround: 24–48 hours statutory acknowledgment</span>
+                </div>
+              </div>
+
+              {/* Developer Profile Card */}
               {profile && (
-                <div className="mt-6 pt-5 border-t border-slate-800 flex items-center gap-3">
+                <div className="mt-5 pt-4 border-t border-slate-200/60 flex items-center gap-3">
                   <img
                     src={profile.avatar_url}
                     alt={profile.name || "Mohd Zaid"}
-                    className="h-10 w-10 rounded-full object-cover border border-emerald-400"
+                    className="h-10 w-10 rounded-full object-cover border border-emerald-500 shadow-2xs"
                   />
                   <div className="text-xs">
-                    <p className="font-bold text-white uppercase tracking-wider">
+                    <p className="font-bold text-slate-900">
                       {profile.name || "MOHD ZAID"}
                     </p>
                     <a
                       href={profile.html_url || "https://github.com/zaid154"}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[11px] font-semibold text-emerald-400 hover:underline"
+                      className="text-[11px] font-semibold text-emerald-700 hover:underline"
                     >
                       Engineering Lead • github.com/zaid154
                     </a>
@@ -326,52 +354,55 @@ const Contact = () => {
               )}
             </div>
 
-            {/* Quick Policy Direct Links */}
-            <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs">
-              <h3 className="text-sm font-black text-slate-900 mb-3">Legal & Compliance Documentation</h3>
-              <ul className="space-y-2.5 text-xs text-slate-600">
-                <li>
-                  <a href="/terms" className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-200">
-                    <span className="font-semibold text-slate-800">📄 Terms & Conditions of Service</span>
-                    <span className="text-emerald-700 font-bold">→</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="/privacy" className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition border border-transparent hover:border-slate-200">
-                    <span className="font-semibold text-slate-800">🛡️ Privacy & Data Protection Policy</span>
-                    <span className="text-emerald-700 font-bold">→</span>
-                  </a>
-                </li>
-              </ul>
+            {/* Quick Legal Links */}
+            <div className="rounded-2xl border border-slate-100 bg-[#f8fafc] p-5 shadow-2xs space-y-2">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
+                Legal & Compliance Documents
+              </h4>
+              <a
+                href="/terms"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-200/70 hover:border-emerald-300 transition text-xs font-bold text-slate-800"
+              >
+                <span>Terms & Conditions of Service</span>
+                <span className="text-emerald-700">→</span>
+              </a>
+              <a
+                href="/privacy"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-200/70 hover:border-emerald-300 transition text-xs font-bold text-slate-800"
+              >
+                <span>Privacy & Data Protection Policy</span>
+                <span className="text-emerald-700">→</span>
+              </a>
             </div>
 
           </div>
 
         </div>
 
-        {/* FAQ Accordion Section */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-xs mb-10">
-          <div className="text-center max-w-xl mx-auto mb-8">
+        {/* FAQ Accordion Knowledge Base */}
+        <div className="rounded-2xl border border-slate-100 bg-white p-6 sm:p-8 shadow-xs">
+          <div className="mb-6">
             <span className="text-xs font-black uppercase tracking-widest text-emerald-700">
               Frequently Asked Questions
             </span>
-            <h2 className="mt-1.5 text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h2 className="mt-1 text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               Customer Support Knowledge Base
             </h2>
+            <p className="text-xs text-slate-500 mt-0.5">Quick answers to common order, cancellation, and refund questions.</p>
           </div>
 
-          <div className="space-y-3 max-w-3xl mx-auto">
+          <div className="space-y-2.5">
             {FAQS.map((faq, index) => {
               const isOpen = openFaq === index;
               return (
                 <div
                   key={faq.q}
-                  className="rounded-2xl border border-slate-200 bg-white overflow-hidden transition"
+                  className="rounded-xl border border-slate-200/70 bg-white overflow-hidden transition"
                 >
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? null : index)}
-                    className="flex w-full items-center justify-between p-4 text-left text-xs sm:text-sm font-bold text-slate-900 hover:text-emerald-700 transition"
+                    className="flex w-full items-center justify-between p-4 text-left text-xs sm:text-sm font-bold text-slate-900 hover:text-emerald-700 transition cursor-pointer"
                   >
                     <span>{faq.q}</span>
                     <span className="ml-3 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-black text-slate-600">
@@ -379,7 +410,7 @@ const Contact = () => {
                     </span>
                   </button>
                   {isOpen && (
-                    <div className="px-4 pb-4 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+                    <div className="px-4 pb-4 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/40">
                       {faq.a}
                     </div>
                   )}
