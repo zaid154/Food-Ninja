@@ -97,35 +97,6 @@ const Contact = () => {
           </div>
         </div>
 
-        {/* Clean Topic Filter Pills (Replaces generic AI boxes with real interactive topics) */}
-        <div className="mb-8">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5">
-            Select Inquiry Topic:
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: "General Inquiry", label: "General Support & Feedback" },
-              { id: "Delivery Issue", label: "Live Order & Delivery Delay" },
-              { id: "Refund Claim", label: "Refunds & Payment Inquiries" },
-              { id: "Food Quality", label: "Food Quality & Packaging Check" },
-              { id: "Statutory Grievance", label: "Grievance & Legal Desk" },
-            ].map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setForm((prev) => ({ ...prev, subject: cat.id }))}
-                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-                  form.subject === cat.id
-                    ? "bg-slate-900 text-white shadow-xs"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* 2-Column Main Section: Support Ticket Form + Corporate Credentials */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
           
