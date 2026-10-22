@@ -7,11 +7,6 @@ import { FALLBACK_RECIPES } from "../utils/fallbackDishes";
 
 const MENU_CATEGORIES = [
   {
-    name: "All",
-    bg: "bg-slate-50",
-    img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&auto=format&fit=crop&q=80",
-  },
-  {
     name: "Biryani",
     bg: "bg-[#f4faee]",
     img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=300&auto=format&fit=crop&q=80",
@@ -239,52 +234,89 @@ const MenuPage = () => {
         </div>
 
         {/* ========================================================
-            2. BROWSE BY CATEGORY (7 Pastel Cards + All)
+            2. BROWSE BY CATEGORY (7 Pastel Cards - Exact Mockup)
         ======================================================== */}
-        <div className="py-6 border-b border-slate-100">
-          <div className="flex items-center justify-between mb-4">
+        <div className="py-6 sm:py-8 border-b border-slate-100">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             <div>
-              <h2 className="text-lg font-black text-slate-900 tracking-tight">Browse by Category</h2>
-              <p className="text-xs text-slate-400">Select a category to filter dishes</p>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                Browse by Category
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+                Select a cuisine to explore matching dishes
+              </p>
             </div>
-            {currentCategory !== "All" && (
-              <button
-                type="button"
-                onClick={() => handleCategorySelect("All")}
-                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 transition"
-              >
-                Clear Filter ✕
-              </button>
-            )}
+
+            {/* Quick Status / Reset Pill */}
+            <div className="flex items-center gap-2">
+              {currentCategory !== "All" ? (
+                <button
+                  type="button"
+                  onClick={() => handleCategorySelect("All")}
+                  className="group inline-flex items-center gap-2 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-3.5 py-1.5 text-xs font-bold text-emerald-800 transition shadow-2xs cursor-pointer"
+                  title="Click to reset to All Categories"
+                >
+                  <span>
+                    Category: <strong className="text-emerald-900">{currentCategory}</strong>
+                  </span>
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 group-hover:bg-emerald-700 text-white text-[10px] transition">
+                    ✕
+                  </span>
+                </button>
+              ) : (
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3.5 py-1.5 text-xs font-semibold text-slate-600">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                  <span>All Dishes ({pagination.totalItems || 38})</span>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
+          {/* 7 Spacious Category Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 sm:gap-5">
             {MENU_CATEGORIES.map((cat) => {
-              const isActive =
-                (cat.name === "All" && currentCategory === "All") ||
-                currentCategory.toLowerCase() === cat.name.toLowerCase();
+              const isActive = currentCategory.toLowerCase() === cat.name.toLowerCase();
 
               return (
                 <button
                   key={cat.name}
                   type="button"
-                  onClick={() => handleCategorySelect(isActive && cat.name !== "All" ? "All" : cat.name)}
-                  className={`flex flex-col items-center justify-between p-3 rounded-2xl transition-all duration-200 border text-center cursor-pointer ${cat.bg} ${
+                  onClick={() => handleCategorySelect(isActive ? "All" : cat.name)}
+                  className={`group relative flex flex-col items-center justify-between p-4 sm:p-5 rounded-2xl transition-all duration-200 border text-center cursor-pointer ${cat.bg} ${
                     isActive
-                      ? "border-emerald-600 shadow-sm ring-2 ring-emerald-500/20"
-                      : "border-transparent hover:border-slate-300 hover:shadow-2xs"
+                      ? "border-emerald-600 shadow-md ring-2 ring-emerald-500/30 scale-[1.02]"
+                      : "border-transparent hover:border-slate-200 hover:shadow-md hover:-translate-y-1"
                   }`}
                 >
-                  <div className="h-14 w-14 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-2">
-                    <img src={cat.img} alt={cat.name} className="h-full w-full object-cover rounded-full" />
+                  {/* Circular Image */}
+                  <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-3 shrink-0">
+                    <img
+                      src={cat.img}
+                      alt={cat.name}
+                      className="h-full w-full object-cover rounded-full group-hover:scale-105 transition duration-300"
+                    />
                   </div>
-                  <span className="text-xs font-bold text-slate-800 mb-2">{cat.name}</span>
+
+                  {/* Category Name */}
+                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 mb-3 tracking-tight">
+                    {cat.name}
+                  </span>
+
+                  {/* Circular Arrow Indicator */}
                   <div
-                    className={`flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-xs text-slate-600 transition ${
-                      isActive ? "bg-emerald-700 text-white" : ""
+                    className={`flex h-6 w-6 items-center justify-center rounded-full shadow-xs transition duration-200 ${
+                      isActive
+                        ? "bg-emerald-700 text-white"
+                        : "bg-white text-slate-600 group-hover:bg-emerald-700 group-hover:text-white"
                     }`}
                   >
-                    <svg viewBox="0 0 24 24" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="h-3 w-3"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    >
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   </div>
