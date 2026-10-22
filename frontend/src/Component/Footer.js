@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import BrandLogo from "./BrandLogo";
 
 const Footer = () => {
   return (
@@ -8,22 +9,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
           {/* Col 1: Brand Info */}
           <div>
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="flex h-8 w-8 items-center justify-center shrink-0">
-                <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none">
-                  <path d="M4 13c0 4.418 3.582 8 8 8s8-3.582 8-8H4z" fill="#ffffff" />
-                  <path d="M12 4c-3 0-5 2.5-5 5.5 0 2.5 2 4.5 5 4.5s5-2 5-4.5c0-3-2-5.5-5-5.5zm0 2c1.8 0 3 1.5 3 3.5 0 1.2-.8 2.5-3 2.5s-3-1.3-3-2.5C9 7.5 10.2 6 12 6z" fill="#10b981" />
-                </svg>
-              </div>
-              <div className="leading-tight">
-                <span className="text-xl font-extrabold tracking-tight text-white">
-                  Food<span className="text-emerald-500">Ninja</span>
-                </span>
-                <span className="block text-[10px] font-medium text-slate-400 tracking-wider">
-                  Restaurant Food Delivery
-                </span>
-              </div>
-            </Link>
+            <BrandLogo variant="dark" badge size="md" />
             <p className="mt-4 text-xs text-slate-400 leading-relaxed max-w-xs">
               Delicious meals crafted with fresh ingredients, delivered hot and fresh directly to your doorstep.
             </p>

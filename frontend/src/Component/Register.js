@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LOGO, API_BASE_URL } from "../utils/Constants";
+import { API_BASE_URL } from "../utils/Constants";
+import BrandLogo from "./BrandLogo";
 
 const Register = () => {
     const [name, setName] = useState("");
@@ -61,13 +62,15 @@ const Register = () => {
         <section className="flex min-h-[80vh] items-center justify-center bg-slate-50 px-4 py-12">
             <div className="w-full max-w-md rounded-2xl bg-white p-7 sm:p-8 shadow-sm border border-slate-200">
                 {/* Brand Header */}
-                <div className="text-center">
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 border border-emerald-200 p-2 shadow-sm mb-3">
-                        <img src={LOGO} alt="Food Ninja" className="h-full w-full object-contain" />
+                <div className="text-center mb-6">
+                    <div className="inline-flex justify-center mb-3">
+                        <BrandLogo to="/" size="lg" badge hideText />
                     </div>
-                    <h1 className="text-2xl font-black text-slate-900">Create an Account</h1>
+                    <h1 className="text-2xl font-black text-slate-900">
+                        Join Food<span className="text-emerald-600">Ninja</span>
+                    </h1>
                     <p className="mt-1 text-xs text-slate-500">
-                        Sign up to start ordering fresh food.
+                        Sign up to order delicious meals and track deliveries.
                     </p>
                 </div>
 

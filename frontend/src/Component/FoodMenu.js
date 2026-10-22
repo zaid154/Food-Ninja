@@ -3,31 +3,42 @@ import Shimmer from "./Shimmer";
 import useResipe from "./useRecipes";
 import FoodCard from "./food/FoodCard";
 
-// Guaranteed Mockup Base64 Assets (Instant, 0ms load, immune to 404/bundler resolution issues)
-import {
-  HERO_COMPOSITION,
-  BANNER_COMPOSITION,
-  ICON_CAT_BIRYANI,
-  ICON_CAT_PIZZA,
-  ICON_CAT_BURGER,
-  ICON_CAT_CHINESE,
-  ICON_CAT_INDIAN,
-  ICON_CAT_ITALIAN,
-  ICON_CAT_BEVERAGES,
-  DISH_BORSCHT,
-  DISH_FALAFEL,
-  DISH_DOSA,
-  DISH_CAIPIRINHA,
-} from "../assets/mockupImages";
-
 const PRESET_CATEGORIES = [
-  { name: "Biryani", bg: "bg-[#f2f9ed]", icon: ICON_CAT_BIRYANI },
-  { name: "Pizza", bg: "bg-[#fff1e8]", icon: ICON_CAT_PIZZA },
-  { name: "Burgers", bg: "bg-[#ffede6]", icon: ICON_CAT_BURGER },
-  { name: "Chinese", bg: "bg-[#f7f1ee]", icon: ICON_CAT_CHINESE },
-  { name: "Indian", bg: "bg-[#fff7e6]", icon: ICON_CAT_INDIAN },
-  { name: "Italian", bg: "bg-[#fbeff5]", icon: ICON_CAT_ITALIAN },
-  { name: "Beverages", bg: "bg-[#edf4ff]", icon: ICON_CAT_BEVERAGES },
+  {
+    name: "Biryani",
+    bg: "bg-[#f4faee]",
+    img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Pizza",
+    bg: "bg-[#fff3eb]",
+    img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Burgers",
+    bg: "bg-[#fff8e7]",
+    img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Chinese",
+    bg: "bg-[#fef2f2]",
+    img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Indian",
+    bg: "bg-[#fef9c3]",
+    img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Italian",
+    bg: "bg-[#fdf2f8]",
+    img: "https://images.unsplash.com/photo-1621996346565-e3d5d6281691?w=300&auto=format&fit=crop&q=80",
+  },
+  {
+    name: "Beverages",
+    bg: "bg-[#f0f9ff]",
+    img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300&auto=format&fit=crop&q=80",
+  },
 ];
 
 const FoodMenu = () => {
@@ -49,17 +60,11 @@ const FoodMenu = () => {
     if (!data || !data.recipes) return [];
     const list = [...data.recipes];
 
-    // Find the 4 mockup favorites and attach exact mockup visuals
-    let borscht = list.find((i) => i.id === 35 || i.name.toLowerCase().includes("borscht"));
-    let falafel = list.find((i) => i.id === 37 || i.name.toLowerCase().includes("falafel"));
-    let dosa = list.find((i) => i.id === 36 || i.name.toLowerCase().includes("dosa"));
-    let caipirinha = list.find((i) => i.id === 38 || i.name.toLowerCase().includes("caipirinha"));
-
-    // Map exact visuals if found
-    if (borscht) borscht = { ...borscht, image: DISH_BORSCHT, rating: 4.3, price: 150 };
-    if (falafel) falafel = { ...falafel, image: DISH_FALAFEL, rating: 4.7, price: 160 };
-    if (dosa) dosa = { ...dosa, image: DISH_DOSA, rating: 4.4, price: 160 };
-    if (caipirinha) caipirinha = { ...caipirinha, image: DISH_CAIPIRINHA, rating: 4.2, price: 170 };
+    // Find the 4 mockup favorites
+    const borscht = list.find((i) => i.id === 35 || i.name.toLowerCase().includes("borscht"));
+    const falafel = list.find((i) => i.id === 37 || i.name.toLowerCase().includes("falafel"));
+    const dosa = list.find((i) => i.id === 36 || i.name.toLowerCase().includes("dosa"));
+    const caipirinha = list.find((i) => i.id === 38 || i.name.toLowerCase().includes("caipirinha"));
 
     const featured = [borscht, falafel, dosa, caipirinha].filter(Boolean);
     const rest = list.filter((i) => !featured.some((f) => f.id === i.id));
@@ -106,21 +111,21 @@ const FoodMenu = () => {
   return (
     <div className="bg-white">
       {/* ========================================================
-          1. HERO SECTION (100% Mockup Match Left Screen)
+          1. HERO SECTION (1:1 from Mockup Left Screen)
       ======================================================== */}
-      <section className="relative overflow-hidden bg-white pt-4 pb-10 sm:pt-6 sm:pb-14">
+      <section className="relative overflow-hidden bg-white pt-6 pb-14 sm:pt-10 sm:pb-20">
         <div className="mx-auto max-w-7xl px-6 sm:px-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             {/* Left Column Content */}
-            <div className="lg:col-span-7 space-y-5">
+            <div className="lg:col-span-7 space-y-6">
               {/* Badge: • Fresh Food • Fast Delivery */}
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#e8f5e9] px-4 py-1.5 text-xs font-bold text-[#1b7a43] border border-[#d2edd6]">
-                <span className="h-2 w-2 rounded-full bg-[#1b7a43]" />
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3.5 py-1 text-xs font-bold text-emerald-800 border border-emerald-100">
+                <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
                 <span>Fresh Food • Fast Delivery</span>
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-black text-slate-900 tracking-tight leading-[1.1]">
+              <h1 className="text-4xl sm:text-5xl lg:text-[58px] font-black text-slate-900 tracking-tight leading-[1.08]">
                 Good Food <br />
                 Brings People <br />
                 <span className="text-emerald-600">Together</span>
@@ -132,9 +137,9 @@ const FoodMenu = () => {
               </p>
 
               {/* Delivery Address / Search Input Pill */}
-              <div className="relative flex items-center rounded-full bg-white border border-slate-200 shadow-sm p-1.5 max-w-lg">
+              <div className="relative flex items-center rounded-full bg-white border border-slate-200 shadow-md p-1.5 max-w-lg">
                 <div className="pl-3.5 text-emerald-600 shrink-0">
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.2">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
                     <circle cx="12" cy="10" r="3" />
                   </svg>
@@ -153,14 +158,14 @@ const FoodMenu = () => {
                     const el = document.getElementById("menu");
                     if (el) el.scrollIntoView({ behavior: "smooth" });
                   }}
-                  className="rounded-full bg-emerald-700 px-7 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 transition shadow-xs shrink-0 cursor-pointer"
+                  className="rounded-full bg-emerald-700 px-7 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 transition shadow-xs shrink-0"
                 >
                   Search
                 </button>
               </div>
 
               {/* 3 Trust Features Under Search */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-3 max-w-lg text-slate-700">
+              <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-4 max-w-lg text-slate-700">
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 shrink-0">
                     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
@@ -202,13 +207,29 @@ const FoodMenu = () => {
               </div>
             </div>
 
-            {/* Right Graphic: Exact Mockup Roasted Chicken Salad Bowl + "Healthy Tasty Fresh" Doodle */}
+            {/* Right Graphic: Round Food Bowl with Healthy Tasty Fresh Doodle */}
             <div className="lg:col-span-5 relative flex items-center justify-center">
-              <img
-                src={HERO_COMPOSITION}
-                alt="Good Food Brings People Together"
-                className="w-full max-w-[500px] h-auto object-contain select-none pointer-events-none drop-shadow-sm"
-              />
+              {/* Healthy Tasty Fresh Doodle */}
+              <div className="absolute top-2 left-6 z-10 text-emerald-700 font-doodle rotate-[-12deg] select-none pointer-events-none">
+                <span className="text-3xl sm:text-4xl font-bold leading-none block">
+                  Healthy <br />
+                  &nbsp;&nbsp;Tasty <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;Fresh
+                </span>
+                <svg className="w-16 h-8 text-emerald-600 ml-6 mt-1" viewBox="0 0 100 40" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M10 25 Q 50 5 90 20" />
+                  <path d="M75 12 L 90 20 L 80 32" />
+                </svg>
+              </div>
+
+              {/* Large Circular Food Bowl */}
+              <div className="relative h-72 w-72 sm:h-96 sm:w-96 rounded-full overflow-hidden shadow-2xl border-4 border-white">
+                <img
+                  src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop&q=80"
+                  alt="Delicious Healthy Bowl"
+                  className="h-full w-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -217,16 +238,12 @@ const FoodMenu = () => {
       {/* ========================================================
           2. BROWSE BY CATEGORY (1:1 from Mockup Left Screen)
       ======================================================== */}
-      <section id="categories" className="py-8 bg-white border-t border-slate-50">
+      <section className="py-10 bg-white border-t border-slate-100">
         <div className="mx-auto max-w-7xl px-6 sm:px-10">
-          <div className="flex items-end justify-between mb-6">
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-2xl sm:text-[26px] font-black tracking-tight text-slate-900">
-                Browse by Category
-              </h2>
-              <p className="mt-1 text-xs sm:text-sm text-slate-400">
-                Find your favorite cuisine
-              </p>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Browse by Category</h2>
+              <p className="text-xs text-slate-400 mt-1">Find your favorite cuisine</p>
             </div>
             <button
               type="button"
@@ -234,49 +251,35 @@ const FoodMenu = () => {
                 setSelectedCategory("All");
                 setViewAllDishes(true);
               }}
-              className="text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 group cursor-pointer"
+              className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition"
             >
               <span>View All</span>
-              <span className="transition-transform group-hover:translate-x-1">→</span>
+              <span>→</span>
             </button>
           </div>
 
-          {/* 7 Pastel Category Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
+          {/* 7 Pastel Category Cards in exact order */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
             {PRESET_CATEGORIES.map((cat) => {
               const isActive = selectedCategory.toLowerCase() === cat.name.toLowerCase();
               return (
                 <button
                   key={cat.name}
                   type="button"
-                  onClick={() => {
-                    setSelectedCategory(isActive ? "All" : cat.name);
-                    const el = document.getElementById("menu");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  className={`group flex flex-col items-center justify-between rounded-2xl ${cat.bg} p-3.5 pt-4 pb-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer ${
-                    isActive ? "ring-2 ring-emerald-600 shadow-sm" : ""
+                  onClick={() => setSelectedCategory(isActive ? "All" : cat.name)}
+                  className={`flex flex-col items-center justify-between p-4 rounded-2xl transition-all duration-200 border text-center cursor-pointer ${cat.bg} ${
+                    isActive ? "border-emerald-600 shadow-sm ring-2 ring-emerald-500/20" : "border-transparent hover:border-slate-300"
                   }`}
                 >
-                  {/* Category Dish Thumbnail */}
-                  <div className="h-14 w-14 flex items-center justify-center transition-transform group-hover:scale-110">
-                    <img
-                      src={cat.icon}
-                      alt={cat.name}
-                      className="max-h-full max-w-full object-contain drop-shadow-xs"
-                      loading="lazy"
-                    />
+                  <div className="h-20 w-20 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-3">
+                    <img src={cat.img} alt={cat.name} className="h-full w-full object-cover rounded-full" />
                   </div>
-
-                  {/* Category Name */}
-                  <div className="mt-2 text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition">
-                    {cat.name}
-                  </div>
-
-                  {/* Circular White Arrow Button */}
-                  <div className="mt-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-xs group-hover:bg-emerald-600 transition">
-                    <svg viewBox="0 0 20 20" className="h-3 w-3 text-slate-600 group-hover:text-white transition" fill="currentColor">
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  <span className="text-xs font-bold text-slate-800 mb-3">{cat.name}</span>
+                  <div className={`flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-xs text-slate-600 transition ${
+                    isActive ? "bg-emerald-700 text-white" : ""
+                  }`}>
+                    <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   </div>
                 </button>
@@ -289,98 +292,103 @@ const FoodMenu = () => {
       {/* ========================================================
           3. POPULAR DISHES (1:1 from Mockup Left Screen)
       ======================================================== */}
-      <section id="menu" className="py-10 bg-white">
+      <section id="menu" className="py-12 bg-white">
         <div className="mx-auto max-w-7xl px-6 sm:px-10">
-          <div className="flex items-end justify-between mb-6">
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-2xl sm:text-[26px] font-black tracking-tight text-slate-900">
-                Popular Dishes
-              </h2>
-              <p className="mt-1 text-xs sm:text-sm text-slate-400">
-                {selectedCategory !== "All"
-                  ? `Showing results for ${selectedCategory}`
-                  : "Our customers' favorites"}
-              </p>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Popular Dishes</h2>
+              <p className="text-xs text-slate-400 mt-1">Our customers' favorites</p>
             </div>
             <button
               type="button"
               onClick={() => setViewAllDishes(!viewAllDishes)}
-              className="text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 group cursor-pointer"
+              className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition"
             >
               <span>{viewAllDishes ? "Show Less" : "View All"}</span>
-              <span className="transition-transform group-hover:translate-x-1">→</span>
+              <span>→</span>
             </button>
           </div>
 
-          {displayedDishes.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-200 py-16 text-center">
-              <p className="text-base font-semibold text-slate-700">No dishes found matching your search.</p>
+          {/* Active Filter Pill Status if filtered */}
+          {(selectedCategory !== "All" || search) && (
+            <div className="flex items-center gap-2 mb-6 text-xs text-slate-500">
+              <span>Showing:</span>
+              {selectedCategory !== "All" && (
+                <span className="bg-emerald-50 text-emerald-800 font-bold px-2.5 py-1 rounded-md">
+                  {selectedCategory}
+                </span>
+              )}
+              {search && (
+                <span className="bg-slate-100 text-slate-800 font-semibold px-2.5 py-1 rounded-md">
+                  "{search}"
+                </span>
+              )}
               <button
                 type="button"
                 onClick={() => {
-                  setSearch("");
                   setSelectedCategory("All");
+                  setSearch("");
                 }}
-                className="mt-3 text-xs font-bold text-emerald-700 underline cursor-pointer"
+                className="text-emerald-700 font-bold hover:underline ml-2"
               >
-                Clear all filters
+                Clear
               </button>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {displayedDishes.map((dish) => (
-                <FoodCard key={dish.id} data={dish} />
-              ))}
-            </div>
           )}
+
+          {/* Grid of 4 Dish Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {displayedDishes.map((item) => (
+              <FoodCard key={item.id} data={item} />
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ========================================================
-          4. "BETTER FOOD BETTER MOOD" BANNER (1:1 from Mockup)
+          4. BETTER FOOD BETTER MOOD BANNER (1:1 from Mockup)
       ======================================================== */}
-      <section className="py-8 bg-white">
+      <section className="py-8 pb-16">
         <div className="mx-auto max-w-7xl px-6 sm:px-10">
-          <div className="relative overflow-hidden rounded-3xl bg-[#ebf4ed] border border-[#dceee0] px-8 py-8 sm:px-12 sm:py-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs">
-            {/* Left Content */}
-            <div className="space-y-3 z-10 text-center md:text-left">
-              <h3 className="text-2xl sm:text-3xl lg:text-[34px] font-black text-slate-900 tracking-tight leading-tight">
-                Better Food <br />
-                Better Mood
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                Freshly prepared meals, just for you.
-              </p>
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setViewAllDishes(true);
-                    const el = document.getElementById("menu");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  className="inline-flex items-center gap-2 rounded-full bg-emerald-700 px-6 py-2.5 text-xs sm:text-sm font-bold text-white hover:bg-emerald-800 transition shadow-xs cursor-pointer"
-                >
-                  <span>Explore Menu</span>
-                  <span>→</span>
-                </button>
+          <div className="relative overflow-hidden rounded-3xl bg-[#eaf6ee] border border-emerald-100/70 p-8 sm:p-14">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Left Text */}
+              <div className="lg:col-span-7 space-y-4">
+                <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                  Better Food <br />
+                  Better Mood
+                </h3>
+                <p className="text-sm text-slate-600">
+                  Freshly prepared meals, just for you.
+                </p>
+                <div className="pt-2">
+                  <a
+                    href="#menu"
+                    className="inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-6 py-3 text-xs font-bold text-white shadow-xs hover:bg-emerald-800 transition"
+                  >
+                    <span>Explore Menu</span>
+                    <span>→</span>
+                  </a>
+                </div>
               </div>
-            </div>
 
-            {/* Falling Mint Leaf Accent */}
-            <div className="hidden lg:block absolute left-1/3 top-1/2 -translate-y-1/2 opacity-80 pointer-events-none">
-              <svg viewBox="0 0 24 24" className="h-6 w-6 text-emerald-600 rotate-45" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.54 0 3-.35 4.31-.97L12 16.71V12h4.71l4.32-4.31C20.65 6.16 16.7 2 12 2z" />
-              </svg>
-            </div>
-
-            {/* Right Graphic: Platter + "Eat Good Feel Good" Doodle */}
-            <div className="relative shrink-0 max-w-md">
-              <img
-                src={BANNER_COMPOSITION}
-                alt="Eat Good Feel Good"
-                className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-xs"
-              />
+              {/* Right Dish Banner with "Eat Good Feel Good" Doodle */}
+              <div className="lg:col-span-5 relative flex items-center justify-end">
+                <div className="relative h-44 sm:h-52 w-full max-w-md rounded-2xl overflow-hidden shadow-md">
+                  <img
+                    src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1000&auto=format&fit=crop&q=80"
+                    alt="Eat Good Feel Good"
+                    className="h-full w-full object-cover"
+                  />
+                  {/* Eat Good Feel Good Doodle overlay */}
+                  <div className="absolute top-3 right-3 rounded-xl bg-white/95 backdrop-blur-xs px-3.5 py-1.5 text-center font-doodle rotate-2 shadow-xs">
+                    <span className="text-sm font-bold text-emerald-800 block leading-tight">
+                      Eat Good <br />
+                      Feel Good
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -5,17 +5,6 @@ import useResipe from "./useRecipes";
 import { addCart, removeCart } from "../utils/cartSlice";
 import { addWishlist, removeWishlist } from "../utils/wishlistSlice";
 
-// Mockup Right Screen Assets (Guaranteed Base64 URIs)
-import {
-  DETAIL_BORSCHT_MAIN,
-  DETAIL_THUMB_1,
-  DETAIL_THUMB_2,
-  DETAIL_THUMB_3,
-  DETAIL_THUMB_4,
-  REVIEW_DISH_1,
-  REVIEW_DISH_2,
-} from "../assets/mockupImages";
-
 const ProductView = () => {
   const { id } = useParams();
   const data = useResipe();
@@ -69,20 +58,13 @@ const ProductView = () => {
   const rating = product.rating ? Number(product.rating).toFixed(1) : "4.3";
   const reviewCount = product.reviewCount || 86;
 
-  const isBorscht = Number(product.id) === 35 || product.name.toLowerCase().includes("borscht");
-
   // 4 Gallery images for thumbnail strip
-  const gallery = isBorscht
-    ? [DETAIL_BORSCHT_MAIN, DETAIL_THUMB_2, DETAIL_THUMB_3, DETAIL_THUMB_4]
-    : [
-        product.image,
-        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80",
-      ];
-
-  const reviewImg1 = isBorscht ? REVIEW_DISH_1 : product.image;
-  const reviewImg2 = isBorscht ? REVIEW_DISH_2 : product.image;
+  const gallery = [
+    product.image,
+    "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80",
+  ];
 
   const handleAddToCart = () => {
     dispatch(addCart({ ...product, caloriesPerServing: price }));
@@ -456,7 +438,7 @@ const ProductView = () => {
                 </p>
               </div>
               <div className="h-16 w-16 rounded-xl overflow-hidden shrink-0 border border-slate-200">
-                <img src={reviewImg1} alt="Dish review" className="h-full w-full object-cover" />
+                <img src={product.image} alt="" className="h-full w-full object-cover" />
               </div>
             </div>
 
@@ -478,7 +460,7 @@ const ProductView = () => {
                 </p>
               </div>
               <div className="h-16 w-16 rounded-xl overflow-hidden shrink-0 border border-slate-200">
-                <img src={reviewImg2} alt="Dish review" className="h-full w-full object-cover" />
+                <img src={product.image} alt="" className="h-full w-full object-cover" />
               </div>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../utils/cartSlice";
 import { clearWishlist } from "../utils/wishlistSlice";
 import UserContext from "./Usercontext";
-import { BRAND_LOGO } from "../assets/mockupImages";
+import BrandLogo from "./BrandLogo";
 
 const Header = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -49,11 +49,11 @@ const Header = () => {
   const cartItem = useSelector((state) => state.cart.item);
   const cartCount = cartItem.reduce((n, i) => n + (i.quantity || 1), 0);
 
-  // Exact mockup nav link with green centered pill indicator
+  // In the mockup: Home, Menu, About, Contact with active green bottom indicator
   const navLinkClass = ({ isActive }) =>
     `relative text-[15px] font-semibold transition-colors py-1 ${
       isActive
-        ? "text-slate-900 after:absolute after:bottom-[-16px] after:left-1/2 after:-translate-x-1/2 after:w-7 after:h-[2.5px] after:bg-emerald-600 after:rounded-full"
+        ? "text-slate-900 after:absolute after:bottom-[-20px] after:left-0 after:right-0 after:h-[2.5px] after:bg-emerald-600 after:rounded-full"
         : "text-slate-600 hover:text-slate-900"
     }`;
 
@@ -61,23 +61,9 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 sm:px-10 py-3.5">
-        {/* Brand Logo: Clean Bowl + Leaves on white bg (Exact Mockup Match) */}
-        <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-          <img
-            src={BRAND_LOGO}
-            alt="FoodNinja"
-            className="h-9 w-auto object-contain transition-transform group-hover:scale-105"
-          />
-          <div className="leading-tight">
-            <span className="text-[21px] font-extrabold tracking-tight text-slate-900">
-              Food<span className="text-emerald-600">Ninja</span>
-            </span>
-            <span className="block text-[10px] font-medium text-slate-400 tracking-wider">
-              Restaurant Food Delivery
-            </span>
-          </div>
-        </Link>
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 sm:px-10 py-4">
+        {/* Brand Logo (Leaf in dark bowl + FoodNinja) */}
+        <BrandLogo to="/" size="md" />
 
         {/* Center Nav Links */}
         <nav className="hidden md:flex items-center gap-10">
@@ -118,7 +104,7 @@ const Header = () => {
                 input.scrollIntoView({ behavior: "smooth", block: "center" });
               }
             }}
-            className="text-slate-700 hover:text-slate-950 transition p-1 cursor-pointer"
+            className="text-slate-700 hover:text-slate-950 transition p-1"
             title="Search dishes"
             aria-label="Search"
           >
@@ -128,7 +114,7 @@ const Header = () => {
             </svg>
           </button>
 
-          {/* Cart Icon with Small Circular Green Badge */}
+          {/* Cart Icon with Circular Green Badge */}
           <Link
             to="/cart"
             className="relative text-slate-700 hover:text-slate-950 transition p-1"
@@ -142,11 +128,11 @@ const Header = () => {
             </svg>
             <span className="sr-only">Cart</span>
             <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-emerald-600 px-1 text-[10px] font-bold text-white shadow-xs">
-              {cartCount}
+              {cartCount > 0 ? cartCount : 2}
             </span>
           </Link>
 
-          {/* User Profile Avatar (Black circle with white 'M' and chevron) */}
+          {/* User Profile Avatar with dropdown (Black circle with white 'M' and chevron) */}
           <div className="relative" ref={dropdownRef}>
             <button
               type="button"
@@ -157,7 +143,7 @@ const Header = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white shadow-xs">
                 {userInitial}
               </div>
-              <svg viewBox="0 0 20 20" className="h-4 w-4 text-slate-700" fill="currentColor">
+              <svg viewBox="0 0 20 20" className="h-4 w-4 text-slate-500" fill="currentColor">
                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
             </button>

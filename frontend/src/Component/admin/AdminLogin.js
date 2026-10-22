@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { LOGO } from "../../utils/Constants";
+import BrandLogo from "../BrandLogo";
 
 const AdminLogin = ({ adminEmail, setAdminEmail, adminPassword, setAdminPassword, authError, onLogin }) => {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -9,8 +9,8 @@ const AdminLogin = ({ adminEmail, setAdminEmail, adminPassword, setAdminPassword
     <section className="flex min-h-[75vh] items-center justify-center bg-slate-50 px-4 py-12">
       <div className="w-full max-w-md rounded-xl bg-white p-7 sm:p-8 shadow-sm border border-slate-200/90">
         <div className="text-center mb-6">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200/80 p-2 shadow-2xs mb-3">
-            <img src={LOGO} alt="Food Ninja" className="h-full w-full object-contain" />
+          <div className="inline-flex justify-center mb-3">
+            <BrandLogo to="/" size="lg" badge hideText />
           </div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900">
             Food<span className="text-emerald-600">Ninja</span>

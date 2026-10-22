@@ -15,8 +15,6 @@ const FoodCard = ({ data }) => {
   const inCart = cartItems.find((i) => i.id === id);
   const cartQty = inCart ? inCart.quantity : 0;
 
-  const isMockupDish = [35, 36, 37, 38].includes(Number(id));
-
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -40,9 +38,9 @@ const FoodCard = ({ data }) => {
   };
 
   return (
-    <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+    <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
       {/* Dish Image */}
-      <Link to={`/restaurant/${id}`} className="block relative h-40 w-full overflow-hidden bg-slate-50">
+      <Link to={`/restaurant/${id}`} className="block relative h-44 w-full overflow-hidden bg-slate-100">
         <img
           src={image}
           alt={name}
@@ -50,23 +48,19 @@ const FoodCard = ({ data }) => {
           loading="lazy"
         />
 
-        {/* Veg / Non-Veg Indicator (only for non-mockup dishes to preserve 100% mockup cleanliness) */}
-        {!isMockupDish && (
-          <div className="absolute left-2.5 top-2.5 rounded-md bg-white/95 p-1 shadow-xs backdrop-blur-sm">
-            <div className={`flex items-center justify-center h-3 w-3 rounded-xs border ${isVeg ? 'border-emerald-600' : 'border-rose-600'} p-[2px]`}>
-              <div className={`h-1.5 w-1.5 rounded-full ${isVeg ? 'bg-emerald-600' : 'bg-rose-600'}`} />
-            </div>
+        {/* Veg / Non-Veg Indicator */}
+        <div className="absolute left-3 top-3 rounded-md bg-white/95 p-1 shadow-xs backdrop-blur-sm">
+          <div className={`flex items-center justify-center h-3.5 w-3.5 rounded-xs border ${isVeg ? 'border-emerald-600' : 'border-rose-600'} p-[2px]`}>
+            <div className={`h-1.5 w-1.5 rounded-full ${isVeg ? 'bg-emerald-600' : 'bg-rose-600'}`} />
           </div>
-        )}
+        </div>
 
         {/* Wishlist Button (White Circle Top-Right) */}
         <button
           type="button"
           onClick={handleLike}
-          className={`absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full transition cursor-pointer ${
-            isMockupDish
-              ? (isLiked ? "bg-white/90 text-rose-500 shadow-xs" : "bg-transparent text-transparent hover:bg-white/40")
-              : (isLiked ? "bg-white/95 text-rose-500 shadow-xs" : "bg-white/95 text-slate-400 hover:text-rose-500 shadow-xs")
+          className={`absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 shadow-xs transition hover:scale-110 ${
+            isLiked ? "text-rose-500" : "text-slate-400 hover:text-rose-500"
           }`}
           title="Save to favorites"
           aria-label="Wishlist"
@@ -77,31 +71,29 @@ const FoodCard = ({ data }) => {
         </button>
 
         {/* Rating Pill (Bottom-Left) */}
-        {!isMockupDish && (
-          <div className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1 rounded-md bg-emerald-700 px-2 py-0.5 text-[11px] font-bold text-white shadow-xs">
-            <span>{rating ? Number(rating).toFixed(1) : "4.3"}</span>
-            <svg className="h-2.5 w-2.5 fill-current" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          </div>
-        )}
+        <div className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-md bg-emerald-700 px-2 py-0.5 text-[11px] font-bold text-white shadow-xs">
+          <span>{rating ? Number(rating).toFixed(1) : "4.3"}</span>
+          <svg className="h-2.5 w-2.5 fill-current" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        </div>
       </Link>
 
       {/* Dish Content */}
-      <div className="flex flex-1 flex-col justify-between p-3.5 pt-3">
+      <div className="flex flex-1 flex-col justify-between p-4">
         <div>
           <Link to={`/restaurant/${id}`} className="block">
-            <h3 className="text-[15px] font-bold text-slate-900 line-clamp-1 hover:text-emerald-700 transition">
+            <h3 className="text-base font-bold text-slate-900 line-clamp-1 hover:text-emerald-700 transition">
               {name}
             </h3>
           </Link>
-          <p className="mt-1 text-xs text-slate-400 line-clamp-2 leading-relaxed">
+          <p className="mt-1 text-xs text-slate-500 line-clamp-2 leading-relaxed">
             {description || "Prepared fresh with authentic herbs and premium ingredients."}
           </p>
         </div>
 
         {/* Price & Action Row */}
-        <div className="mt-3.5 flex items-center justify-between pt-1">
+        <div className="mt-4 flex items-center justify-between pt-1">
           <div className="text-base font-extrabold text-slate-900">
             ₹{price}
           </div>
@@ -111,7 +103,7 @@ const FoodCard = ({ data }) => {
               <button
                 type="button"
                 onClick={handleRemoveFromCart}
-                className="text-sm font-bold text-emerald-800 hover:text-emerald-950 px-1 cursor-pointer"
+                className="text-sm font-bold text-emerald-800 hover:text-emerald-950 px-1"
                 aria-label="Decrease quantity"
               >
                 −
@@ -122,7 +114,7 @@ const FoodCard = ({ data }) => {
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="text-sm font-bold text-emerald-800 hover:text-emerald-950 px-1 cursor-pointer"
+                className="text-sm font-bold text-emerald-800 hover:text-emerald-950 px-1"
                 aria-label="Increase quantity"
               >
                 +
@@ -132,7 +124,7 @@ const FoodCard = ({ data }) => {
             <button
               type="button"
               onClick={handleAddToCart}
-              className="rounded-lg bg-emerald-700 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-emerald-800 transition shadow-xs cursor-pointer"
+              className="inline-flex items-center justify-center rounded-lg bg-emerald-700 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-emerald-800 transition"
             >
               Add to Cart
             </button>

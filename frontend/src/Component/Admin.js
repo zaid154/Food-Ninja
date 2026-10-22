@@ -3,7 +3,8 @@ import { NavLink, Link, Outlet, useLocation, useNavigate } from "react-router-do
 import AdminLogin from "./admin/AdminLogin";
 import Header from "./Header";
 import Footer from "./Footer";
-import { API_BASE_URL, LOGO } from "../utils/Constants";
+import BrandLogo from "./BrandLogo";
+import { API_BASE_URL } from "../utils/Constants";
 
 const Admin = () => {
   const [isAdminAuth, setIsAdminAuth] = useState(() => sessionStorage.getItem("adminAuth") === "true");
@@ -166,22 +167,7 @@ const Admin = () => {
         {/* Top Branding Row */}
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3">
           {/* Brand Logo */}
-          <Link to="/admin" className="flex items-center gap-2.5 shrink-0">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-100 p-1">
-              <img src={LOGO} alt="Food Ninja" className="h-full w-full object-contain" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-base font-black tracking-tight text-slate-900 leading-none">
-                  Food<span className="text-emerald-600">Ninja</span>
-                </span>
-                <span className="rounded bg-slate-900 px-1.5 py-0.5 text-[10px] font-bold uppercase text-white tracking-wider">
-                  Admin
-                </span>
-              </div>
-              <p className="text-[11px] font-medium text-slate-400 mt-0.5">Admin Dashboard</p>
-            </div>
-          </Link>
+          <BrandLogo to="/admin" size="sm" adminBadge />
 
           {/* Right Tools & Admin Profile */}
           <div className="flex items-center gap-2 sm:gap-3">
