@@ -338,48 +338,37 @@ const Checkout = () => {
     return (
         <section className="bg-[#f8fafc] px-4 py-8 sm:py-10 min-h-[85vh]">
             <div className="mx-auto max-w-6xl">
-                <form onSubmit={placeOrder} className="grid gap-6 lg:grid-cols-[1fr_1.55fr] items-start">
+                <form onSubmit={placeOrder} className="grid gap-6 lg:grid-cols-[1.4fr_1fr] items-start">
                     
-                    {/* RIGHT COLUMN on desktop: Delivery Address & Payment */}
-                    <div className="rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-2xs lg:order-2">
+                    {/* RIGHT COLUMN on desktop: Delivery Address & Payment (Compact companion widget) */}
+                    <div className="rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-2xs lg:order-2">
                         
-                        {/* Main Card Header */}
-                        <div className="flex items-center gap-3.5 mb-6">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shrink-0">
-                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        {/* Compact Card Header */}
+                        <div className="flex items-center gap-2.5 mb-3.5 pb-2.5 border-b border-slate-100">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                             </div>
                             <div>
-                                <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
-                                    Delivery Address & Payment
+                                <h1 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight leading-tight">
+                                    Delivery & Payment
                                 </h1>
-                                <p className="text-xs text-slate-400 mt-0.5">Review your delivery details and payment method</p>
+                                <p className="text-[11px] text-slate-400">Where & how to deliver</p>
                             </div>
                         </div>
 
-                        {/* Section 1: Delivery Address */}
-                        <div className="rounded-2xl border border-slate-200/90 bg-white p-5 mb-5">
-                            <div className="flex items-center justify-between pb-3.5">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h2 className="text-sm font-bold text-slate-900">Delivery Address</h2>
-                                        <p className="text-[11px] text-slate-400">Your order will be delivered to this address</p>
-                                    </div>
-                                </div>
+                        {/* Section 1: Delivery Address (Compact) */}
+                        <div className="rounded-xl border border-slate-200/80 bg-white p-3 mb-3">
+                            <div className="flex items-center justify-between pb-2">
+                                <span className="text-xs font-bold text-slate-800">Delivery Address</span>
                                 <button
                                     type="button"
                                     onClick={() => setIsEditingAddress(!isEditingAddress)}
-                                    className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 transition cursor-pointer"
+                                    className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition cursor-pointer"
                                 >
-                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                     </svg>
                                     <span>{isEditingAddress ? "Close" : "Change address"}</span>
@@ -387,45 +376,36 @@ const Checkout = () => {
                             </div>
 
                             {!isEditingAddress ? (
-                                <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 flex items-start justify-between gap-3">
-                                    <div className="flex items-start gap-3.5">
-                                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0 mt-0.5">
-                                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <div className="p-2.5 rounded-lg border border-slate-100 bg-slate-50/70 flex items-start justify-between gap-2.5">
+                                    <div className="flex items-start gap-2.5 min-w-0">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 shrink-0 mt-0.5">
+                                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                             </svg>
                                         </div>
-                                        <div>
-                                            <p className="font-bold text-sm text-slate-900">{name}</p>
-                                            <p className="text-xs text-slate-600 mt-1 flex items-center gap-1.5 font-medium">
-                                                <svg className="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                                </svg>
-                                                <span>+91 {phone}</span>
-                                            </p>
-                                            <div className="text-xs text-slate-600 mt-1 flex items-start gap-1.5 font-medium leading-relaxed">
-                                                <svg className="h-3.5 w-3.5 text-slate-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                </svg>
-                                                <div>
-                                                    <p>{house}</p>
-                                                    <p className="text-slate-500">{street}{city ? `, ${city}` : ""} • {pincode}</p>
-                                                </div>
+                                        <div className="min-w-0">
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-bold text-xs text-slate-900 truncate">{name}</p>
+                                                <span className="text-[11px] text-slate-500 font-medium shrink-0">+91 {phone}</span>
                                             </div>
+                                            <p className="text-[11px] text-slate-600 mt-0.5 leading-snug break-words">
+                                                {house}, {street}{city ? `, ${city}` : ""}
+                                            </p>
+                                            <p className="text-[10px] text-slate-400 font-mono mt-0.5">PIN: {pincode}</p>
                                         </div>
                                     </div>
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-0.5 text-xs font-bold border border-emerald-200/70 shrink-0">
-                                        <svg className="h-3 w-3 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                    <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[10px] font-bold border border-emerald-200/70 shrink-0">
+                                        <svg className="h-2.5 w-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                         <span>Saved</span>
                                     </span>
                                 </div>
                             ) : (
-                                <div className="mt-3 space-y-3 pt-3 border-t border-slate-100">
+                                <div className="mt-2.5 space-y-2.5 pt-2.5 border-t border-slate-100">
                                     {savedAddresses.length > 0 && (
-                                        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-2.5">
-                                            <p className="text-[11px] font-bold text-slate-600 mb-1.5">Pick from Saved Addresses:</p>
+                                        <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-2">
+                                            <p className="text-[10px] font-bold text-slate-600 mb-1">Pick Saved Address:</p>
                                             <div className="space-y-1">
                                                 {savedAddresses.map((addr, idx) => (
                                                     <button
@@ -441,9 +421,9 @@ const Checkout = () => {
                                                             setPincode(addr.pincode || "");
                                                             setIsEditingAddress(false);
                                                         }}
-                                                        className="w-full text-left rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs hover:border-emerald-500 hover:bg-emerald-50/40 transition cursor-pointer"
+                                                        className="w-full text-left rounded-md border border-slate-200 bg-white px-2 py-1 text-xs hover:border-emerald-500 hover:bg-emerald-50/40 transition cursor-pointer"
                                                     >
-                                                        <span className="font-bold text-slate-800">{addr.label || `${addr.house}, ${addr.street}`}</span>
+                                                        <span className="font-bold text-slate-800 text-[11px]">{addr.label || `${addr.house}, ${addr.street}`}</span>
                                                         <span className="text-[10px] text-slate-400 block">{addr.city} • {addr.pincode}</span>
                                                     </button>
                                                 ))}
@@ -451,72 +431,72 @@ const Checkout = () => {
                                         </div>
                                     )}
 
-                                    <div className="grid gap-3 sm:grid-cols-2">
+                                    <div className="grid gap-2 sm:grid-cols-2">
                                         <div>
-                                            <label className="text-[11px] font-bold uppercase text-slate-600">Full Name *</label>
+                                            <label className="text-[10px] font-bold uppercase text-slate-600">Full Name *</label>
                                             <input
                                                 type="text"
                                                 required
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
-                                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                                                className="mt-0.5 w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-[11px] font-bold uppercase text-slate-600">Phone Number *</label>
+                                            <label className="text-[10px] font-bold uppercase text-slate-600">Phone *</label>
                                             <input
                                                 type="tel"
                                                 required
                                                 maxLength={10}
                                                 value={phone}
                                                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                                                className="mt-0.5 w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
                                             />
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="text-[11px] font-bold uppercase text-slate-600">Flat / House / Building *</label>
+                                        <label className="text-[10px] font-bold uppercase text-slate-600">Flat / House / Building *</label>
                                         <input
                                             type="text"
                                             required
                                             value={house}
                                             onChange={(e) => setHouse(e.target.value)}
-                                            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                                            className="mt-0.5 w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="text-[11px] font-bold uppercase text-slate-600">Street / Area / Locality *</label>
+                                        <label className="text-[10px] font-bold uppercase text-slate-600">Street / Area *</label>
                                         <input
                                             type="text"
                                             required
                                             value={street}
                                             onChange={(e) => setStreet(e.target.value)}
-                                            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                                            className="mt-0.5 w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
                                         />
                                     </div>
 
-                                    <div className="grid gap-3 sm:grid-cols-2">
+                                    <div className="grid gap-2 sm:grid-cols-2">
                                         <div>
-                                            <label className="text-[11px] font-bold uppercase text-slate-600">City *</label>
+                                            <label className="text-[10px] font-bold uppercase text-slate-600">City *</label>
                                             <input
                                                 type="text"
                                                 required
                                                 value={city}
                                                 onChange={(e) => setCity(e.target.value)}
-                                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                                                className="mt-0.5 w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-[11px] font-bold uppercase text-slate-600">6-Digit PIN *</label>
+                                            <label className="text-[10px] font-bold uppercase text-slate-600">PIN Code *</label>
                                             <input
                                                 type="text"
                                                 required
                                                 maxLength={6}
                                                 value={pincode}
                                                 onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
-                                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500 font-mono"
+                                                className="mt-0.5 w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500 font-mono"
                                             />
                                         </div>
                                     </div>
@@ -524,7 +504,7 @@ const Checkout = () => {
                                     <button
                                         type="button"
                                         onClick={() => setIsEditingAddress(false)}
-                                        className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 cursor-pointer transition"
+                                        className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-1.5 cursor-pointer transition"
                                     >
                                         Save Address
                                     </button>
@@ -532,27 +512,16 @@ const Checkout = () => {
                             )}
                         </div>
 
-                        {/* Section 2: Payment Method */}
-                        <div className="rounded-2xl border border-slate-200/90 bg-white p-5">
-                            <div className="flex items-center justify-between pb-3.5">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                            <rect x="2" y="5" width="20" height="14" rx="2" strokeWidth="2" />
-                                            <line x1="2" y1="10" x2="22" y2="10" strokeWidth="2" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h2 className="text-sm font-bold text-slate-900">Payment Method</h2>
-                                        <p className="text-[11px] text-slate-400">Your selected payment option</p>
-                                    </div>
-                                </div>
+                        {/* Section 2: Payment Method (Compact) */}
+                        <div className="rounded-xl border border-slate-200/80 bg-white p-3">
+                            <div className="flex items-center justify-between pb-2">
+                                <span className="text-xs font-bold text-slate-800">Payment Method</span>
                                 <button
                                     type="button"
                                     onClick={() => setIsChangingPayment(!isChangingPayment)}
-                                    className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 transition cursor-pointer"
+                                    className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition cursor-pointer"
                                 >
-                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                     </svg>
                                     <span>{isChangingPayment ? "Close" : "Change"}</span>
@@ -560,51 +529,51 @@ const Checkout = () => {
                             </div>
 
                             {!isChangingPayment ? (
-                                <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-emerald-600">
-                                            <div className="h-2 w-2 rounded-full bg-emerald-600" />
+                                <div className="p-2.5 rounded-lg border border-slate-100 bg-slate-50/70 flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                        <div className="flex h-4 w-4 items-center justify-center rounded-full border-2 border-emerald-600 shrink-0">
+                                            <div className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
                                         </div>
-                                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 shrink-0">
-                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 shrink-0">
+                                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                                 <rect x="2" y="5" width="20" height="14" rx="2" strokeWidth="2" />
                                                 <line x1="2" y1="10" x2="22" y2="10" strokeWidth="2" />
                                             </svg>
                                         </div>
-                                        <div>
-                                            <p className="font-bold text-xs text-slate-900">
+                                        <div className="min-w-0">
+                                            <p className="font-bold text-xs text-slate-900 truncate">
                                                 {payment === "Online Payment" ? "Online Payment" : "Cash on Delivery"}
                                             </p>
-                                            <p className="text-[11px] text-slate-400">
-                                                {payment === "Online Payment" ? "UPI, Card, Net Banking" : "Pay with Cash or UPI upon food arrival"}
+                                            <p className="text-[10px] text-slate-400 truncate">
+                                                {payment === "Online Payment" ? "UPI, Card, Net Banking" : "Pay cash / UPI on arrival"}
                                             </p>
                                         </div>
                                     </div>
 
                                     {/* Payment Logos */}
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                        <span className="font-bold text-[10px] text-slate-800 bg-white border border-slate-200 rounded px-1.5 py-0.5 font-mono">UPI</span>
-                                        <span className="font-extrabold text-[10px] text-blue-700 bg-white border border-slate-200 rounded px-1.5 py-0.5 italic">VISA</span>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                        <span className="font-bold text-[9px] text-slate-800 bg-white border border-slate-200 rounded px-1.5 py-0.5 font-mono">UPI</span>
+                                        <span className="font-extrabold text-[9px] text-blue-700 bg-white border border-slate-200 rounded px-1.5 py-0.5 italic">VISA</span>
                                         <div className="flex items-center bg-white border border-slate-200 rounded px-1 py-0.5">
-                                            <span className="h-2.5 w-2.5 rounded-full bg-red-500 inline-block" />
-                                            <span className="h-2.5 w-2.5 rounded-full bg-amber-500 -ml-1 inline-block opacity-90" />
+                                            <span className="h-2 w-2 rounded-full bg-red-500 inline-block" />
+                                            <span className="h-2 w-2 rounded-full bg-amber-500 -ml-0.5 inline-block opacity-90" />
                                         </div>
-                                        <span className="font-bold text-[10px] text-emerald-800 bg-white border border-slate-200 rounded px-1.5 py-0.5">RuPay</span>
+                                        <span className="font-bold text-[9px] text-emerald-800 bg-white border border-slate-200 rounded px-1.5 py-0.5">RuPay</span>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="mt-3 space-y-2 pt-3 border-t border-slate-100">
+                                <div className="mt-2.5 space-y-2 pt-2.5 border-t border-slate-100">
                                     <div
                                         onClick={() => { setPayment("Online Payment"); setIsChangingPayment(false); }}
-                                        className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition ${payment === "Online Payment" ? "border-emerald-500 bg-emerald-50/40" : "border-slate-200 bg-white hover:bg-slate-50"}`}
+                                        className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition ${payment === "Online Payment" ? "border-emerald-500 bg-emerald-50/40" : "border-slate-200 bg-white hover:bg-slate-50"}`}
                                     >
-                                        <div className="flex items-center gap-2.5">
+                                        <div className="flex items-center gap-2">
                                             <div className={`flex h-4 w-4 items-center justify-center rounded-full border ${payment === "Online Payment" ? "border-emerald-600" : "border-slate-300"}`}>
-                                                {payment === "Online Payment" && <div className="h-2 w-2 rounded-full bg-emerald-600" />}
+                                                {payment === "Online Payment" && <div className="h-1.5 w-1.5 rounded-full bg-emerald-600" />}
                                             </div>
                                             <div>
                                                 <p className="font-bold text-xs text-slate-900">Online Payment</p>
-                                                <p className="text-[10.5px] text-slate-400">UPI, Credit/Debit Card, Net Banking</p>
+                                                <p className="text-[10px] text-slate-400">UPI, Credit/Debit Card, Net Banking</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-1">
@@ -616,15 +585,15 @@ const Checkout = () => {
 
                                     <div
                                         onClick={() => { setPayment("Cash on Delivery"); setIsChangingPayment(false); }}
-                                        className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition ${payment === "Cash on Delivery" ? "border-emerald-500 bg-emerald-50/40" : "border-slate-200 bg-white hover:bg-slate-50"}`}
+                                        className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition ${payment === "Cash on Delivery" ? "border-emerald-500 bg-emerald-50/40" : "border-slate-200 bg-white hover:bg-slate-50"}`}
                                     >
-                                        <div className="flex items-center gap-2.5">
+                                        <div className="flex items-center gap-2">
                                             <div className={`flex h-4 w-4 items-center justify-center rounded-full border ${payment === "Cash on Delivery" ? "border-emerald-600" : "border-slate-300"}`}>
-                                                {payment === "Cash on Delivery" && <div className="h-2 w-2 rounded-full bg-emerald-600" />}
+                                                {payment === "Cash on Delivery" && <div className="h-1.5 w-1.5 rounded-full bg-emerald-600" />}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-xs text-slate-900">Cash on Delivery / Pay on Arrival</p>
-                                                <p className="text-[10.5px] text-slate-400">Pay cash or scan UPI QR upon arrival</p>
+                                                <p className="font-bold text-xs text-slate-900">Cash on Delivery</p>
+                                                <p className="text-[10px] text-slate-400">Pay cash or scan UPI QR upon arrival</p>
                                             </div>
                                         </div>
                                         <span className="text-[10px] font-bold text-slate-500 bg-slate-100 rounded px-2 py-0.5">COD</span>
@@ -634,7 +603,7 @@ const Checkout = () => {
                         </div>
 
                         {error && (
-                            <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-3.5 py-2.5 text-xs font-semibold text-red-700 flex items-start gap-2">
+                            <div className="mt-3 rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 flex items-start gap-2">
                                 <span className="text-sm font-bold">⚠</span>
                                 <span>{error}</span>
                             </div>
