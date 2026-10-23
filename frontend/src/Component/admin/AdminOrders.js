@@ -156,7 +156,7 @@ const AdminOrders = (props) => {
                     <select
                       value={o.status}
                       onChange={(e) => onUpdateStatus(o.id, e.target.value)}
-                      className={`rounded-lg border px-2.5 py-1.5 font-bold text-xs outline-none shadow-2xs transition ${
+                      className={`w-full max-w-[140px] rounded-lg border px-2.5 py-1.5 font-bold text-xs outline-none shadow-2xs transition cursor-pointer ${
                         o.status === "Delivered"
                           ? "border-emerald-300 bg-emerald-50 text-emerald-800"
                           : o.status === "Cancelled"
@@ -175,14 +175,20 @@ const AdminOrders = (props) => {
                       <option value="Cancelled">● Cancelled</option>
                     </select>
 
-                    <div>
+                    <div className="flex justify-end">
                       <button
                         type="button"
                         onClick={() => setActiveInvoiceOrder(o)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 shadow-2xs transition cursor-pointer"
-                        title="Print Kitchen Order Ticket / Invoice"
+                        className="w-full max-w-[140px] inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white hover:border-emerald-400 hover:bg-emerald-50/80 px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-emerald-800 shadow-2xs transition cursor-pointer group"
+                        title="View & Print Kitchen Order Ticket / Invoice Slip"
                       >
-                        <svg className="h-3 w-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <svg
+                          className="h-3.5 w-3.5 text-slate-400 group-hover:text-emerald-600 transition"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                         </svg>
                         <span>Print KOT</span>

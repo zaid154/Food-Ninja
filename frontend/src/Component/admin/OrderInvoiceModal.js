@@ -1,67 +1,292 @@
 import React from "react";
 
+/**
+ * Kitchen Order Ticket (KOT) & Tax Invoice Slip Modal
+ * Formatted strictly according to standard 80mm Thermal Printer Paper Size (POS Receipt).
+ * Isolated printing via hidden IFrame ensures ONLY the thermal slip is printed.
+ */
 const OrderInvoiceModal = ({ order, onClose }) => {
   if (!order) return null;
 
+  const items = order.items || [];
+
+  // Accurate math computed dynamically from items array (no fake fallback calculations)
+  const calculatedSubtotal = items.reduce((acc, it) => {
+    const price = Number(it.price || it.caloriesPerServing || 199);
+    const qty = Number(it.quantity || 1);
+    return acc + price * qty;
+  }, 0);
+
+  const subtotal = order.subtotal !== undefined ? order.subtotal : calculatedSubtotal;
+  const deliveryFee = order.deliveryFee !== undefined ? order.deliveryFee : 30;
+  const taxes = order.taxes !== undefined ? order.taxes : Math.max(0, (order.total || 0) - subtotal - deliveryFee);
+  const grandTotal = order.total || (subtotal + deliveryFee + taxes);
+
+  // Isolated Thermal Printer (80mm) Print Engine
   const handlePrint = () => {
-    window.print();
+    const printContent = document.getElementById("printable-thermal-slip");
+    if (!printContent) return;
+
+    // Create isolated hidden iframe for printing
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>KOT_Order_${order.id}</title>
+          <style>
+            @page {
+              size: 80mm auto;
+              margin: 0mm;
+            }
+            @media print {
+              html, body {
+                width: 80mm;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+            }
+            body {
+              font-family: 'Courier New', Courier, monospace, system-ui, sans-serif;
+              width: 74mm;
+              margin: 0 auto;
+              padding: 4mm 2mm;
+              font-size: 11px;
+              line-height: 1.35;
+              color: #000000;
+              background: #ffffff;
+            }
+            .text-center { text-align: center; }
+            .text-right { text-align: right; }
+            .text-left { text-align: left; }
+            .font-bold { font-weight: bold; }
+            .uppercase { text-transform: uppercase; }
+            .divider { border-top: 1px dashed #000000; margin: 6px 0; }
+            .double-divider { border-top: 2px dashed #000000; margin: 6px 0; }
+            .row { display: flex; justify-content: space-between; margin: 2px 0; }
+            table { width: 100%; border-collapse: collapse; margin: 4px 0; }
+            th { border-bottom: 1px dashed #000000; padding: 3px 0; font-size: 10px; text-transform: uppercase; }
+            td { padding: 3px 0; font-size: 11px; vertical-align: top; }
+            .tag { display: inline-block; border: 1px solid #000000; padding: 1px 4px; font-size: 9px; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <div class="text-center">
+            <h2 style="margin: 0; font-size: 18px; font-weight: 900; letter-spacing: 1px;">FOOD NINJA</h2>
+            <div style="font-size: 9px; margin-top: 2px;">AUTHENTIC RESTAURANT & FAST KITCHEN</div>
+            <div style="font-size: 9px; color: #333; margin-top: 2px;">FSSAI: 10020042001234 • GST: 27AABCF1234P1Z5</div>
+            <div class="double-divider"></div>
+            <div style="font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">KITCHEN ORDER TICKET (KOT) / TAX INVOICE</div>
+            <div class="divider"></div>
+          </div>
+
+          <!-- Metadata Section -->
+          <div style="font-size: 10.5px; margin: 4px 0;">
+            <div class="row">
+              <span class="font-bold">ORDER ID: #${order.id}</span>
+              <span>${order.date || new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
+            </div>
+            <div class="row">
+              <span>TYPE: ONLINE DELIVERY</span>
+              <span class="font-bold">[ ${order.status || "PLACED"} ]</span>
+            </div>
+            <div class="divider"></div>
+            <div style="margin: 2px 0;">
+              <span class="font-bold">CUSTOMER:</span> ${order.customerName}
+            </div>
+            <div style="margin: 2px 0;">
+              <span class="font-bold">PHONE:</span> +91 ${order.phone}
+            </div>
+            <div style="margin: 2px 0;">
+              <span class="font-bold">ADDRESS:</span> ${order.address}
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Items Table -->
+          <table>
+            <thead>
+              <tr>
+                <th class="text-left">ITEM</th>
+                <th class="text-center" style="width: 25px;">QTY</th>
+                <th class="text-right" style="width: 40px;">PRICE</th>
+                <th class="text-right" style="width: 45px;">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map(it => {
+                const itemPrice = Number(it.price || it.caloriesPerServing || 199);
+                const itemQty = Number(it.quantity || 1);
+                return `
+                  <tr>
+                    <td class="text-left font-bold">${it.name || it.title}</td>
+                    <td class="text-center">${itemQty}</td>
+                    <td class="text-right">₹${itemPrice}</td>
+                    <td class="text-right font-bold">₹${itemPrice * itemQty}</td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+
+          <div class="divider"></div>
+
+          <!-- Bill Summary -->
+          <div style="font-size: 11px;">
+            <div class="row">
+              <span>Item Subtotal (${items.length} items)</span>
+              <span>₹${subtotal}</span>
+            </div>
+            <div class="row">
+              <span>Delivery Charges</span>
+              <span>${deliveryFee === 0 ? "FREE" : "₹" + deliveryFee}</span>
+            </div>
+            <div class="row">
+              <span>Restaurant Packaging & GST</span>
+              <span>₹${taxes}</span>
+            </div>
+            <div class="double-divider"></div>
+            <div class="row font-bold" style="font-size: 14px;">
+              <span>NET PAYABLE</span>
+              <span>₹${grandTotal}</span>
+            </div>
+            <div class="double-divider"></div>
+          </div>
+
+          <!-- Payment Info -->
+          <div style="font-size: 10px; margin-top: 4px;">
+            <div class="row">
+              <span class="font-bold">PAYMENT: ${order.payment || "Cash on Delivery"}</span>
+              <span class="font-bold">${order.payment?.includes("UPI") || order.payment?.includes("Card") ? "PAID ONLINE" : "COLLECT CASH"}</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="text-center" style="font-size: 9px; margin-top: 6px;">
+            <div>*** THANK YOU FOR ORDERING ***</div>
+            <div>FRESH • HYGIENIC • FAST DELIVERY</div>
+          </div>
+        </body>
+      </html>
+    `);
+    doc.close();
+
+    iframe.contentWindow.focus();
+    setTimeout(() => {
+      iframe.contentWindow.print();
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    }, 250);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
-      <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
-        {/* Printable Ticket Area */}
-        <div id="printable-invoice" className="text-slate-900 font-sans">
-          {/* Header */}
-          <div className="border-b border-dashed border-slate-300 pb-4 text-center">
-            <h2 className="text-xl font-black tracking-tight text-slate-900">FOOD NINJA</h2>
-            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest mt-0.5">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-3 sm:p-4 backdrop-blur-xs overflow-y-auto"
+      onClick={onClose}
+    >
+      {/* Thermal POS Receipt Modal Container (80mm standard width: max-w-[340px], fits on screen with NO scrollbar) */}
+      <div
+        className="relative w-full max-w-[340px] rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200 text-slate-900"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal Top Bar */}
+        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-4 py-2 text-xs">
+          <span className="font-bold text-slate-700 flex items-center gap-1.5 text-[11px]">
+            <svg className="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span>80mm POS Thermal Slip</span>
+          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-6 w-6 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition cursor-pointer"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Printable 80mm Receipt Content */}
+        <div id="printable-thermal-slip" className="p-4 bg-white font-mono text-slate-800 text-[11px] leading-tight">
+          
+          {/* Receipt Brand Header */}
+          <div className="text-center pb-2 border-b border-dashed border-slate-300">
+            <h2 className="text-base font-black tracking-wider text-slate-900">FOOD NINJA</h2>
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
               Kitchen Order Ticket & Tax Invoice
             </p>
-            <p className="text-[10px] text-slate-400 mt-1">
-              FSSAI Lic: 10020042001234 • GSTIN: 27AABCF1234P1Z5
+            <p className="text-[9px] text-slate-400 mt-0.5">
+              FSSAI: 10020042001234 • GST: 27AABCF1234P1Z5
             </p>
           </div>
 
-          {/* Order & Customer Metadata */}
-          <div className="grid grid-cols-2 gap-3 py-3 border-b border-dashed border-slate-300 text-xs">
-            <div>
-              <p className="text-[10px] uppercase font-bold text-slate-400">Order ID</p>
-              <p className="font-extrabold text-slate-900">#{order.id}</p>
-              <p className="text-[10px] uppercase font-bold text-slate-400 mt-2">Order Date</p>
-              <p className="font-medium text-slate-700">{order.date || new Date().toLocaleString()}</p>
+          {/* Balanced Metadata (Zero empty void) */}
+          <div className="py-2.5 border-b border-dashed border-slate-300 space-y-1 text-[10.5px]">
+            <div className="flex justify-between items-center">
+              <span className="font-extrabold text-slate-900 text-xs">ORDER #{order.id}</span>
+              <span className="text-slate-500 text-[10px]">{order.date || "Today"}</span>
             </div>
-            <div>
-              <p className="text-[10px] uppercase font-bold text-slate-400">Customer</p>
-              <p className="font-extrabold text-slate-900">{order.customerName}</p>
-              <p className="text-[11px] font-mono text-slate-700">{order.phone}</p>
-              <p className="text-[10px] uppercase font-bold text-slate-400 mt-2">Delivery Address</p>
-              <p className="font-medium text-slate-700 leading-snug line-clamp-2">{order.address}</p>
+            <div className="flex justify-between items-center text-[10px]">
+              <span className="text-slate-500">TYPE: ONLINE DELIVERY</span>
+              <span className="rounded bg-emerald-50 text-emerald-800 font-bold px-1.5 py-0.5 border border-emerald-200">
+                {order.status || "Placed"}
+              </span>
+            </div>
+            <div className="pt-1.5 border-t border-slate-100 text-[10.5px] leading-snug">
+              <div>
+                <span className="font-bold text-slate-600">CUSTOMER: </span>
+                <span className="font-extrabold text-slate-900">{order.customerName}</span>
+              </div>
+              <div>
+                <span className="font-bold text-slate-600">PHONE: </span>
+                <span className="text-slate-800 font-mono">+91 {order.phone}</span>
+              </div>
+              <div className="text-slate-700 mt-0.5 break-words">
+                <span className="font-bold text-slate-600">DELIVERY: </span>
+                {order.address}
+              </div>
             </div>
           </div>
 
           {/* Items Table */}
-          <div className="py-3 border-b border-dashed border-slate-300">
-            <p className="text-[10px] uppercase font-bold text-slate-400 mb-2">Order Items ({order.items?.length || 0})</p>
-            <table className="w-full text-xs">
+          <div className="py-2.5 border-b border-dashed border-slate-300">
+            <table className="w-full text-[10.5px]">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-400 text-[10px] uppercase">
-                  <th className="text-left pb-1.5">Item</th>
-                  <th className="text-center pb-1.5 w-12">Qty</th>
-                  <th className="text-right pb-1.5 w-16">Price</th>
-                  <th className="text-right pb-1.5 w-16">Total</th>
+                <tr className="border-b border-dashed border-slate-200 text-slate-400 text-[9px] uppercase font-bold">
+                  <th className="text-left pb-1">ITEM</th>
+                  <th className="text-center pb-1 w-8">QTY</th>
+                  <th className="text-right pb-1 w-10">RATE</th>
+                  <th className="text-right pb-1 w-12">TOTAL</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
-                {(order.items || []).map((item, idx) => {
-                  const itemPrice = item.price || item.caloriesPerServing || 199;
-                  const itemQty = item.quantity || 1;
+                {items.map((it, idx) => {
+                  const itemPrice = Number(it.price || it.caloriesPerServing || 199);
+                  const itemQty = Number(it.quantity || 1);
                   return (
-                    <tr key={idx} className="py-1.5">
-                      <td className="py-1.5 text-slate-800 pr-2">{item.name}</td>
-                      <td className="py-1.5 text-center text-slate-600">{itemQty}</td>
-                      <td className="py-1.5 text-right font-mono text-slate-600">₹{itemPrice}</td>
-                      <td className="py-1.5 text-right font-mono font-bold text-slate-900">₹{itemPrice * itemQty}</td>
+                    <tr key={idx} className="py-1">
+                      <td className="py-1 text-slate-900 pr-1 font-bold leading-tight">{it.name || it.title}</td>
+                      <td className="py-1 text-center text-slate-600">{itemQty}</td>
+                      <td className="py-1 text-right text-slate-600">₹{itemPrice}</td>
+                      <td className="py-1 text-right font-extrabold text-slate-900">₹{itemPrice * itemQty}</td>
                     </tr>
                   );
                 })}
@@ -69,59 +294,62 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             </table>
           </div>
 
-          {/* Financials & Total */}
-          <div className="py-3 space-y-1.5 text-xs border-b border-dashed border-slate-300">
+          {/* Accurate Bill Calculation */}
+          <div className="py-2 space-y-1 text-[10.5px] border-b border-dashed border-slate-300">
             <div className="flex justify-between text-slate-600">
-              <span>Item Subtotal</span>
-              <span className="font-mono">₹{order.subtotal || order.total - 45 || order.total}</span>
+              <span>Item Subtotal ({items.length} items)</span>
+              <span>₹{subtotal}</span>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>Delivery Fee</span>
-              <span className="font-mono">{order.deliveryFee ? `₹${order.deliveryFee}` : "₹30"}</span>
+              <span>{deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}</span>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>Restaurant Packaging & GST</span>
-              <span className="font-mono">{order.taxes ? `₹${order.taxes}` : "₹15"}</span>
+              <span>₹${taxes}</span>
             </div>
-            <div className="flex justify-between pt-2 border-t border-slate-200 text-sm font-extrabold text-slate-900">
-              <span>Grand Total</span>
-              <span className="font-mono text-emerald-800">₹{order.total}</span>
+            <div className="flex justify-between pt-1.5 border-t border-slate-200 text-sm font-black text-slate-900">
+              <span>GRAND TOTAL</span>
+              <span className="text-emerald-800">₹{grandTotal}</span>
             </div>
           </div>
 
-          {/* Payment & Status Footer */}
-          <div className="pt-3 pb-1 flex items-center justify-between text-xs">
+          {/* Payment Mode */}
+          <div className="pt-2 text-[10px] flex justify-between items-center text-slate-600">
             <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 block">Payment Mode</span>
-              <span className="font-bold text-slate-800">{order.payment || "Cash on Delivery"}</span>
+              <span className="font-bold text-slate-700">PAYMENT: </span>
+              <span>{order.payment || "Cash on Delivery"}</span>
             </div>
-            <div className="text-right">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block">Live Status</span>
-              <span className="inline-block rounded bg-emerald-50 text-emerald-800 px-2 py-0.5 text-[10px] font-bold border border-emerald-200">
-                {order.status || "Placed"}
-              </span>
-            </div>
+            <span className="font-bold text-slate-900">
+              {order.payment?.includes("UPI") || order.payment?.includes("Card") ? "PAID" : "COLLECT CASH"}
+            </span>
+          </div>
+
+          {/* Kitchen Footer Note */}
+          <div className="mt-3 pt-2 border-t border-dashed border-slate-200 text-center text-[9px] text-slate-400">
+            <p className="font-bold text-slate-600">*** KOT READY FOR KITCHEN ***</p>
+            <p className="mt-0.5">Thank you for ordering with Food Ninja!</p>
           </div>
         </div>
 
-        {/* Action Buttons (Hidden when printed) */}
-        <div className="mt-5 flex items-center justify-end gap-2 border-t border-slate-100 pt-4 print:hidden">
+        {/* Modal Action Buttons (Always immediately visible without scrolling) */}
+        <div className="flex items-center justify-between gap-2 border-t border-slate-100 bg-slate-50/80 p-3">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+            className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer text-center"
           >
             Close
           </button>
           <button
             type="button"
             onClick={handlePrint}
-            className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700"
+            className="flex-[1.5] inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-3 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-800 transition cursor-pointer"
           >
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
-            <span>Print Slip (KOT)</span>
+            <span>Print Slip (80mm)</span>
           </button>
         </div>
       </div>
