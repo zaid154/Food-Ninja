@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 /**
  * Modern Custom Dropdown Component
  * Replaces ugly native OS <select> popups with modern Tailwind emerald styling.
+ * Floats cleanly on z-50 without triggering modal scrollbars or layout shifts.
  * Supports inline dynamic addition of custom cuisines (+ Add New Cuisine).
  */
 const CustomDropdown = ({
@@ -83,10 +84,10 @@ const CustomDropdown = ({
         </svg>
       </button>
 
-      {/* Floating Dropdown Panel */}
+      {/* Floating Dropdown Panel (Clean shadow-2xl, sleek 6px custom scrollbar, NO arrows) */}
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl bg-white border border-slate-200 shadow-xl overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150">
-          <div className="max-h-44 overflow-y-auto divide-y divide-slate-50">
+        <div className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl bg-white border border-slate-200 shadow-2xl overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150">
+          <div className="max-h-36 overflow-y-auto divide-y divide-slate-50 [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-200 hover:[&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-transparent">
             {options.map((opt) => {
               const isSelected = opt === value;
               return (
@@ -134,7 +135,7 @@ const CustomDropdown = ({
                   <button
                     type="button"
                     onClick={handleCreateNew}
-                    className="rounded-lg bg-emerald-700 px-2 py-1 text-[11px] font-bold text-white hover:bg-emerald-800 transition shrink-0 cursor-pointer"
+                    className="rounded-lg bg-emerald-700 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-emerald-800 transition shrink-0 cursor-pointer"
                   >
                     Add
                   </button>
@@ -227,13 +228,13 @@ const FoodDishModal = ({
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto"
       onClick={onClose}
     >
-      {/* Modal Dialog with max-h-[92vh] flex-col to never overflow laptop screens */}
+      {/* Modal Dialog (overflow-visible so dropdowns float cleanly without triggering scrollbars) */}
       <div
-        className="relative w-full max-w-3xl max-h-[92vh] flex flex-col rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-3xl rounded-2xl bg-white shadow-2xl border border-slate-200 my-auto animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header (Fixed at top) */}
-        <div className="shrink-0 flex items-center justify-between border-b border-slate-100 bg-slate-50/90 px-5 py-3">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/90 px-5 py-3 rounded-t-2xl">
           <div className="flex items-center gap-2.5">
             {/* Elegant Food Cloche / Dining Icon */}
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 shrink-0">
@@ -294,8 +295,8 @@ const FoodDishModal = ({
           </button>
         </div>
 
-        {/* Modal Form Body (Scrollable if viewport is small) */}
-        <form onSubmit={onSave} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 text-xs">
+        {/* Modal Form Body (overflow-visible: dropdowns float freely without any scrollbar jumping!) */}
+        <form onSubmit={onSave} className="p-4 sm:p-5 space-y-3.5 text-xs overflow-visible">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             
             {/* Left Column: Essential Dish Specifications & Ingredients */}
@@ -312,7 +313,7 @@ const FoodDishModal = ({
                 />
               </div>
 
-              {/* Category & Cuisine Dropdowns (Custom Tailwind Dropdowns) */}
+              {/* Category & Cuisine Dropdowns (Clean floating dropdowns with zero scrollbar trigger) */}
               <div className="grid grid-cols-2 gap-2.5">
                 <CustomDropdown
                   label="Category *"
@@ -571,29 +572,28 @@ const FoodDishModal = ({
             </div>
 
           </div>
-        </form>
 
-        {/* Modal Footer Actions (Fixed at bottom) */}
-        <div className="shrink-0 flex items-center justify-end gap-2.5 px-5 py-3 border-t border-slate-100 bg-slate-50/70">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={saving}
-            onClick={onSave}
-            className="rounded-xl bg-emerald-700 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800 transition disabled:opacity-50 shadow-2xs cursor-pointer flex items-center gap-1.5"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-            <span>{saving ? "Saving..." : editingFoodId ? "Save Changes" : "Add Dish to Menu"}</span>
-          </button>
-        </div>
+          {/* Modal Footer Actions */}
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-xl bg-emerald-700 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800 transition disabled:opacity-50 shadow-2xs cursor-pointer flex items-center gap-1.5"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>{saving ? "Saving..." : editingFoodId ? "Save Changes" : "Add Dish to Menu"}</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
