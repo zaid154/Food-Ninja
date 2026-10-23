@@ -332,15 +332,23 @@ const Checkout = () => {
 
     return (
         <section className="bg-slate-50 px-4 py-8 sm:py-10 min-h-[85vh]">
-            <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1.25fr_1fr]">
+            <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.75fr_1fr] items-start">
                 {/* Structured Delivery Form */}
-                <form onSubmit={placeOrder} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <form onSubmit={placeOrder} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
                     <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                        <div>
-                            <h1 className="text-xl font-black text-slate-900">
-                                Delivery & Payment
-                            </h1>
-                            <p className="text-xs text-slate-500 mt-0.5">Please provide where you want your food delivered.</p>
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 shrink-0">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                                    Delivery Address & Payment
+                                </h1>
+                                <p className="text-xs text-slate-500">Enter where you want your fresh food delivered</p>
+                            </div>
                         </div>
                         {isBuyNow && (
                             <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
@@ -520,31 +528,54 @@ const Checkout = () => {
                 </form>
 
                 {/* Order Summary */}
-                <aside className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm h-fit">
-                    <h2 className="text-sm font-black text-slate-900 pb-3 border-b border-slate-100">Order Summary</h2>
+                <aside className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs h-fit sticky top-20">
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 shrink-0">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                                    Order Summary
+                                </h2>
+                                <p className="text-xs text-slate-500">{totalItems} {totalItems === 1 ? "item" : "items"} in cart</p>
+                            </div>
+                        </div>
+                        <span className="text-xs font-bold bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg">
+                            ₹{grandTotal}
+                        </span>
+                    </div>
 
-                    <ul className="mt-4 space-y-3 divide-y divide-slate-100">
+                    <ul className="mt-4 space-y-2.5 divide-y divide-slate-100 max-h-[320px] overflow-y-auto pr-1">
                         {items.map((item, idx) => (
-                            <li key={idx} className="flex justify-between pt-2 text-sm">
-                                <div>
-                                    <p className="font-bold text-slate-800">{item.name || item.title}</p>
-                                    <span className="text-xs text-slate-400 font-medium">Qty: {item.quantity || 1}</span>
+                            <li key={idx} className="flex items-start justify-between pt-2.5 text-xs sm:text-sm">
+                                <div className="pr-2">
+                                    <p className="font-bold text-slate-800 leading-snug">{item.name || item.title}</p>
+                                    <span className="text-[11px] text-slate-400 font-medium">Qty: {item.quantity || 1}</span>
                                 </div>
-                                <span className="font-bold text-slate-900">
+                                <span className="font-extrabold text-slate-900 shrink-0">
                                     ₹{(item.price || item.caloriesPerServing || 0) * (item.quantity || 1)}
                                 </span>
                             </li>
                         ))}
                     </ul>
 
-                    <div className="mt-6 space-y-2 border-t border-slate-100 pt-4 text-xs font-medium text-slate-600">
+                    <div className="mt-5 space-y-2 border-t border-slate-100 pt-3.5 text-xs font-medium text-slate-600">
                         <div className="flex justify-between">
                             <span>Item Total</span>
                             <span className="font-bold text-slate-900">₹{subtotal}</span>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between items-center">
                             <span>Delivery Partner Fee</span>
-                            <span className="font-bold text-slate-900">₹{deliveryFee}</span>
+                            <span className="font-bold text-slate-900">
+                                {deliveryFee === 0 ? (
+                                    <span className="text-emerald-700 font-extrabold bg-emerald-50 px-2 py-0.5 rounded text-[11px]">FREE</span>
+                                ) : (
+                                    `₹${deliveryFee}`
+                                )}
+                            </span>
                         </div>
                         <div className="flex justify-between">
                             <span>Govt. Taxes ({settings.taxRate ?? 5}% GST)</span>
@@ -552,9 +583,16 @@ const Checkout = () => {
                         </div>
                     </div>
 
-                    <div className="mt-4 flex justify-between border-t border-slate-200 pt-4 text-base font-black text-slate-900">
+                    <div className="mt-4 flex justify-between border-t border-slate-200 pt-3.5 text-base font-black text-slate-900">
                         <span>Grand Total</span>
                         <span className="text-emerald-700">₹{grandTotal}</span>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-dashed border-slate-200 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+                        <svg className="h-3.5 w-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <span>100% Safe & Contactless Delivery</span>
                     </div>
                 </aside>
             </div>
