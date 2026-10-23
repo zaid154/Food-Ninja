@@ -24,6 +24,7 @@ app.use("/api/contact", require("./routes/inquiry"));
 app.use("/api/reviews", require("./routes/review"));
 app.use("/api/categories", require("./routes/category"));
 app.use("/api/settings", require("./routes/settings"));
+app.use("/api/payment", require("./routes/payment"));
 
 // Health Check
 app.get("/", (req, res) => {

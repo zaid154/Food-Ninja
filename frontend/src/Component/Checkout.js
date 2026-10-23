@@ -150,7 +150,7 @@ const Checkout = () => {
         const fullAddress = `${house.trim()}, ${street.trim()}${landmark.trim() ? `, Near ${landmark.trim()}` : ""}, ${city.trim()} - ${cleanPincode}`;
         const estDelivery = totalItems > 4 ? "40–50 mins" : "25–30 mins";
 
-        const newOrder = {
+        const baseOrder = {
             id: Date.now(),
             userEmail: user ? user.email : "foodninja@gmail.com",
             customerName: name.trim(),
@@ -164,6 +164,7 @@ const Checkout = () => {
             total: grandTotal,
             estDelivery: estDelivery,
             status: "Placed",
+            paymentStatus: payment === "Cash on Delivery" ? "Pending" : "Paid",
             date: new Date().toLocaleString("en-US", {
                 day: "numeric",
                 month: "short",
@@ -174,43 +175,145 @@ const Checkout = () => {
             })
         };
 
+        const finalizeOrder = async (orderToSave) => {
+            try {
+                // Save to Backend MongoDB Atlas
+                await fetch(`${API_BASE_URL}/orders`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(orderToSave),
+                });
+
+                // Save to Redux Store
+                dispatch(addOrder(orderToSave));
+
+                if (!isBuyNow) {
+                    dispatch(clearCart());
+                }
+
+                // Save address for future auto-fill
+                try {
+                    const addrs = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]");
+                    const newAddr = { name: name.trim(), phone: cleanPhone, house: house.trim(), street: street.trim(), landmark: landmark.trim(), city: city.trim(), pincode: cleanPincode, label: `${house.trim()}, ${street.trim()}, ${city.trim()}` };
+                    const exists = addrs.some(a => a.house === newAddr.house && a.street === newAddr.street && a.pincode === newAddr.pincode);
+                    if (!exists) { addrs.push(newAddr); localStorage.setItem("fn_saved_addresses", JSON.stringify(addrs.slice(-5))); }
+                } catch {}
+                setConfirmedOrder(orderToSave);
+            } catch (err) {
+                console.error("Order error:", err);
+                dispatch(addOrder(orderToSave));
+                if (!isBuyNow) dispatch(clearCart());
+                try {
+                    const addrs = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]");
+                    const newAddr = { name: name.trim(), phone: cleanPhone, house: house.trim(), street: street.trim(), landmark: landmark.trim(), city: city.trim(), pincode: cleanPincode, label: `${house.trim()}, ${street.trim()}, ${city.trim()}` };
+                    const exists = addrs.some(a => a.house === newAddr.house && a.street === newAddr.street && a.pincode === newAddr.pincode);
+                    if (!exists) { addrs.push(newAddr); localStorage.setItem("fn_saved_addresses", JSON.stringify(addrs.slice(-5))); }
+                } catch {}
+                setConfirmedOrder(orderToSave);
+            } finally {
+                setSubmitting(false);
+            }
+        };
+
+        // 1. Cash on Delivery Flow
+        if (payment === "Cash on Delivery") {
+            setSubmitting(true);
+            await finalizeOrder(baseOrder);
+            return;
+        }
+
+        // 2. Online Payment via Razorpay
         try {
             setSubmitting(true);
-            // Save to Backend MongoDB Atlas
-            await fetch(`${API_BASE_URL}/orders`, {
+            const orderRes = await fetch(`${API_BASE_URL}/payment/create-order`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newOrder),
+                body: JSON.stringify({ amount: grandTotal }),
             });
+            const data = await orderRes.json();
 
-            // Save to Redux Store
-            dispatch(addOrder(newOrder));
-
-            if (!isBuyNow) {
-                dispatch(clearCart());
+            if (!data.success) {
+                setError(data.message || "Failed to initialize payment gateway.");
+                setSubmitting(false);
+                return;
             }
 
-            // Save address for future auto-fill
-            try {
-                const addrs = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]");
-                const newAddr = { name: name.trim(), phone: cleanPhone, house: house.trim(), street: street.trim(), landmark: landmark.trim(), city: city.trim(), pincode: cleanPincode, label: `${house.trim()}, ${street.trim()}, ${city.trim()}` };
-                const exists = addrs.some(a => a.house === newAddr.house && a.street === newAddr.street && a.pincode === newAddr.pincode);
-                if (!exists) { addrs.push(newAddr); localStorage.setItem("fn_saved_addresses", JSON.stringify(addrs.slice(-5))); }
-            } catch {}
-            setConfirmedOrder(newOrder);
+            // If real keys are configured and Razorpay SDK is loaded
+            if (!data.isDemo && typeof window.Razorpay !== "undefined") {
+                const options = {
+                    key: data.key,
+                    amount: data.order.amount,
+                    currency: data.order.currency || "INR",
+                    name: settings.restaurantName || "Food Ninja",
+                    description: `Order Payment #${baseOrder.id}`,
+                    order_id: data.order.id,
+                    prefill: {
+                        name: name.trim(),
+                        contact: cleanPhone,
+                        email: user?.email || "customer@foodninja.com",
+                    },
+                    theme: {
+                        color: "#0c5936",
+                    },
+                    handler: async function (response) {
+                        try {
+                            const verifyRes = await fetch(`${API_BASE_URL}/payment/verify`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify(response),
+                            });
+                            const verifyData = await verifyRes.json();
+                            if (verifyData.success) {
+                                await finalizeOrder({
+                                    ...baseOrder,
+                                    paymentStatus: "Paid",
+                                    razorpayOrderId: response.razorpay_order_id,
+                                    razorpayPaymentId: response.razorpay_payment_id,
+                                    razorpaySignature: response.razorpay_signature,
+                                });
+                            } else {
+                                setError("Payment signature verification failed.");
+                                setSubmitting(false);
+                            }
+                        } catch {
+                            await finalizeOrder({
+                                ...baseOrder,
+                                paymentStatus: "Paid",
+                                razorpayPaymentId: response.razorpay_payment_id,
+                            });
+                        }
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            setSubmitting(false);
+                        },
+                    },
+                };
+                const rzp = new window.Razorpay(options);
+                rzp.on("payment.failed", function (resp) {
+                    setError(`Payment failed: ${resp.error?.description || "Transaction declined"}`);
+                    setSubmitting(false);
+                });
+                rzp.open();
+            } else {
+                // Demo / Test mode (when live/test keys are not yet configured in backend/.env)
+                // Seamlessly simulate verification so the user can test the full flow
+                const verifyRes = await fetch(`${API_BASE_URL}/payment/verify`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ isDemo: true, razorpay_payment_id: `pay_demo_${Date.now()}` }),
+                });
+                const verifyData = await verifyRes.json();
+                await finalizeOrder({
+                    ...baseOrder,
+                    paymentStatus: "Paid",
+                    razorpayOrderId: data.order?.id || `order_demo_${Date.now()}`,
+                    razorpayPaymentId: verifyData.paymentId || `pay_demo_${Date.now()}`,
+                });
+            }
         } catch (err) {
-            console.error("Order error:", err);
-            // Fallback: save to local store even if offline
-            dispatch(addOrder(newOrder));
-            if (!isBuyNow) dispatch(clearCart());
-            try {
-                const addrs = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]");
-                const newAddr = { name: name.trim(), phone: cleanPhone, house: house.trim(), street: street.trim(), landmark: landmark.trim(), city: city.trim(), pincode: cleanPincode, label: `${house.trim()}, ${street.trim()}, ${city.trim()}` };
-                const exists = addrs.some(a => a.house === newAddr.house && a.street === newAddr.street && a.pincode === newAddr.pincode);
-                if (!exists) { addrs.push(newAddr); localStorage.setItem("fn_saved_addresses", JSON.stringify(addrs.slice(-5))); }
-            } catch {}
-            setConfirmedOrder(newOrder);
-        } finally {
+            console.error("Razorpay error:", err);
+            setError("Unable to connect to payment gateway. Please try again or use Cash on Delivery.");
             setSubmitting(false);
         }
     };
@@ -254,6 +357,16 @@ const Checkout = () => {
                         <div>
                             <span className="text-slate-400 font-medium">Mode: </span>
                             <span className="font-bold text-slate-800">{confirmedOrder.payment}</span>
+                            {confirmedOrder.paymentStatus === "Paid" && (
+                                <span className="ml-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
+                                    ✓ Paid
+                                </span>
+                            )}
+                            {confirmedOrder.razorpayPaymentId && (
+                                <span className="block text-[10px] font-mono text-slate-400 mt-0.5">
+                                    Ref: {confirmedOrder.razorpayPaymentId}
+                                </span>
+                            )}
                         </div>
                     </div>
 
