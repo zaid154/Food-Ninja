@@ -338,10 +338,10 @@ const Checkout = () => {
     return (
         <section className="bg-[#f8fafc] px-4 py-8 sm:py-10 min-h-[85vh]">
             <div className="mx-auto max-w-6xl">
-                <form onSubmit={placeOrder} className="grid gap-6 lg:grid-cols-[1.55fr_1fr] items-start">
+                <form onSubmit={placeOrder} className="grid gap-6 lg:grid-cols-[1fr_1.55fr] items-start">
                     
-                    {/* LEFT COLUMN: Delivery Address & Payment */}
-                    <div className="rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-2xs">
+                    {/* RIGHT COLUMN on desktop: Delivery Address & Payment */}
+                    <div className="rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-2xs lg:order-2">
                         
                         {/* Main Card Header */}
                         <div className="flex items-center gap-3.5 mb-6">
@@ -641,8 +641,8 @@ const Checkout = () => {
                         )}
                     </div>
 
-                    {/* RIGHT COLUMN: Order Summary */}
-                    <aside className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xs sticky top-20">
+                    {/* LEFT COLUMN on desktop: Order Summary */}
+                    <aside className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xs sticky top-20 lg:order-1">
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
