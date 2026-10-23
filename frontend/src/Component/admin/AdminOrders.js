@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useOutletContext } from "react-router-dom";
+import OrderInvoiceModal from "./OrderInvoiceModal";
 
 const STATUSES = ["All", "Placed", "Preparing", "Out for Delivery", "Delivered", "Cancelled"];
 
@@ -10,6 +11,7 @@ const AdminOrders = (props) => {
 
   const [search, setSearch] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All");
+  const [activeInvoiceOrder, setActiveInvoiceOrder] = useState(null);
 
   const filteredOrders = orders.filter((o) => {
     const q = search.trim().toLowerCase();
@@ -132,7 +134,7 @@ const AdminOrders = (props) => {
                     <p className="font-black text-slate-900 text-sm">₹{o.total}</p>
                     <p className="text-[10px] text-slate-400">{o.payment}</p>
                   </td>
-                  <td className="py-3.5 align-top text-right">
+                  <td className="py-3.5 align-top text-right space-y-1.5">
                     <select
                       value={o.status}
                       onChange={(e) => onUpdateStatus(o.id, e.target.value)}
@@ -154,12 +156,34 @@ const AdminOrders = (props) => {
                       <option value="Delivered">● Delivered</option>
                       <option value="Cancelled">● Cancelled</option>
                     </select>
+
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => setActiveInvoiceOrder(o)}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 shadow-2xs transition cursor-pointer"
+                        title="Print Kitchen Order Ticket / Invoice"
+                      >
+                        <svg className="h-3 w-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        <span>Print KOT</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {/* Printable Invoice / Kitchen Order Ticket Modal */}
+      {activeInvoiceOrder && (
+        <OrderInvoiceModal
+          order={activeInvoiceOrder}
+          onClose={() => setActiveInvoiceOrder(null)}
+        />
       )}
     </div>
   );

@@ -20,6 +20,7 @@ const AdminOverview = (props) => {
   const context = useOutletContext() || {};
   const orders = props.orders || context.orders || [];
   const foods = props.foods || context.foods || [];
+  const categories = props.categories || context.categories || [];
   const inquiries = props.inquiries || context.inquiries || [];
   const navigate = useNavigate();
 
@@ -36,8 +37,8 @@ const AdminOverview = (props) => {
 
   return (
     <div className="space-y-6">
-      {/* 4 Professional, Consistent Metric Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* 6 Professional Metric & Module Cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {/* Total Revenue */}
         <div className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-34">
           <div className="flex items-center justify-between">
@@ -97,6 +98,55 @@ const AdminOverview = (props) => {
               </span>
             </div>
             <p className="mt-1 text-xs text-slate-400 font-medium">Active in online catalog</p>
+          </div>
+        </div>
+
+        {/* Categories Card */}
+        <div
+          onClick={() => navigate("/admin/categories")}
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-34 transition hover:border-slate-300 hover:shadow-xs group"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Categories</span>
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 text-slate-600">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+            </span>
+          </div>
+          <div>
+            <div className="flex items-baseline justify-between">
+              <p className="text-2xl font-bold tracking-tight text-slate-900">{categories.length || 7}</p>
+              <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
+                Create & Style →
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-slate-400 font-medium">Menu sections & palettes</p>
+          </div>
+        </div>
+
+        {/* Store Settings & Charges Card */}
+        <div
+          onClick={() => navigate("/admin/settings")}
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-34 transition hover:border-slate-300 hover:shadow-xs group"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Store Charges</span>
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 text-slate-600">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </span>
+          </div>
+          <div>
+            <div className="flex items-baseline justify-between">
+              <p className="text-2xl font-bold tracking-tight text-slate-900">Delivery & Fees</p>
+              <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
+                Configure →
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-slate-400 font-medium">Free delivery thresholds</p>
           </div>
         </div>
 

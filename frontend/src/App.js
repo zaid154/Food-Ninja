@@ -27,6 +27,9 @@ import AdminOverview from "./Component/admin/AdminOverview";
 import AdminOrders from "./Component/admin/AdminOrders";
 import AdminFoods from "./Component/admin/AdminFoods";
 import AdminInquiries from "./Component/admin/AdminInquiries";
+import AdminCategories from "./Component/admin/AdminCategories";
+import AdminCustomers from "./Component/admin/AdminCustomers";
+import AdminSettings from "./Component/admin/AdminSettings";
 
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
@@ -98,6 +101,9 @@ const appRouter = createBrowserRouter([
           { path: "overview", element: <AdminOverview /> },
           { path: "orders", element: <AdminOrders /> },
           { path: "foods", element: <AdminFoods /> },
+          { path: "categories", element: <AdminCategories /> },
+          { path: "customers", element: <AdminCustomers /> },
+          { path: "settings", element: <AdminSettings /> },
           { path: "inquiries", element: <AdminInquiries /> }
         ]
       },

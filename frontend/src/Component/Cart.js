@@ -1,20 +1,42 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addCart, clearCart, removeCart } from "../utils/cartSlice";
+import { API_BASE_URL } from "../utils/Constants";
 
 const Cart = () => {
   const cartItems = useSelector((store) => store.cart.item);
   const dispatch = useDispatch();
+
+  const [settings, setSettings] = useState({
+    deliveryFee: 30,
+    freeDeliveryThreshold: 499,
+    packagingFee: 15,
+    taxRate: 5,
+  });
+
+  useEffect(() => {
+    if (typeof fetch !== "undefined") {
+      fetch(`${API_BASE_URL}/settings`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d && d.settings) setSettings(d.settings);
+        })
+        .catch(() => {});
+    }
+  }, []);
 
   const totalItems = cartItems.reduce((n, i) => n + (i.quantity || 1), 0);
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + (item.caloriesPerServing || 0) * (item.quantity || 1),
     0
   );
-  const deliveryFee = totalItems > 0 ? 49 : 0;
-  const taxes = totalItems > 0 ? Math.round(totalAmount * 0.05) : 0;
-  const grandTotal = totalAmount + deliveryFee + taxes;
+
+  const isFreeDelivery = totalAmount >= (settings.freeDeliveryThreshold || 499);
+  const deliveryFee = totalItems > 0 ? (isFreeDelivery ? 0 : (settings.deliveryFee ?? 30)) : 0;
+  const packagingFee = totalItems > 0 ? (settings.packagingFee ?? 15) : 0;
+  const taxes = totalItems > 0 ? Math.round(totalAmount * ((settings.taxRate ?? 5) / 100)) : 0;
+  const grandTotal = totalAmount + deliveryFee + packagingFee + taxes;
 
   if (totalItems === 0) {
     return (
@@ -140,6 +162,20 @@ const Cart = () => {
           <aside className="sticky top-24 h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-sm text-xs">
             <h2 className="text-base font-black text-slate-900 pb-3 border-b border-slate-100">Bill Details</h2>
 
+            {/* Free Delivery Promo Bar */}
+            <div className="mt-4 rounded-xl bg-emerald-50/70 border border-emerald-200/80 p-3 text-xs">
+              {isFreeDelivery ? (
+                <p className="font-bold text-emerald-800 flex items-center gap-1.5">
+                  <span>🎉</span>
+                  <span>You've unlocked <strong>FREE Delivery!</strong></span>
+                </p>
+              ) : (
+                <p className="text-slate-700">
+                  Add <strong className="text-emerald-700 font-bold">₹{settings.freeDeliveryThreshold - totalAmount}</strong> more for <strong>FREE Delivery</strong>
+                </p>
+              )}
+            </div>
+
             <div className="mt-4 space-y-3">
               <div className="flex items-center justify-between text-slate-600">
                 <span>Items Total ({totalItems})</span>
@@ -147,12 +183,23 @@ const Cart = () => {
               </div>
 
               <div className="flex items-center justify-between text-slate-600">
-                <span>Standard Delivery Fee</span>
-                <span className="font-bold text-slate-900">₹{deliveryFee}</span>
+                <span>Delivery Fee</span>
+                {isFreeDelivery ? (
+                  <span className="font-bold text-emerald-700">FREE</span>
+                ) : (
+                  <span className="font-bold text-slate-900">₹{deliveryFee}</span>
+                )}
               </div>
 
+              {packagingFee > 0 && (
+                <div className="flex items-center justify-between text-slate-600">
+                  <span>Restaurant Packaging Fee</span>
+                  <span className="font-bold text-slate-900">₹{packagingFee}</span>
+                </div>
+              )}
+
               <div className="flex items-center justify-between text-slate-600">
-                <span>Govt Taxes (5%)</span>
+                <span>Govt Taxes ({settings.taxRate || 5}%)</span>
                 <span className="font-bold text-slate-900">₹{taxes}</span>
               </div>
 

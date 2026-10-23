@@ -451,18 +451,24 @@ const ProductView = () => {
               </div>
 
               {/* Add to Cart Button */}
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#137947] hover:bg-[#0e5c36] text-white px-6 py-3.5 text-sm font-bold shadow-xs transition cursor-pointer"
-              >
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <circle cx="9" cy="21" r="1" />
-                  <circle cx="20" cy="21" r="1" />
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                </svg>
-                <span>{cartQty > 0 ? `Add to Cart (${cartQty} in cart)` : "Add to Cart"}</span>
-              </button>
+              {product.inStock === false ? (
+                <div className="flex-1 flex items-center justify-center rounded-xl bg-slate-100 border border-slate-200 text-slate-400 px-6 py-3.5 text-sm font-bold shadow-xs">
+                  Currently Sold Out
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#137947] hover:bg-[#0e5c36] text-white px-6 py-3.5 text-sm font-bold shadow-xs transition cursor-pointer"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="9" cy="21" r="1" />
+                    <circle cx="20" cy="21" r="1" />
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                  </svg>
+                  <span>{cartQty > 0 ? `Add to Cart (${cartQty} in cart)` : "Add to Cart"}</span>
+                </button>
+              )}
             </div>
 
             {/* 3 Trust Features Container */}

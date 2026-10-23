@@ -40,8 +40,12 @@ export const FOOD_CUISINES = [
 const AdminFoods = (props) => {
   const context = useOutletContext() || {};
   const foods = props.foods || context.foods || [];
+  const categories = props.categories || context.categories || [];
   const onRefresh = props.onRefresh || context.fetchData;
   const showToast = props.showToast || context.showToast || alert;
+
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   const initialFood = {
     name: "",
@@ -59,6 +63,30 @@ const AdminFoods = (props) => {
 
   const [foodForm, setFoodForm] = useState(initialFood);
   const [editingFoodId, setEditingFoodId] = useState(null);
+
+  // Combine dynamic categories with defaults
+  const availableCategories = categories.length > 0
+    ? Array.from(new Set([...categories.map((c) => c.name), ...FOOD_CATEGORIES]))
+    : FOOD_CATEGORIES;
+
+  const handleToggleStock = async (food) => {
+    try {
+      const newStock = food.inStock === false ? true : false;
+      const res = await fetch(`${API_BASE_URL}/recipes/${food.id}/stock`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inStock: newStock }),
+      });
+      if (res.ok) {
+        showToast(`${food.name} is now ${newStock ? "In Stock" : "Out of Stock"}`);
+        if (onRefresh) onRefresh();
+      } else {
+        alert("Failed to update stock status.");
+      }
+    } catch {
+      alert("Error connecting to server.");
+    }
+  };
 
   const handleSaveFood = async (e) => {
     e.preventDefault();
@@ -153,7 +181,7 @@ const AdminFoods = (props) => {
                 onChange={(e) => setFoodForm({ ...foodForm, category: e.target.value })}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-emerald-500 bg-white"
               >
-                {FOOD_CATEGORIES.map((c) => (
+                {availableCategories.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
@@ -314,92 +342,163 @@ const AdminFoods = (props) => {
         </form>
       </div>
 
-      {/* Food Dishes Table */}
-      <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs">
-        <h3 className="font-bold text-slate-900 text-sm mb-4">
-          Current Active Food Dishes ({foods.length})
-        </h3>
-        <div className="overflow-x-auto max-h-[640px] overflow-y-auto pr-1">
-          <table className="w-full text-left text-xs min-w-[620px]">
-            <thead className="sticky top-0 bg-white border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px] z-10">
-              <tr>
-                <th className="pb-2.5 min-w-[160px]">Dish</th>
-                <th className="pb-2.5 min-w-[90px]">Category</th>
-                <th className="pb-2.5 min-w-[100px]">Cuisine</th>
-                <th className="pb-2.5 min-w-[70px]">Price</th>
-                <th className="pb-2.5 min-w-[90px]">Type</th>
-                <th className="pb-2.5 text-right min-w-[110px] pr-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {foods.map((f) => {
-                const isVegan = f.dietary === "Vegan";
-                const isVeg = f.isVeg !== false && f.dietary !== "Non-Veg";
+      {/* Food Dishes Table & Live Inventory Management */}
+      <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <h3 className="font-bold text-slate-900 text-sm">
+              Menu Inventory & Stock Management ({filteredFoods.length} of {foods.length})
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Toggle stock availability or edit dish information
+            </p>
+          </div>
 
-                return (
-                  <tr key={f.id} className="text-slate-700 hover:bg-slate-50/50 transition">
-                    <td className="py-3 flex items-center gap-3">
-                      <img src={f.image} alt={f.name} className="h-10 w-10 rounded-lg object-cover border border-slate-200 shrink-0" />
-                      <div className="min-w-0">
-                        <Link to={`/restaurant/${f.id}`} target="_blank" className="font-bold text-slate-900 hover:text-emerald-600 truncate block">
-                          {f.name}
-                        </Link>
-                        <p className="text-[10px] text-slate-400">{f.deliveryTime || "25-30 mins"}</p>
-                      </div>
-                    </td>
-                    <td className="font-medium text-slate-900 whitespace-nowrap">{f.category}</td>
-                    <td className="whitespace-nowrap">
-                      <span className="rounded bg-slate-100 px-2 py-0.5 font-bold text-slate-700 text-[11px]">
-                        {f.cuisine || "Indian"}
-                      </span>
-                    </td>
-                    <td className="font-black text-slate-900 whitespace-nowrap">₹{f.price || f.caloriesPerServing}</td>
-                    <td className="whitespace-nowrap">
-                      <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded whitespace-nowrap ${
-                        isVegan
-                          ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                          : isVeg
-                          ? "bg-green-50 text-green-700 border border-green-200"
-                          : "bg-red-50 text-red-700 border border-red-200"
-                      }`}>
-                        {isVegan ? "VEGAN" : isVeg ? "VEG" : "NON-VEG"}
-                      </span>
-                    </td>
-                    <td className="text-right space-x-1.5 whitespace-nowrap pr-2">
-                      <button
-                        onClick={() => {
-                          setEditingFoodId(f.id);
-                          const foodDietary = f.dietary || (f.isVeg !== false ? "Veg" : "Non-Veg");
-                          setFoodForm({
-                            name: f.name || "",
-                            category: f.category || "Biryani",
-                            cuisine: f.cuisine || "Indian",
-                            price: f.price || f.caloriesPerServing || 199,
-                            caloriesPerServing: f.caloriesPerServing || 300,
-                            deliveryTime: f.deliveryTime || "25-30 mins",
-                            dietary: foodDietary,
-                            isVeg: foodDietary !== "Non-Veg",
-                            image: f.image || "",
-                            description: f.description || "",
-                            ingredients: Array.isArray(f.ingredients) ? f.ingredients.join(", ") : (f.ingredients || "")
-                          });
-                        }}
-                        className="rounded-lg bg-slate-100 px-2.5 py-1.5 font-bold text-slate-700 hover:bg-slate-200"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteFood(f.id)}
-                        className="rounded-lg bg-red-50 px-2.5 py-1.5 font-bold text-red-700 hover:bg-red-100"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          {/* Search Box */}
+          <div className="relative w-full sm:w-64">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search dish, cuisine, ID..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-8 pr-3 text-xs outline-none focus:border-emerald-500 focus:bg-white transition"
+            />
+            <svg className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Category Quick Filter Chips */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+          {["All", ...availableCategories.slice(0, 10)].map((cat) => {
+            const isSelected = selectedCategory === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                  isSelected
+                    ? "bg-slate-900 text-white shadow-2xs"
+                    : "bg-slate-50 text-slate-600 border border-slate-200/70 hover:bg-slate-100"
+                }`}
+              >
+                {cat}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="overflow-x-auto max-h-[640px] overflow-y-auto pr-1">
+          {filteredFoods.length === 0 ? (
+            <div className="py-12 text-center text-xs text-slate-400">
+              No dishes found matching your search.
+            </div>
+          ) : (
+            <table className="w-full text-left text-xs min-w-[700px]">
+              <thead className="sticky top-0 bg-white border-b border-slate-200 text-slate-400 font-bold uppercase text-[10px] z-10">
+                <tr>
+                  <th className="pb-2.5 min-w-[170px]">Dish</th>
+                  <th className="pb-2.5 min-w-[90px]">Category</th>
+                  <th className="pb-2.5 min-w-[100px]">Cuisine</th>
+                  <th className="pb-2.5 min-w-[70px]">Price</th>
+                  <th className="pb-2.5 min-w-[80px]">Type</th>
+                  <th className="pb-2.5 min-w-[100px]">Availability</th>
+                  <th className="pb-2.5 text-right min-w-[110px] pr-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredFoods.map((f) => {
+                  const isVegan = f.dietary === "Vegan";
+                  const isVeg = f.isVeg !== false && f.dietary !== "Non-Veg";
+                  const isAvailable = f.inStock !== false;
+
+                  return (
+                    <tr key={f.id} className="text-slate-700 hover:bg-slate-50/50 transition">
+                      <td className="py-3 flex items-center gap-3">
+                        <img
+                          src={f.image}
+                          alt={f.name}
+                          className="h-10 w-10 rounded-lg object-cover border border-slate-200 shrink-0"
+                          onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&auto=format&fit=crop&q=80"; }}
+                        />
+                        <div className="min-w-0">
+                          <Link to={`/restaurant/${f.id}`} target="_blank" className="font-bold text-slate-900 hover:text-emerald-600 truncate block">
+                            {f.name}
+                          </Link>
+                          <p className="text-[10px] text-slate-400">ID #{f.id} • {f.deliveryTime || "25-30 mins"}</p>
+                        </div>
+                      </td>
+                      <td className="font-medium text-slate-900 whitespace-nowrap">{f.category}</td>
+                      <td className="whitespace-nowrap">
+                        <span className="rounded bg-slate-100 px-2 py-0.5 font-bold text-slate-700 text-[11px]">
+                          {f.cuisine || "Indian"}
+                        </span>
+                      </td>
+                      <td className="font-black text-slate-900 whitespace-nowrap">₹{f.price || f.caloriesPerServing}</td>
+                      <td className="whitespace-nowrap">
+                        <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded whitespace-nowrap ${
+                          isVegan
+                            ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                            : isVeg
+                            ? "bg-green-50 text-green-700 border border-green-200"
+                            : "bg-red-50 text-red-700 border border-red-200"
+                        }`}>
+                          {isVegan ? "VEGAN" : isVeg ? "VEG" : "NON-VEG"}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleStock(f)}
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold transition cursor-pointer border ${
+                            isAvailable
+                              ? "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
+                              : "bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100"
+                          }`}
+                          title="Click to toggle availability"
+                        >
+                          <span className={`h-1.5 w-1.5 rounded-full ${isAvailable ? "bg-emerald-600" : "bg-rose-600"}`} />
+                          <span>{isAvailable ? "In Stock" : "Sold Out"}</span>
+                        </button>
+                      </td>
+                      <td className="text-right space-x-1.5 whitespace-nowrap pr-2">
+                        <button
+                          onClick={() => {
+                            setEditingFoodId(f.id);
+                            const foodDietary = f.dietary || (f.isVeg !== false ? "Veg" : "Non-Veg");
+                            setFoodForm({
+                              name: f.name || "",
+                              category: f.category || "Biryani",
+                              cuisine: f.cuisine || "Indian",
+                              price: f.price || f.caloriesPerServing || 199,
+                              caloriesPerServing: f.caloriesPerServing || 300,
+                              deliveryTime: f.deliveryTime || "25-30 mins",
+                              dietary: foodDietary,
+                              isVeg: foodDietary !== "Non-Veg",
+                              image: f.image || "",
+                              description: f.description || "",
+                              ingredients: Array.isArray(f.ingredients) ? f.ingredients.join(", ") : (f.ingredients || "")
+                            });
+                          }}
+                          className="rounded-lg bg-slate-100 px-2.5 py-1.5 font-bold text-slate-700 hover:bg-slate-200 cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteFood(f.id)}
+                          className="rounded-lg bg-red-50 px-2.5 py-1.5 font-bold text-red-700 hover:bg-red-100 cursor-pointer"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

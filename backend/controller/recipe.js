@@ -160,7 +160,8 @@ const addRecipe = async (req, res) => {
       reviewCount: 15,
       description: description || "Freshly made restaurant preparation.",
       ingredients: Array.isArray(ingredients) ? ingredients : (ingredients ? ingredients.split(",").map(s => s.trim()) : ["Fresh Ingredients"]),
-      instructions: ["Prepared fresh on order", "Packed hygienically in spill-proof box", "Delivered hot to your doorstep"]
+      instructions: ["Prepared fresh on order", "Packed hygienically in spill-proof box", "Delivered hot to your doorstep"],
+      inStock: inStock !== undefined ? Boolean(inStock) : true,
     });
 
     await newFood.save();
@@ -173,7 +174,7 @@ const addRecipe = async (req, res) => {
 // Admin: Update food item
 const updateRecipe = async (req, res) => {
   try {
-    const { name, category, price, image, isVeg, dietary, deliveryTime, description, cuisine } = req.body;
+    const { name, category, price, image, isVeg, dietary, deliveryTime, description, cuisine, inStock } = req.body;
     
     const updateData = {
       name,
@@ -188,6 +189,10 @@ const updateRecipe = async (req, res) => {
       cuisine
     };
 
+    if (inStock !== undefined) {
+      updateData.inStock = Boolean(inStock);
+    }
+
     const updated = await Recipe.findOneAndUpdate(
       { id: Number(req.params.id) },
       { $set: updateData },
@@ -198,6 +203,25 @@ const updateRecipe = async (req, res) => {
     return res.status(200).json({ message: "Dish updated successfully!", food: updated });
   } catch (error) {
     return res.status(500).json({ message: "Failed to update dish", error: error.message });
+  }
+};
+
+// Admin: Quick Stock Toggle (In Stock / Out of Stock)
+const updateRecipeStock = async (req, res) => {
+  try {
+    const { inStock } = req.body;
+    const updated = await Recipe.findOneAndUpdate(
+      { id: Number(req.params.id) },
+      { $set: { inStock: Boolean(inStock) } },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: "Dish not found." });
+    return res.status(200).json({
+      message: `Dish availability updated to ${Boolean(inStock) ? "In Stock" : "Out of Stock"}`,
+      food: updated,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to update stock status", error: error.message });
   }
 };
 
@@ -212,4 +236,4 @@ const deleteRecipe = async (req, res) => {
   }
 };
 
-module.exports = { getRecipes, getRecipe, addRecipe, updateRecipe, deleteRecipe };
+module.exports = { getRecipes, getRecipe, addRecipe, updateRecipe, updateRecipeStock, deleteRecipe };

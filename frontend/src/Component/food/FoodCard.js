@@ -5,8 +5,9 @@ import { addCart, removeCart } from "../../utils/cartSlice";
 import { addWishlist, removeWishlist } from "../../utils/wishlistSlice";
 
 const FoodCard = ({ data }) => {
-  const { id, name, image, price, rating, isVeg, description } = data;
+  const { id, name, image, price, rating, isVeg, description, inStock } = data;
   const dispatch = useDispatch();
+  const isAvailable = inStock !== false;
 
   const wishlistItems = useSelector((store) => store.wishlist.item);
   const isLiked = wishlistItems.some((i) => i.id === id);
@@ -77,6 +78,15 @@ const FoodCard = ({ data }) => {
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
           </svg>
         </div>
+
+        {/* Sold Out Overlay Badge */}
+        {!isAvailable && (
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[1px] flex items-center justify-center">
+            <span className="rounded-lg bg-slate-900/90 text-white px-3 py-1 text-xs font-bold uppercase tracking-wider shadow-md border border-white/20">
+              Sold Out
+            </span>
+          </div>
+        )}
       </Link>
 
       {/* Dish Content */}
@@ -98,7 +108,11 @@ const FoodCard = ({ data }) => {
             ₹{price}
           </div>
 
-          {cartQty > 0 ? (
+          {!isAvailable ? (
+            <span className="rounded-lg bg-slate-100 border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-400">
+              Unavailable
+            </span>
+          ) : cartQty > 0 ? (
             <div className="flex items-center gap-2 rounded-lg border border-emerald-600 bg-emerald-50/80 px-2.5 py-1">
               <button
                 type="button"

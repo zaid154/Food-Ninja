@@ -136,6 +136,7 @@ const MenuPage = () => {
 
   // Component state
   const [dishes, setDishes] = useState([]);
+  const [menuCategories, setMenuCategories] = useState(MENU_CATEGORIES);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     limit: 12,
@@ -143,6 +144,20 @@ const MenuPage = () => {
     totalPages: 1,
   });
   const [loading, setLoading] = useState(true);
+
+  // Fetch dynamic categories created by Admin
+  useEffect(() => {
+    if (typeof fetch !== "undefined") {
+      fetch(`${API_BASE_URL}/categories`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data && data.categories && data.categories.length > 0) {
+            setMenuCategories(data.categories.filter((c) => c.isActive !== false));
+          }
+        })
+        .catch(() => {});
+    }
+  }, []);
   const [error, setError] = useState(null);
 
   const [sortOpen, setSortOpen] = useState(false);
@@ -478,8 +493,8 @@ const MenuPage = () => {
             2. 7 CATEGORY CARDS (Responsive: Swipe on mobile, 7-col on laptop/desktop)
         ======================================================== */}
         <div className="mb-4 sm:mb-5">
-          <div className="flex sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-3.5 overflow-x-auto pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
-            {MENU_CATEGORIES.map((cat) => {
+          <div className="flex sm:grid sm:grid-cols-4 lg:grid-flow-col lg:auto-cols-fr gap-2.5 sm:gap-3.5 overflow-x-auto pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
+            {menuCategories.map((cat) => {
               const isActive = currentCategory.toLowerCase() === cat.name.toLowerCase();
 
               return (

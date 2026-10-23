@@ -17,6 +17,7 @@ const recipeSchema = new mongoose.Schema(
     description: { type: String, default: "Delicious and freshly prepared restaurant dish." },
     ingredients: { type: [String], default: [] },
     instructions: { type: [String], default: [] },
+    inStock: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
