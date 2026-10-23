@@ -745,9 +745,6 @@ const Checkout = () => {
             </div>
         </section>
     );
-            </div>
-        </section>
-    );
 };
 
 export default Checkout;
