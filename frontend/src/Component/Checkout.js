@@ -318,109 +318,251 @@ const Checkout = () => {
         }
     };
 
-    // Full Order Confirmation Screen with Direct Tracking Button
+    // Full Order Confirmation Screen — matches mockup exactly
     if (confirmedOrder) {
+        const orderTime = new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
         return (
-            <section className="min-h-[85vh] bg-slate-50 px-4 py-8">
-                <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-                    {/* Top Status */}
-                    <div className="text-center pb-6 border-b border-slate-100">
-                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mb-3 ring-8 ring-emerald-50">
-                            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <section className="min-h-[85vh] bg-[#f8fafc] px-4 py-8 sm:py-10">
+                <div className="mx-auto max-w-3xl">
+
+                    {/* ─── Top Hero: Checkmark + Thank You ─── */}
+                    <div className="rounded-2xl bg-white border border-slate-200/80 shadow-sm p-6 sm:p-8 text-center">
+                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white mb-4 shadow-lg shadow-emerald-200">
+                            <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
-                        <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200 px-3 py-0.5 text-xs font-bold text-emerald-800">
-                            Order Placed Successfully
+                        <span className="inline-block rounded-full bg-emerald-50 border border-emerald-300 px-4 py-1 text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                            Order Confirmed
                         </span>
-                        <h1 className="mt-2 text-2xl font-black text-slate-900">
+                        <h1 className="mt-3 text-2xl sm:text-3xl font-black text-slate-900">
                             Thank You, {confirmedOrder.customerName}!
                         </h1>
-                        <p className="mt-1 text-xs text-slate-500">
-                            Your order has been confirmed and kitchen preparation has started.
+                        <p className="mt-1.5 text-sm text-slate-500">
+                            Your order is confirmed and the kitchen is getting started.
                         </p>
                     </div>
 
-                    {/* Meta Bar */}
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <div>
-                            <span className="text-slate-400 font-medium">Order ID: </span>
-                            <span className="font-mono font-bold text-slate-800">#{confirmedOrder.id}</span>
+                    {/* ─── Meta Info Bar: Order ID | Estimated Delivery | Payment Mode ─── */}
+                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {/* Order ID */}
+                        <div className="flex items-center gap-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-sm p-4">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                                    <path d="M16 2v4M8 2v4M3 10h18" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-[11px] text-slate-400 font-medium">Order ID</p>
+                                <p className="text-sm font-bold text-slate-900 font-mono">#{confirmedOrder.id}</p>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-1 font-semibold text-emerald-700">
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12 6 12 12 16 14" />
-                            </svg>
-                            <span>Estimated: {confirmedOrder.estDelivery}</span>
+
+                        {/* Estimated Delivery */}
+                        <div className="flex items-center gap-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-sm p-4">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-[11px] text-slate-400 font-medium">Estimated Delivery</p>
+                                <p className="text-sm font-bold text-slate-900">{confirmedOrder.estDelivery}</p>
+                            </div>
                         </div>
-                        <div>
-                            <span className="text-slate-400 font-medium">Mode: </span>
-                            <span className="font-bold text-slate-800">{confirmedOrder.payment}</span>
-                            {confirmedOrder.paymentStatus === "Paid" && (
-                                <span className="ml-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
-                                    ✓ Paid
-                                </span>
-                            )}
-                            {confirmedOrder.razorpayPaymentId && (
-                                <span className="block text-[10px] font-mono text-slate-400 mt-0.5">
-                                    Ref: {confirmedOrder.razorpayPaymentId}
-                                </span>
-                            )}
+
+                        {/* Payment Mode */}
+                        <div className="flex items-center gap-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-sm p-4">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                                    <line x1="2" y1="10" x2="22" y2="10" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-[11px] text-slate-400 font-medium">Payment Mode</p>
+                                <p className="text-sm font-bold text-slate-900">{confirmedOrder.payment}</p>
+                                {confirmedOrder.razorpayPaymentId && (
+                                    <p className="text-[10px] font-mono text-slate-400 mt-0.5">Ref: {confirmedOrder.razorpayPaymentId}</p>
+                                )}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Delivery Address Summary */}
-                    <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 text-xs">
-                        <p className="font-bold text-slate-700">Delivery Address:</p>
-                        <p className="mt-0.5 text-slate-600">{confirmedOrder.address}</p>
-                        <p className="mt-1 text-slate-500 text-[11px]">Phone: +91 {confirmedOrder.phone}</p>
+                    {/* ─── Address + Payment Summary (2 Columns) ─── */}
+                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-[1.3fr_1fr] gap-5">
+
+                        {/* Delivery Address Card */}
+                        <div className="rounded-2xl bg-white border border-slate-200/80 shadow-sm p-5">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
+                                        <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </div>
+                                    <h2 className="text-base font-bold text-slate-900">Delivery Address</h2>
+                                </div>
+                                <Link to="/checkout" className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition">
+                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    <span>Change address</span>
+                                </Link>
+                            </div>
+                            <div className="text-sm text-slate-700 leading-relaxed">
+                                <p className="font-medium">{confirmedOrder.address}</p>
+                            </div>
+                            <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+                                <svg className="h-4 w-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                </svg>
+                                <span className="font-medium">+91 {confirmedOrder.phone}</span>
+                            </div>
+                        </div>
+
+                        {/* Payment Summary Card */}
+                        <div className="rounded-2xl bg-white border border-slate-200/80 shadow-sm p-5">
+                            <div className="flex items-center gap-2.5 mb-4">
+                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
+                                    <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                        <rect x="2" y="3" width="20" height="18" rx="2" />
+                                        <path d="M8 7h8M8 11h4M8 15h6" />
+                                    </svg>
+                                </div>
+                                <h2 className="text-base font-bold text-slate-900">Payment Summary</h2>
+                            </div>
+                            <div className="space-y-2.5 text-sm">
+                                <div className="flex justify-between text-slate-600">
+                                    <span>Item Total</span>
+                                    <span className="font-semibold text-slate-800">₹{confirmedOrder.subtotal || subtotal}</span>
+                                </div>
+                                <div className="flex justify-between text-slate-600">
+                                    <span>Delivery Fee</span>
+                                    <span className="font-semibold text-slate-800">₹{confirmedOrder.deliveryFee ?? deliveryFee}</span>
+                                </div>
+                                <div className="flex justify-between text-slate-600">
+                                    <span>Discount</span>
+                                    <span className="font-semibold text-emerald-600">₹{discountAmount}</span>
+                                </div>
+                                <div className="flex justify-between border-t border-slate-200 pt-2.5 text-base font-black text-slate-900">
+                                    <span>Grand Total</span>
+                                    <span>₹{confirmedOrder.total}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Bill Breakdown */}
-                    <div className="mt-5 space-y-2 border-t border-slate-100 pt-4 text-xs">
-                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                            Payment Summary
-                        </h3>
-                        <div className="flex justify-between text-slate-600 pt-1">
-                            <span>Item Total</span>
-                            <span className="font-bold text-slate-800">₹{confirmedOrder.subtotal || subtotal}</span>
+                    {/* ─── Order Progress Stepper ─── */}
+                    <div className="mt-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm p-5 sm:p-6">
+                        <div className="flex items-center gap-2.5 mb-5">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
+                                <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 className="text-base font-bold text-slate-900">Order Progress</h2>
+                                <p className="text-xs text-slate-400">You can track your order in real time</p>
+                            </div>
                         </div>
-                        <div className="flex justify-between text-slate-600">
-                            <span>Delivery Partner Fee</span>
-                            <span className="font-bold text-slate-800">₹{confirmedOrder.deliveryFee || deliveryFee}</span>
-                        </div>
-                        <div className="flex justify-between text-slate-600">
-                            <span>Govt. Taxes ({settings.taxRate ?? 5}% GST)</span>
-                            <span className="font-bold text-slate-800">₹{confirmedOrder.taxes || taxes}</span>
-                        </div>
-                        <div className="flex justify-between border-t border-dashed border-slate-300 pt-2 text-sm font-black text-slate-900">
-                            <span>Grand Total</span>
-                            <span className="text-base text-emerald-700">₹{confirmedOrder.total}</span>
+
+                        {/* Horizontal Stepper */}
+                        <div className="flex items-start justify-between relative">
+                            {/* Connecting Line */}
+                            <div className="absolute top-5 left-[12%] right-[12%] h-0.5 bg-slate-200 z-0" />
+                            <div className="absolute top-5 left-[12%] h-0.5 bg-emerald-500 z-[1]" style={{ width: "15%" }} />
+
+                            {/* Step 1: Confirmed */}
+                            <div className="flex flex-col items-center text-center z-10 flex-1">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md shadow-emerald-200">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <p className="mt-2 text-xs font-bold text-emerald-700">Confirmed</p>
+                                <p className="text-[10px] text-slate-400">{orderTime}</p>
+                            </div>
+
+                            {/* Step 2: Preparing */}
+                            <div className="flex flex-col items-center text-center z-10 flex-1">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md shadow-emerald-200 ring-4 ring-emerald-100">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+                                        <path d="M12 6v6l4 2" />
+                                    </svg>
+                                </div>
+                                <p className="mt-2 text-xs font-bold text-emerald-700">Preparing</p>
+                                <p className="text-[10px] text-slate-400">Kitchen is cooking<br />your food</p>
+                            </div>
+
+                            {/* Step 3: Out for delivery */}
+                            <div className="flex flex-col items-center text-center z-10 flex-1">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400 border-2 border-slate-200">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                        <rect x="1" y="3" width="15" height="13" rx="1" />
+                                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                                        <circle cx="5.5" cy="18.5" r="2.5" />
+                                        <circle cx="18.5" cy="18.5" r="2.5" />
+                                    </svg>
+                                </div>
+                                <p className="mt-2 text-xs font-semibold text-slate-400">Out for delivery</p>
+                            </div>
+
+                            {/* Step 4: Delivered */}
+                            <div className="flex flex-col items-center text-center z-10 flex-1">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400 border-2 border-slate-200">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                        <polyline points="9 22 9 12 15 12 15 22" />
+                                    </svg>
+                                </div>
+                                <p className="mt-2 text-xs font-semibold text-slate-400">Delivered</p>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                    {/* ─── Action Buttons (Track Order + Continue Shopping) ─── */}
+                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <Link
                             to={`/orders/${confirmedOrder.id}`}
-                            className="flex-1 rounded-xl bg-emerald-600 py-3 text-center text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-emerald-700 active:scale-95 flex items-center justify-center gap-1.5"
+                            className="flex items-center justify-center gap-2.5 rounded-2xl bg-[#0c5936] hover:bg-[#084227] text-white py-4 px-6 font-bold text-sm shadow-sm transition active:scale-[0.98]"
                         >
-                            <span>Track Order Details</span>
-                            <span>→</span>
-                        </Link>
-                        <Link
-                            to="/orders"
-                            className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-center text-xs font-bold text-slate-700 transition hover:bg-slate-50"
-                        >
-                            View All Past Orders
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>Track Order</span>
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
                         </Link>
                         <Link
                             to="/"
-                            className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-xs font-bold text-slate-600 transition hover:bg-slate-50"
+                            className="flex items-center justify-center gap-2.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-800 py-4 px-6 font-bold text-sm transition active:scale-[0.98]"
                         >
-                            Menu
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <circle cx="9" cy="21" r="1" />
+                                <circle cx="20" cy="21" r="1" />
+                                <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
+                            </svg>
+                            <span>Continue Shopping</span>
                         </Link>
+                    </div>
+
+                    {/* ─── Support Footer ─── */}
+                    <div className="mt-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm px-5 py-3.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-slate-500">
+                        <svg className="h-4 w-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span className="font-medium">Need help? Contact our support team</span>
+                        <span className="text-slate-300">|</span>
+                        <span className="font-semibold text-slate-700">+91 {settings.supportPhone || "9876543210"}</span>
+                        <span className="text-slate-300">|</span>
+                        <span className="font-semibold text-slate-700">support@foodninja.in</span>
                     </div>
                 </div>
             </section>
