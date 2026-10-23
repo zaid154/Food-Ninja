@@ -326,6 +326,8 @@ const ProductView = () => {
     }
   };
 
+  const isVegDish = product.dietary === "Non-Veg" || product.isVeg === false ? false : true;
+
   return (
     <div className="bg-white min-h-screen pt-4 sm:pt-6 pb-16 text-slate-800">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -335,18 +337,18 @@ const ProductView = () => {
           
           {/* Left Column: Prominent Single Authentic Dish Image */}
           <div className="lg:col-span-6 w-full">
-            <div className="relative w-full aspect-square rounded-3xl overflow-hidden bg-slate-50 border border-slate-100 shadow-sm">
+            <div className="relative w-full h-[380px] sm:h-[420px] rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-xs group">
               <img
                 src={mainDishImg}
                 alt={product.name}
-                className={`h-full w-full ${product.imageFit === "contain" ? "object-contain p-4 bg-white" : "object-cover"} transition-all duration-300`}
+                className={`h-full w-full ${product.imageFit === "contain" ? "object-contain p-4 bg-slate-50" : "object-cover"} transition-transform duration-500 group-hover:scale-105`}
               />
 
               {/* Floating Wishlist Heart Button (Top Right) */}
               <button
                 type="button"
                 onClick={handleLike}
-                className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transition-transform hover:scale-110 cursor-pointer ${
+                className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 backdrop-blur-xs shadow-md transition-transform hover:scale-110 cursor-pointer ${
                   isLiked ? "text-rose-500" : "text-slate-400 hover:text-rose-500"
                 }`}
                 title="Save to favorites"
@@ -366,113 +368,183 @@ const ProductView = () => {
           </div>
 
           {/* Right Column: Dish Info & Purchasing Actions */}
-          <div className="lg:col-span-6 space-y-4">
+          <div className="lg:col-span-6 flex flex-col justify-between space-y-3.5">
             
-            {/* Cuisine Pill Tag */}
+            {/* Top Tag Bar: Cuisine + Category (Left) and Veg status + Stock (Right) */}
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="inline-block rounded-full bg-emerald-50 border border-emerald-200/80 px-3 py-1 text-xs font-semibold text-emerald-800">
+                  {product.cuisine ? `${product.cuisine} Cuisine` : "Specialty Dish"}
+                </span>
+                {product.category && (
+                  <span className="inline-block rounded-full bg-slate-100 border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-700">
+                    {product.category}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${isVegDish ? "bg-emerald-50 text-emerald-800 border-emerald-300" : "bg-red-50 text-red-800 border-red-300"}`}>
+                  <span className={`h-2 w-2 rounded-full ${isVegDish ? "bg-emerald-600" : "bg-red-600"}`} />
+                  {isVegDish ? "100% Pure Veg" : "Non-Veg"}
+                </span>
+
+                {product.inStock !== false ? (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50/80 border border-emerald-200/60 px-2.5 py-1 rounded-full">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Available Now
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
+                    Sold Out
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Dish Title & Rating Row */}
             <div>
-              <span className="inline-block rounded-full bg-[#eef7ee] border border-emerald-200/60 px-3 py-1 text-xs font-semibold text-emerald-800">
-                {product.cuisine ? `${product.cuisine} Cuisine` : "Russian Cuisine"}
-              </span>
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
+                {product.name}
+              </h1>
+
+              <div className="flex flex-wrap items-center gap-2.5 mt-2 text-xs">
+                <div className="flex items-center gap-1 font-bold text-slate-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded-md">
+                  <span className="text-amber-500 text-sm leading-none">★</span>
+                  <span>{displayRating}</span>
+                </div>
+                <span className="text-slate-500 font-medium">
+                  ({displayReviewCount} customer {displayReviewCount === 1 ? "review" : "reviews"})
+                </span>
+                <span className="text-slate-300">•</span>
+                <span className="text-emerald-700 font-medium flex items-center gap-1">
+                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  25-35 mins prep & delivery
+                </span>
+              </div>
             </div>
 
-            {/* Dish Title */}
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">
-              {product.name}
-            </h1>
-
-            {/* Rating Row */}
-            <div className="flex items-center gap-1.5 text-xs text-slate-500">
-              <span className="text-amber-500 font-bold text-sm">★</span>
-              <span className="font-black text-slate-800">{displayRating}</span>
-              <span>({displayReviewCount} reviews)</span>
-            </div>
-
-            {/* 3 Quick Attributes (Serves, Calories, Eco-sealed) */}
-            <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 pt-1 pb-1">
-              <div className="flex items-center gap-1.5">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-                <span className="font-medium">Serves 1-2</span>
+            {/* 3 Quick Attributes (Portion, Energy, Packaging) */}
+            <div className="grid grid-cols-3 gap-2.5 py-2.5 border-y border-slate-100 text-xs">
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="h-7 w-7 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400 font-medium leading-none">Portion</div>
+                  <div className="text-xs font-bold text-slate-800 mt-0.5">{product.servings || "Serves 1-2"}</div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
-                <span className="font-medium">300 kcal</span>
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="h-7 w-7 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2c.5 2.5 3 4.5 3 8a6 6 0 1 1-12 0c0-3.5 2.5-5.5 3-8a3 3 0 0 0 6 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400 font-medium leading-none">Energy</div>
+                  <div className="text-xs font-bold text-slate-800 mt-0.5">{product.caloriesPerServing || "300"} kcal</div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  <polyline points="9 12 11 14 15 10" />
-                </svg>
-                <span className="font-medium">Eco-sealed container</span>
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="h-7 w-7 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center shrink-0">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <polyline points="9 12 11 14 15 10" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400 font-medium leading-none">Packaging</div>
+                  <div className="text-xs font-bold text-slate-800 mt-0.5 truncate">Eco-sealed</div>
+                </div>
               </div>
             </div>
 
             {/* Short Description */}
-            <p className="text-xs text-slate-500 leading-relaxed">
-              {product.description || "Delicious Russian style Russian Borscht, prepared fresh with aromatic herbs and premium quality ingredients."}
+            <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+              {product.description || (isBorscht
+                ? "A traditional Russian soup made with fresh beets, vegetables and aromatic herbs, cooked to perfection and served with sour cream."
+                : "Prepared fresh to order using authentic traditional recipes, aromatic herbs, and hand-selected premium ingredients.")}
             </p>
 
-            {/* Price */}
-            <div className="text-3xl font-black text-slate-900 pt-1">
-              ₹{price}
-            </div>
-
-            {/* Quantity Stepper + Green Add to Cart Button */}
-            <div className="flex items-center gap-3 pt-2">
-              {/* Stepper */}
-              <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-2.5 w-28 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="text-base font-bold text-slate-600 hover:text-slate-900 cursor-pointer disabled:opacity-30"
-                  disabled={quantity <= 1}
-                >
-                  −
-                </button>
-                <span className="text-sm font-extrabold text-slate-900">
-                  {quantity}
+            {/* Price & Quantity Purchase Card */}
+            <div className="bg-slate-50/80 rounded-2xl p-3.5 border border-slate-200/70 space-y-3">
+              <div className="flex items-baseline justify-between">
+                <div className="flex items-baseline gap-2.5">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                    ₹{price}
+                  </span>
+                  <span className="text-sm font-semibold text-slate-400 line-through">
+                    ₹{Math.round(price * 1.25)}
+                  </span>
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                    20% OFF
+                  </span>
+                </div>
+                <span className="text-[11px] font-medium text-slate-400">
+                  Inclusive of all taxes
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="text-base font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
-                >
-                  +
-                </button>
               </div>
 
-              {/* Add to Cart Button */}
-              {product.inStock === false ? (
-                <div className="flex-1 flex items-center justify-center rounded-xl bg-slate-100 border border-slate-200 text-slate-400 px-6 py-3.5 text-sm font-bold shadow-xs">
-                  Currently Sold Out
+              <div className="flex items-center gap-3">
+                {/* Stepper */}
+                <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2.5 w-28 shrink-0 shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="text-base font-bold text-slate-500 hover:text-slate-900 cursor-pointer disabled:opacity-30 leading-none"
+                    disabled={quantity <= 1}
+                    title="Decrease quantity"
+                  >
+                    −
+                  </button>
+                  <span className="text-sm font-black text-slate-900 select-none">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((q) => q + 1)}
+                    className="text-base font-bold text-slate-500 hover:text-slate-900 cursor-pointer leading-none"
+                    title="Increase quantity"
+                  >
+                    +
+                  </button>
                 </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleAddToCart}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#137947] hover:bg-[#0e5c36] text-white px-6 py-3.5 text-sm font-bold shadow-xs transition cursor-pointer"
-                >
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <circle cx="9" cy="21" r="1" />
-                    <circle cx="20" cy="21" r="1" />
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                  </svg>
-                  <span>{cartQty > 0 ? `Add to Cart (${cartQty} in cart)` : "Add to Cart"}</span>
-                </button>
-              )}
+
+                {/* Add to Cart Button */}
+                {product.inStock === false ? (
+                  <div className="flex-1 flex items-center justify-center rounded-xl bg-slate-200 text-slate-500 px-5 py-3 text-sm font-bold shadow-xs">
+                    Currently Sold Out
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#137947] hover:bg-[#0e5c36] text-white px-5 py-3 text-sm font-bold shadow-xs transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <circle cx="9" cy="21" r="1" />
+                      <circle cx="20" cy="21" r="1" />
+                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                    </svg>
+                    <span>{cartQty > 0 ? `Add More (${cartQty} in cart)` : "Add Dish to Cart"}</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* 3 Trust Features Container */}
-            <div className="rounded-2xl border border-slate-100 bg-[#fbfdfb] p-3.5 flex items-center justify-between gap-2 text-slate-700 mt-4">
+            <div className="rounded-2xl border border-slate-100 bg-[#fbfdfb] p-3 flex items-center justify-between gap-2 text-slate-700">
               <div className="flex items-center gap-2">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 shrink-0">
                   <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
