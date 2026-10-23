@@ -339,7 +339,7 @@ const ProductView = () => {
               <img
                 src={mainDishImg}
                 alt={product.name}
-                className="h-full w-full object-cover transition-all duration-300"
+                className={`h-full w-full ${product.imageFit === "contain" ? "object-contain p-4 bg-white" : "object-cover"} transition-all duration-300`}
               />
 
               {/* Floating Wishlist Heart Button (Top Right) */}

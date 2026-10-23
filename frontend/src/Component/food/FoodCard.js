@@ -41,12 +41,15 @@ const FoodCard = ({ data }) => {
   return (
     <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
       {/* Dish Image */}
-      <Link to={`/restaurant/${id}`} className="block relative h-44 w-full overflow-hidden bg-slate-100">
+      <Link to={`/restaurant/${id}`} className="block relative h-44 w-full overflow-hidden bg-slate-100 flex items-center justify-center">
         <img
           src={image}
           alt={name}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className={`h-full w-full ${data.imageFit === "contain" ? "object-contain p-2" : "object-cover"} transition-transform duration-500 group-hover:scale-105`}
           loading="lazy"
+          onError={(e) => {
+            e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&auto=format&fit=crop&q=80";
+          }}
         />
 
         {/* Veg / Non-Veg Indicator */}

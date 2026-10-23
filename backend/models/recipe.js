@@ -7,6 +7,7 @@ const recipeSchema = new mongoose.Schema(
     category: { type: String, default: "Fast Food", trim: true },
     price: { type: Number, required: true, default: 199 },
     image: { type: String, required: true },
+    imageFit: { type: String, default: "contain" },
     isVeg: { type: Boolean, default: true },
     dietary: { type: String, default: "Veg" },
     rating: { type: Number, default: 4.5 },

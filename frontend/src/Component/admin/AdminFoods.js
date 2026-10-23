@@ -32,6 +32,14 @@ const AdminFoods = (props) => {
     ? categories.map((c) => c.name)
     : ["Biryani", "Pizza", "Burgers", "Chinese", "Indian", "Italian", "Beverages"];
 
+  // Dynamic cuisines dynamically unified from database dishes + standard cuisines
+  const dynamicCuisines = Array.from(
+    new Set([
+      ...FOOD_CUISINES,
+      ...foods.map((f) => f.cuisine).filter(Boolean)
+    ])
+  );
+
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedStock, setSelectedStock] = useState("All"); // "All" | "In Stock" | "Sold Out"
@@ -42,6 +50,7 @@ const AdminFoods = (props) => {
     name: "",
     category: availableCategories[0] || "Biryani",
     cuisine: "Hyderabadi",
+    imageFit: "contain",
     price: "",
     caloriesPerServing: "",
     deliveryTime: "25-30 mins",
@@ -91,6 +100,7 @@ const AdminFoods = (props) => {
       name: f.name || "",
       category: f.category || "Biryani",
       cuisine: f.cuisine || "Indian",
+      imageFit: f.imageFit || "contain",
       price: f.price || f.caloriesPerServing || 199,
       caloriesPerServing: f.caloriesPerServing || 300,
       deliveryTime: f.deliveryTime || "25-30 mins",
@@ -134,6 +144,7 @@ const AdminFoods = (props) => {
       name: foodForm.name.trim(),
       category: foodForm.category,
       cuisine: foodForm.cuisine || "Indian",
+      imageFit: foodForm.imageFit || "contain",
       price: Number(foodForm.price),
       caloriesPerServing: Number(foodForm.caloriesPerServing) || Number(foodForm.price) * 2,
       deliveryTime: foodForm.deliveryTime || "25-30 mins",
@@ -324,7 +335,7 @@ const AdminFoods = (props) => {
                         <img
                           src={f.image}
                           alt={f.name}
-                          className="h-11 w-11 rounded-xl object-cover border border-slate-200 shrink-0"
+                          className={`h-11 w-11 rounded-xl ${f.imageFit === "contain" ? "object-contain p-0.5 bg-white" : "object-cover"} border border-slate-200 shrink-0`}
                           onError={(e) => {
                             e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&auto=format&fit=crop&q=80";
                           }}
@@ -429,7 +440,7 @@ const AdminFoods = (props) => {
         foodForm={foodForm}
         setFoodForm={setFoodForm}
         availableCategories={availableCategories}
-        foodCuisines={FOOD_CUISINES}
+        foodCuisines={dynamicCuisines}
         saving={saving}
       />
     </div>
