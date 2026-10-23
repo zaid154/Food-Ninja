@@ -66,167 +66,263 @@ const Cart = () => {
   }
 
   return (
-    <section className="min-h-screen bg-slate-50 px-4 py-8 md:px-6">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-black text-slate-900">Shopping Cart</h1>
-            <p className="text-xs text-slate-500 mt-0.5">{totalItems} items in your order</p>
+    <section className="min-h-screen bg-slate-50/70 px-4 py-5 sm:py-7 md:px-6">
+      <div className="mx-auto max-w-6xl">
+        {/* Sleek Cart Header */}
+        <div className="mb-4 sm:mb-5 flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Shopping Cart</h1>
+            <span className="rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-0.5 text-xs font-bold border border-emerald-200">
+              {totalItems} {totalItems === 1 ? "item" : "items"}
+            </span>
           </div>
 
-          <button
-            onClick={() => dispatch(clearCart())}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-red-600 transition hover:bg-red-50"
-          >
-            Clear Cart
-          </button>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/menu"
+              className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition"
+            >
+              <span>+ Add More Dishes</span>
+            </Link>
+            <span className="text-slate-300">|</span>
+            <button
+              type="button"
+              onClick={() => dispatch(clearCart())}
+              className="text-xs font-semibold text-rose-600 hover:text-rose-700 transition flex items-center gap-1 cursor-pointer"
+              title="Remove all items from cart"
+            >
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
+              <span>Clear Cart</span>
+            </button>
+          </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.5fr_0.8fr]">
-          {/* Cart Items List */}
-          <div className="space-y-4">
-            {cartItems.map((item, index) => (
-              <article
-                key={`${item.id}-${index}`}
-                className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md"
-              >
-                <div className="flex flex-col gap-4 sm:flex-row">
-                  <Link
-                    to={`/restaurant/${item.id}`}
-                    className="group/img block h-28 w-full sm:w-36 shrink-0 overflow-hidden rounded-xl bg-slate-100 cursor-pointer"
-                    title={`View ${item.name} details`}
+        <div className="grid gap-6 lg:grid-cols-12 items-start">
+          {/* Left Column: Consolidated Cart Items */}
+          <div className="lg:col-span-7 xl:col-span-8 space-y-3.5">
+            {/* Free Delivery Bar */}
+            <div className="rounded-xl border border-emerald-200/90 bg-emerald-50/70 px-4 py-2 text-xs flex items-center justify-between gap-2 shadow-2xs">
+              {isFreeDelivery ? (
+                <div className="flex items-center gap-2 text-emerald-800 font-bold">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-white shrink-0">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </span>
+                  <span>You've unlocked <strong>FREE Delivery!</strong></span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-slate-700">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 shrink-0">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <rect x="1" y="3" width="15" height="13" />
+                      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                      <circle cx="5.5" cy="18.5" r="2.5" />
+                      <circle cx="18.5" cy="18.5" r="2.5" />
+                    </svg>
+                  </span>
+                  <span>
+                    Add <strong className="text-emerald-800">₹{settings.freeDeliveryThreshold - totalAmount}</strong> more for <strong>FREE Delivery</strong>
+                  </span>
+                </div>
+              )}
+              <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wide">FoodNinja Express</span>
+            </div>
+
+            {/* Single Cohesive Card with Clean Dividing Lines */}
+            <div className="rounded-2xl border border-slate-200/90 bg-white shadow-2xs overflow-hidden divide-y divide-slate-100">
+              {cartItems.map((item, index) => {
+                const itemPrice = item.caloriesPerServing || item.price || 0;
+                const itemTotal = itemPrice * (item.quantity || 1);
+                const isVeg = item.dietary === "Non-Veg" || item.isVeg === false ? false : true;
+
+                return (
+                  <div
+                    key={`${item.id}-${index}`}
+                    className="p-3 sm:p-3.5 flex items-center justify-between gap-3 sm:gap-4 hover:bg-slate-50/50 transition"
                   >
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover/img:scale-105"
-                    />
-                  </Link>
+                    {/* Left: Food Thumbnail + Details */}
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <Link
+                        to={`/restaurant/${item.id}`}
+                        className="h-16 w-16 sm:h-18 sm:w-18 shrink-0 overflow-hidden rounded-xl bg-slate-100 border border-slate-200/70 group"
+                        title={`View ${item.name}`}
+                      >
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          loading="lazy"
+                          className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
+                          onError={(e) => {
+                            e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&auto=format&fit=crop&q=80";
+                          }}
+                        />
+                      </Link>
 
-                  <div className="flex flex-1 flex-col justify-between">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <Link
-                          to={`/restaurant/${item.id}`}
-                          className="block group/title"
-                          title={`View ${item.name} details`}
-                        >
-                          <h2 className="text-base font-bold text-slate-900 group-hover/title:text-emerald-700 transition cursor-pointer">
-                            {item.name}
-                          </h2>
-                        </Link>
-                        <span className="text-xs font-semibold text-emerald-600">{item.cuisine || item.category}</span>
-                      </div>
-                      <p className="text-base font-black text-slate-900">
-                        ₹{(item.caloriesPerServing || 0) * (item.quantity || 1)}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
-                      <span className="text-slate-400">₹{item.caloriesPerServing} per unit</span>
-
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 rounded-lg border-2 border-emerald-600 bg-emerald-50 px-2 py-0.5">
-                          <button
-                            onClick={() => dispatch(removeCart(item.id))}
-                            className="h-6 w-6 text-sm font-bold text-emerald-700 hover:bg-emerald-100 rounded"
-                          >
-                            −
-                          </button>
-                          <span className="text-xs font-bold text-emerald-800 min-w-[14px] text-center">
-                            {item.quantity || 1}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          {/* Standard Indian Veg/Non-Veg Icon */}
+                          <span className={`inline-flex items-center justify-center h-3 w-3 rounded-xs border p-[1px] shrink-0 ${isVeg ? "border-green-600" : "border-red-600"}`}>
+                            <span className={`h-1.5 w-1.5 rounded-full ${isVeg ? "bg-green-600" : "bg-red-600"}`} />
                           </span>
-                          <button
-                            onClick={() => dispatch(addCart(item))}
-                            disabled={(item.quantity || 1) >= 10}
-                            className={`h-6 w-6 text-sm font-bold rounded ${
-                              (item.quantity || 1) >= 10
-                                ? "text-gray-300 cursor-not-allowed"
-                                : "text-emerald-700 hover:bg-emerald-100"
-                            }`}
-                            title={(item.quantity || 1) >= 10 ? "Maximum 10 per dish" : "Add one more"}
+
+                          <Link
+                            to={`/restaurant/${item.id}`}
+                            className="font-bold text-slate-900 text-xs sm:text-sm truncate hover:text-emerald-700 transition"
                           >
-                            +
-                          </button>
+                            {item.name}
+                          </Link>
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500">
+                          <span>₹{itemPrice} per unit</span>
+                          {(item.cuisine || item.category) && (
+                            <>
+                              <span className="text-slate-300">•</span>
+                              <span className="truncate">{item.cuisine || item.category}</span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
+
+                    {/* Right: Quantity Stepper + Line Total */}
+                    <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+                      {/* Compact Stepper */}
+                      <div className="flex items-center justify-between rounded-lg border border-emerald-600 bg-emerald-50/70 px-2 py-1 w-20 text-xs font-bold text-emerald-900 shadow-2xs">
+                        <button
+                          type="button"
+                          onClick={() => dispatch(removeCart(item.id))}
+                          className="h-5 w-5 flex items-center justify-center text-emerald-800 hover:text-emerald-950 hover:bg-emerald-100 rounded transition cursor-pointer text-sm"
+                          title="Decrease"
+                        >
+                          −
+                        </button>
+                        <span className="select-none font-black text-xs text-emerald-950">
+                          {item.quantity || 1}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => dispatch(addCart(item))}
+                          disabled={(item.quantity || 1) >= 10}
+                          className={`h-5 w-5 flex items-center justify-center rounded transition text-sm cursor-pointer ${
+                            (item.quantity || 1) >= 10
+                              ? "text-slate-300 cursor-not-allowed"
+                              : "text-emerald-800 hover:text-emerald-950 hover:bg-emerald-100"
+                          }`}
+                          title={(item.quantity || 1) >= 10 ? "Maximum 10 per dish" : "Add more"}
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* Total */}
+                      <div className="text-right min-w-[55px] sm:min-w-[65px]">
+                        <span className="text-xs sm:text-sm font-black text-slate-900">
+                          ₹{itemTotal}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                );
+              })}
+            </div>
+
+            {/* Quick Kitchen Note Box */}
+            <div className="rounded-xl border border-slate-200/80 bg-white p-3 text-xs flex items-center gap-2.5 text-slate-600 shadow-2xs">
+              <svg viewBox="0 0 24 24" className="h-4 w-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+              </svg>
+              <span className="flex-1 text-[11px] text-slate-500">
+                Prepared fresh to order with authentic spices & hygienic spill-proof packaging.
+              </span>
+            </div>
           </div>
 
-          {/* Order Summary & Bill */}
-          <aside className="sticky top-24 h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-sm text-xs">
-            <h2 className="text-base font-black text-slate-900 pb-3 border-b border-slate-100">Bill Details</h2>
-
-            {/* Free Delivery Promo Bar */}
-            <div className="mt-4 rounded-xl bg-emerald-50/70 border border-emerald-200/80 p-3 text-xs">
-              {isFreeDelivery ? (
-                <p className="font-bold text-emerald-800 flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>You've unlocked <strong>FREE Delivery!</strong></span>
-                </p>
-              ) : (
-                <p className="text-slate-700">
-                  Add <strong className="text-emerald-700 font-bold">₹{settings.freeDeliveryThreshold - totalAmount}</strong> more for <strong>FREE Delivery</strong>
-                </p>
-              )}
-            </div>
-
-            <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between text-slate-600">
-                <span>Items Total ({totalItems})</span>
-                <span className="font-bold text-slate-900">₹{totalAmount}</span>
+          {/* Right Column: Sleek Restaurant Bill Summary */}
+          <div className="lg:col-span-5 xl:col-span-4 sticky top-20">
+            <aside className="rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-2xs text-xs space-y-3.5">
+              <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
+                <h2 className="text-sm font-black text-slate-900 uppercase tracking-wide">Bill Details</h2>
+                <span className="text-[10px] font-bold text-slate-400">{totalItems} {totalItems === 1 ? "item" : "items"}</span>
               </div>
 
-              <div className="flex items-center justify-between text-slate-600">
-                <span>Delivery Fee</span>
-                {isFreeDelivery ? (
-                  <span className="font-bold text-emerald-700">FREE</span>
-                ) : (
-                  <span className="font-bold text-slate-900">₹{deliveryFee}</span>
+              <div className="space-y-2.5 text-xs text-slate-600">
+                <div className="flex items-center justify-between">
+                  <span>Items Total ({totalItems})</span>
+                  <span className="font-bold text-slate-900">₹{totalAmount}</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <span>Delivery Fee</span>
+                    {isFreeDelivery && (
+                      <span className="rounded bg-emerald-100 px-1 py-0.2 text-[9px] font-bold text-emerald-800">
+                        FREE
+                      </span>
+                    )}
+                  </span>
+                  {isFreeDelivery ? (
+                    <span className="font-bold text-emerald-700">FREE</span>
+                  ) : (
+                    <span className="font-bold text-slate-900">₹{deliveryFee}</span>
+                  )}
+                </div>
+
+                {packagingFee > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span>Restaurant Packaging Fee</span>
+                    <span className="font-bold text-slate-900">₹{packagingFee}</span>
+                  </div>
                 )}
-              </div>
 
-              {packagingFee > 0 && (
-                <div className="flex items-center justify-between text-slate-600">
-                  <span>Restaurant Packaging Fee</span>
-                  <span className="font-bold text-slate-900">₹{packagingFee}</span>
+                <div className="flex items-center justify-between">
+                  <span>Govt Taxes ({settings.taxRate || 5}%)</span>
+                  <span className="font-bold text-slate-900">₹{taxes}</span>
                 </div>
-              )}
 
-              <div className="flex items-center justify-between text-slate-600">
-                <span>Govt Taxes ({settings.taxRate || 5}%)</span>
-                <span className="font-bold text-slate-900">₹{taxes}</span>
-              </div>
-
-              <div className="border-t border-dashed border-slate-200 pt-3">
-                <div className="flex items-center justify-between text-sm font-black text-slate-900">
-                  <span>Grand Total</span>
-                  <span className="text-lg text-emerald-600">₹{grandTotal}</span>
+                <div className="border-t border-dashed border-slate-200 pt-3">
+                  <div className="flex items-baseline justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-slate-800">Grand Total</span>
+                      <span className="block text-[10px] text-slate-400 font-normal">Inclusive of all taxes & fees</span>
+                    </div>
+                    <span className="text-xl font-black text-emerald-700">₹{grandTotal}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <Link
-              to="/checkout"
-              className="mt-6 block w-full rounded-xl bg-emerald-600 py-3 text-center text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-emerald-700 active:scale-95"
-            >
-              Proceed to Checkout →
-            </Link>
+              {/* Checkout Action Button */}
+              <Link
+                to="/checkout"
+                className="w-full flex items-center justify-between rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] px-4 py-3 text-white text-xs font-bold shadow-xs transition cursor-pointer"
+              >
+                <span>PROCEED TO CHECKOUT</span>
+                <span className="flex items-center gap-1 font-black">
+                  <span>₹{grandTotal}</span>
+                  <span>→</span>
+                </span>
+              </Link>
 
-            <Link
-              to="/"
-              className="mt-3 block text-center font-bold text-emerald-600 hover:underline"
-            >
-              ← Add More Dishes
-            </Link>
-          </aside>
+              {/* Safe & Secure Footnote */}
+              <div className="pt-1 flex items-center justify-center gap-3 text-[10px] text-slate-400 border-t border-slate-100">
+                <span className="flex items-center gap-1">
+                  <svg viewBox="0 0 24 24" className="h-3 w-3 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                  <span>100% Safe & Secure</span>
+                </span>
+                <span>•</span>
+                <span>Fresh & Hot Guarantee</span>
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     </section>
