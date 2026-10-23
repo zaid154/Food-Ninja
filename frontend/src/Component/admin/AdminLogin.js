@@ -63,6 +63,24 @@ const AdminLogin = ({ adminEmail, setAdminEmail, adminPassword, setAdminPassword
             </div>
           )}
 
+          {/* Quick Demo Credentials Box */}
+          <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-lg p-2.5">
+            <div className="text-[11px] text-slate-500">
+              <p className="font-semibold text-slate-700">Demo Credentials</p>
+              <p className="font-mono text-slate-500">admin@foodninja.com / admin123</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setAdminEmail("admin@foodninja.com");
+                setAdminPassword("admin123");
+              }}
+              className="text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-md px-2 py-1 text-[11px] font-bold transition cursor-pointer"
+            >
+              Auto-Fill
+            </button>
+          </div>
+
           <button
             type="submit"
             className="w-full rounded-lg bg-slate-900 py-3 text-xs font-semibold uppercase tracking-wider text-white shadow-2xs transition hover:bg-slate-800 active:scale-95"

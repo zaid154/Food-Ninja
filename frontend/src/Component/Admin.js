@@ -7,9 +7,19 @@ import BrandLogo from "./BrandLogo";
 import { API_BASE_URL } from "../utils/Constants";
 
 const Admin = () => {
-  const [isAdminAuth, setIsAdminAuth] = useState(() => sessionStorage.getItem("adminAuth") === "true");
-  const [adminEmail, setAdminEmail] = useState("");
-  const [adminPassword, setAdminPassword] = useState("");
+  const [isAdminAuth, setIsAdminAuth] = useState(() => {
+    try {
+      const sessionAuth = sessionStorage.getItem("adminAuth") === "true";
+      const localAuth = localStorage.getItem("adminAuth") === "true";
+      const storedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
+      const isUserAdmin = storedUser?.role === "admin" || storedUser?.email === "admin@foodninja.com";
+      return sessionAuth || localAuth || isUserAdmin;
+    } catch {
+      return false;
+    }
+  });
+  const [adminEmail, setAdminEmail] = useState("admin@foodninja.com");
+  const [adminPassword, setAdminPassword] = useState("admin123");
   const [authError, setAuthError] = useState("");
 
   const [orders, setOrders] = useState([]);
@@ -28,9 +38,10 @@ const Admin = () => {
   };
 
   const handleAdminLogin = (e) => {
-    e.preventDefault();
-    if (adminEmail.trim() === "admin@foodninja.com" && adminPassword === "admin123") {
+    if (e && e.preventDefault) e.preventDefault();
+    if (adminEmail.trim().toLowerCase() === "admin@foodninja.com" && adminPassword === "admin123") {
       sessionStorage.setItem("adminAuth", "true");
+      localStorage.setItem("adminAuth", "true");
       setIsAdminAuth(true);
       setAuthError("");
     } else {
@@ -40,6 +51,7 @@ const Admin = () => {
 
   const handleAdminLogout = () => {
     sessionStorage.removeItem("adminAuth");
+    localStorage.removeItem("adminAuth");
     setIsAdminAuth(false);
     navigate("/");
   };

@@ -69,6 +69,23 @@ const AdminFoods = (props) => {
     ? Array.from(new Set([...categories.map((c) => c.name), ...FOOD_CATEGORIES]))
     : FOOD_CATEGORIES;
 
+  // Filter foods based on search query and category chip
+  const filteredFoods = foods.filter((f) => {
+    const q = search.trim().toLowerCase();
+    const matchesSearch =
+      !q ||
+      (f.name && f.name.toLowerCase().includes(q)) ||
+      (f.category && f.category.toLowerCase().includes(q)) ||
+      (f.cuisine && f.cuisine.toLowerCase().includes(q)) ||
+      String(f.id).includes(q);
+
+    const matchesCategory =
+      selectedCategory === "All" ||
+      (f.category && f.category.toLowerCase() === selectedCategory.toLowerCase());
+
+    return matchesSearch && matchesCategory;
+  });
+
   const handleToggleStock = async (food) => {
     try {
       const newStock = food.inStock === false ? true : false;
