@@ -37,14 +37,18 @@ const Checkout = () => {
     // Structured address fields to ensure 100% valid delivery information
     // Auto-fill from last saved address
     const lastAddr = (() => { try { const arr = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]"); return Array.isArray(arr) && arr.length > 0 ? arr[arr.length - 1] : null; } catch { return null; } })();
-    const [name, setName] = useState(user ? user.name : (lastAddr?.name || ""));
-    const [phone, setPhone] = useState(lastAddr?.phone || "");
-    const [house, setHouse] = useState(lastAddr?.house || "");
-    const [street, setStreet] = useState(lastAddr?.street || "");
+    const [name, setName] = useState(user?.name || lastAddr?.name || "Store Administrator");
+    const [phone, setPhone] = useState(lastAddr?.phone || "9876543210");
+    const [house, setHouse] = useState(lastAddr?.house || "Flat 402, Sunshine Heights, Tower 3");
+    const [street, setStreet] = useState(lastAddr?.street || "Sector 62, Noida");
     const [landmark, setLandmark] = useState(lastAddr?.landmark || "");
-    const [city, setCity] = useState(lastAddr?.city || "Delhi NCR");
-    const [pincode, setPincode] = useState(lastAddr?.pincode || "");
-    const [payment, setPayment] = useState("Cash on Delivery");
+    const [city, setCity] = useState(lastAddr?.city || "Noida");
+    const [pincode, setPincode] = useState(lastAddr?.pincode || "201301");
+    const [payment, setPayment] = useState("Online Payment");
+    const [isEditingAddress, setIsEditingAddress] = useState(false);
+    const [isChangingPayment, setIsChangingPayment] = useState(false);
+    const [discount, setDiscount] = useState(50);
+    const [couponCode, setCouponCode] = useState("WELCOME50");
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [confirmedOrder, setConfirmedOrder] = useState(null);
@@ -59,7 +63,7 @@ const Checkout = () => {
     const [showSaved, setShowSaved] = useState(false);
 
     const [settings, setSettings] = useState({
-        deliveryFee: 30,
+        deliveryFee: 60,
         freeDeliveryThreshold: 499,
         packagingFee: 15,
         taxRate: 5,
@@ -86,9 +90,10 @@ const Checkout = () => {
         0
     );
     const isFreeDelivery = subtotal >= (settings.freeDeliveryThreshold || 499);
-    const deliveryFee = totalItems > 0 ? (isFreeDelivery ? 0 : (settings.deliveryFee ?? 30)) : 0;
+    const deliveryFee = totalItems > 0 ? (isFreeDelivery ? 0 : (settings.deliveryFee ?? 60)) : 0;
     const taxes = totalItems > 0 ? Math.round(subtotal * ((settings.taxRate ?? 5) / 100)) : 0;
-    const grandTotal = subtotal + deliveryFee + taxes;
+    const discountAmount = totalItems > 0 ? discount : 0;
+    const grandTotal = Math.max(0, subtotal + deliveryFee - discountAmount);
 
     const placeOrder = async (e) => {
         e.preventDefault();
@@ -331,270 +336,415 @@ const Checkout = () => {
     }
 
     return (
-        <section className="bg-slate-50 px-4 py-8 sm:py-10 min-h-[85vh]">
-            <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.75fr_1fr] items-start">
-                {/* Structured Delivery Form */}
-                <form onSubmit={placeOrder} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
-                    <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 shrink-0">
+        <section className="bg-[#f8fafc] px-4 py-8 sm:py-10 min-h-[85vh]">
+            <div className="mx-auto max-w-6xl">
+                <form onSubmit={placeOrder} className="grid gap-6 lg:grid-cols-[1.55fr_1fr] items-start">
+                    
+                    {/* LEFT COLUMN: Delivery Address & Payment */}
+                    <div className="rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-2xs">
+                        
+                        {/* Main Card Header */}
+                        <div className="flex items-center gap-3.5 mb-6">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shrink-0">
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                             </div>
                             <div>
-                                <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                                <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
                                     Delivery Address & Payment
                                 </h1>
-                                <p className="text-xs text-slate-500">Enter where you want your fresh food delivered</p>
+                                <p className="text-xs text-slate-400 mt-0.5">Review your delivery details and payment method</p>
                             </div>
                         </div>
-                        {isBuyNow && (
-                            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
-                                Instant Order
-                            </span>
-                        )}
-                    </div>
 
-                    {/* Saved Addresses Quick-Fill */}
-                    {savedAddresses.length > 0 && (
-                        <div className="mt-4 rounded-lg border border-dashed border-slate-300 bg-slate-50/50 p-3">
-                            <button type="button" onClick={() => setShowSaved(!showSaved)} className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 cursor-pointer">
-                                <span className="flex items-center gap-1.5">
-                                    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                                    Saved Addresses ({savedAddresses.length})
-                                </span>
-                                <span className="text-slate-400">{showSaved ? "Hide" : "Show"}</span>
-                            </button>
-                            {showSaved && (
-                                <div className="mt-2 space-y-1.5">
-                                    {savedAddresses.map((addr, idx) => (
-                                        <button key={idx} type="button" onClick={() => {
-                                            setName(addr.name || name); setPhone(addr.phone || phone);
-                                            setHouse(addr.house || ""); setStreet(addr.street || "");
-                                            setLandmark(addr.landmark || ""); setCity(addr.city || "Delhi NCR");
-                                            setPincode(addr.pincode || ""); setShowSaved(false);
-                                        }} className="w-full text-left rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 hover:border-emerald-400 hover:bg-emerald-50/40 transition cursor-pointer">
-                                            <p className="font-bold text-slate-800">{addr.label || `${addr.house}, ${addr.street}`}</p>
-                                            <p className="text-[11px] text-slate-400 mt-0.5">{addr.city} - {addr.pincode} | {addr.phone}</p>
-                                        </button>
-                                    ))}
+                        {/* Section 1: Delivery Address */}
+                        <div className="rounded-2xl border border-slate-200/90 bg-white p-5 mb-5">
+                            <div className="flex items-center justify-between pb-3.5">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-sm font-bold text-slate-900">Delivery Address</h2>
+                                        <p className="text-[11px] text-slate-400">Your order will be delivered to this address</p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsEditingAddress(!isEditingAddress)}
+                                    className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 transition cursor-pointer"
+                                >
+                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    <span>{isEditingAddress ? "Close" : "Change address"}</span>
+                                </button>
+                            </div>
+
+                            {!isEditingAddress ? (
+                                <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 flex items-start justify-between gap-3">
+                                    <div className="flex items-start gap-3.5">
+                                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0 mt-0.5">
+                                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm text-slate-900">{name}</p>
+                                            <p className="text-xs text-slate-600 mt-1 flex items-center gap-1.5 font-medium">
+                                                <svg className="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                                </svg>
+                                                <span>+91 {phone}</span>
+                                            </p>
+                                            <div className="text-xs text-slate-600 mt-1 flex items-start gap-1.5 font-medium leading-relaxed">
+                                                <svg className="h-3.5 w-3.5 text-slate-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                                <div>
+                                                    <p>{house}</p>
+                                                    <p className="text-slate-500">{street}{city ? `, ${city}` : ""} • {pincode}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-0.5 text-xs font-bold border border-emerald-200/70 shrink-0">
+                                        <svg className="h-3 w-3 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span>Saved</span>
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="mt-3 space-y-3 pt-3 border-t border-slate-100">
+                                    {savedAddresses.length > 0 && (
+                                        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-2.5">
+                                            <p className="text-[11px] font-bold text-slate-600 mb-1.5">Pick from Saved Addresses:</p>
+                                            <div className="space-y-1">
+                                                {savedAddresses.map((addr, idx) => (
+                                                    <button
+                                                        key={idx}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setName(addr.name || name);
+                                                            setPhone(addr.phone || phone);
+                                                            setHouse(addr.house || "");
+                                                            setStreet(addr.street || "");
+                                                            setLandmark(addr.landmark || "");
+                                                            setCity(addr.city || "Noida");
+                                                            setPincode(addr.pincode || "");
+                                                            setIsEditingAddress(false);
+                                                        }}
+                                                        className="w-full text-left rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs hover:border-emerald-500 hover:bg-emerald-50/40 transition cursor-pointer"
+                                                    >
+                                                        <span className="font-bold text-slate-800">{addr.label || `${addr.house}, ${addr.street}`}</span>
+                                                        <span className="text-[10px] text-slate-400 block">{addr.city} • {addr.pincode}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                        <div>
+                                            <label className="text-[11px] font-bold uppercase text-slate-600">Full Name *</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[11px] font-bold uppercase text-slate-600">Phone Number *</label>
+                                            <input
+                                                type="tel"
+                                                required
+                                                maxLength={10}
+                                                value={phone}
+                                                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+                                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[11px] font-bold uppercase text-slate-600">Flat / House / Building *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={house}
+                                            onChange={(e) => setHouse(e.target.value)}
+                                            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[11px] font-bold uppercase text-slate-600">Street / Area / Locality *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={street}
+                                            onChange={(e) => setStreet(e.target.value)}
+                                            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                                        />
+                                    </div>
+
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                        <div>
+                                            <label className="text-[11px] font-bold uppercase text-slate-600">City *</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={city}
+                                                onChange={(e) => setCity(e.target.value)}
+                                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[11px] font-bold uppercase text-slate-600">6-Digit PIN *</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                maxLength={6}
+                                                value={pincode}
+                                                onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
+                                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500 font-mono"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditingAddress(false)}
+                                        className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 cursor-pointer transition"
+                                    >
+                                        Save Address
+                                    </button>
                                 </div>
                             )}
                         </div>
-                    )}
 
-                    <div className="mt-5 space-y-4">
-                        {/* Name and Mobile Grid */}
-                        <div className="grid gap-3 sm:grid-cols-2">
-                            <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">Full Name *</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="e.g. Mohd Zaid"
-                                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">Phone Number *</label>
-                                <div className="relative mt-1">
-                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-xs font-bold text-slate-500">
-                                        +91
-                                    </span>
-                                    <input
-                                        type="tel"
-                                        required
-                                        maxLength={10}
-                                        value={phone}
-                                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                                        className="w-full rounded-lg border border-slate-300 pl-11 pr-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
-                                        placeholder="10-digit mobile"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Flat / House No */}
-                        <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                                Flat / House / Floor / Building *
-                            </label>
-                            <input
-                                type="text"
-                                required
-                                value={house}
-                                onChange={(e) => setHouse(e.target.value)}
-                                placeholder="e.g. Flat 402, Sunshine Heights, Tower 3"
-                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
-                            />
-                        </div>
-
-                        {/* Street / Locality */}
-                        <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                                Street / Area / Locality *
-                            </label>
-                            <input
-                                type="text"
-                                required
-                                value={street}
-                                onChange={(e) => setStreet(e.target.value)}
-                                placeholder="e.g. Sector 62, Near Metro Station"
-                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
-                            />
-                        </div>
-
-                        {/* Landmark */}
-                        <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                                Landmark (Optional)
-                            </label>
-                            <input
-                                type="text"
-                                value={landmark}
-                                onChange={(e) => setLandmark(e.target.value)}
-                                placeholder="e.g. Opposite City Hospital or Apollo Pharmacy"
-                                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
-                            />
-                        </div>
-
-                        {/* City and 6-digit Pincode Grid */}
-                        <div className="grid gap-3 sm:grid-cols-2">
-                            <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                                    City / Town *
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={city}
-                                    onChange={(e) => setCity(e.target.value)}
-                                    placeholder="e.g. Delhi NCR, Noida, Gurugram"
-                                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                                    6-Digit PIN Code *
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    maxLength={6}
-                                    value={pincode}
-                                    onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
-                                    placeholder="e.g. 110001 or 201301"
-                                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 transition font-mono"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Payment Method */}
-                        <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-slate-700">Payment Method</label>
-                            <div className="mt-1 flex items-center justify-between rounded-lg border-2 border-emerald-500 bg-emerald-50/60 p-3">
+                        {/* Section 2: Payment Method */}
+                        <div className="rounded-2xl border border-slate-200/90 bg-white p-5">
+                            <div className="flex items-center justify-between pb-3.5">
                                 <div className="flex items-center gap-2.5">
-                                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-xs text-white font-bold">✓</span>
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                            <rect x="2" y="5" width="20" height="14" rx="2" strokeWidth="2" />
+                                            <line x1="2" y1="10" x2="22" y2="10" strokeWidth="2" />
+                                        </svg>
+                                    </div>
                                     <div>
-                                        <p className="text-xs font-bold text-slate-900">Cash on Delivery / Pay on Arrival</p>
-                                        <p className="text-[11px] text-slate-500">Pay with Cash, UPI, or Card upon food arrival</p>
+                                        <h2 className="text-sm font-bold text-slate-900">Payment Method</h2>
+                                        <p className="text-[11px] text-slate-400">Your selected payment option</p>
                                     </div>
                                 </div>
-                                <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">Only Available</span>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsChangingPayment(!isChangingPayment)}
+                                    className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 transition cursor-pointer"
+                                >
+                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    <span>{isChangingPayment ? "Close" : "Change"}</span>
+                                </button>
                             </div>
+
+                            {!isChangingPayment ? (
+                                <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-emerald-600">
+                                            <div className="h-2 w-2 rounded-full bg-emerald-600" />
+                                        </div>
+                                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-600 shrink-0">
+                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                <rect x="2" y="5" width="20" height="14" rx="2" strokeWidth="2" />
+                                                <line x1="2" y1="10" x2="22" y2="10" strokeWidth="2" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-xs text-slate-900">
+                                                {payment === "Online Payment" ? "Online Payment" : "Cash on Delivery"}
+                                            </p>
+                                            <p className="text-[11px] text-slate-400">
+                                                {payment === "Online Payment" ? "UPI, Card, Net Banking" : "Pay with Cash or UPI upon food arrival"}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Payment Logos */}
+                                    <div className="flex items-center gap-1.5 shrink-0">
+                                        <span className="font-bold text-[10px] text-slate-800 bg-white border border-slate-200 rounded px-1.5 py-0.5 font-mono">UPI</span>
+                                        <span className="font-extrabold text-[10px] text-blue-700 bg-white border border-slate-200 rounded px-1.5 py-0.5 italic">VISA</span>
+                                        <div className="flex items-center bg-white border border-slate-200 rounded px-1 py-0.5">
+                                            <span className="h-2.5 w-2.5 rounded-full bg-red-500 inline-block" />
+                                            <span className="h-2.5 w-2.5 rounded-full bg-amber-500 -ml-1 inline-block opacity-90" />
+                                        </div>
+                                        <span className="font-bold text-[10px] text-emerald-800 bg-white border border-slate-200 rounded px-1.5 py-0.5">RuPay</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="mt-3 space-y-2 pt-3 border-t border-slate-100">
+                                    <div
+                                        onClick={() => { setPayment("Online Payment"); setIsChangingPayment(false); }}
+                                        className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition ${payment === "Online Payment" ? "border-emerald-500 bg-emerald-50/40" : "border-slate-200 bg-white hover:bg-slate-50"}`}
+                                    >
+                                        <div className="flex items-center gap-2.5">
+                                            <div className={`flex h-4 w-4 items-center justify-center rounded-full border ${payment === "Online Payment" ? "border-emerald-600" : "border-slate-300"}`}>
+                                                {payment === "Online Payment" && <div className="h-2 w-2 rounded-full bg-emerald-600" />}
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-xs text-slate-900">Online Payment</p>
+                                                <p className="text-[10.5px] text-slate-400">UPI, Credit/Debit Card, Net Banking</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <span className="font-bold text-[9px] text-slate-800 bg-white border border-slate-200 rounded px-1 py-0.5">UPI</span>
+                                            <span className="font-extrabold text-[9px] text-blue-700 bg-white border border-slate-200 rounded px-1 py-0.5 italic">VISA</span>
+                                            <span className="font-bold text-[9px] text-emerald-800 bg-white border border-slate-200 rounded px-1 py-0.5">RuPay</span>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        onClick={() => { setPayment("Cash on Delivery"); setIsChangingPayment(false); }}
+                                        className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition ${payment === "Cash on Delivery" ? "border-emerald-500 bg-emerald-50/40" : "border-slate-200 bg-white hover:bg-slate-50"}`}
+                                    >
+                                        <div className="flex items-center gap-2.5">
+                                            <div className={`flex h-4 w-4 items-center justify-center rounded-full border ${payment === "Cash on Delivery" ? "border-emerald-600" : "border-slate-300"}`}>
+                                                {payment === "Cash on Delivery" && <div className="h-2 w-2 rounded-full bg-emerald-600" />}
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-xs text-slate-900">Cash on Delivery / Pay on Arrival</p>
+                                                <p className="text-[10.5px] text-slate-400">Pay cash or scan UPI QR upon arrival</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 rounded px-2 py-0.5">COD</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {error && (
-                            <div className="rounded-lg bg-red-50 border border-red-200 px-3.5 py-2.5 text-xs font-semibold text-red-700 flex items-start gap-2">
+                            <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-3.5 py-2.5 text-xs font-semibold text-red-700 flex items-start gap-2">
                                 <span className="text-sm font-bold">⚠</span>
                                 <span>{error}</span>
                             </div>
                         )}
+                    </div>
 
+                    {/* RIGHT COLUMN: Order Summary */}
+                    <aside className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xs sticky top-20">
+                        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 className="text-base font-bold text-slate-900">Order Summary</h2>
+                                    <p className="text-xs text-slate-400">{totalItems} items in cart</p>
+                                </div>
+                            </div>
+                            <span className="text-sm font-bold bg-emerald-50 text-emerald-700 px-3 py-1 rounded-xl">
+                                ₹{grandTotal}
+                            </span>
+                        </div>
+
+                        {/* Items list with dish photos */}
+                        <ul className="my-4 space-y-3.5 max-h-[300px] overflow-y-auto pr-1">
+                            {items.map((item, idx) => (
+                                <li key={idx} className="flex items-center justify-between gap-3 text-xs">
+                                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                                        <img
+                                            src={item.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&auto=format&fit=crop&q=80"}
+                                            alt={item.name || item.title}
+                                            className="h-12 w-12 rounded-xl object-cover shrink-0 border border-slate-100 bg-slate-50"
+                                            onError={(e) => {
+                                                e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&auto=format&fit=crop&q=80";
+                                            }}
+                                        />
+                                        <div className="min-w-0 flex-1">
+                                            <p className="font-bold text-slate-900 truncate leading-snug">{item.name || item.title}</p>
+                                            <p className="text-[11px] text-slate-400 mt-0.5">Qty: {item.quantity || 1}</p>
+                                        </div>
+                                    </div>
+                                    <span className="font-bold text-slate-900 shrink-0 text-xs">
+                                        ₹{(item.price || item.caloriesPerServing || 0) * (item.quantity || 1)}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+
+                        {/* Price Breakdown */}
+                        <div className="pt-4 border-t border-slate-100 space-y-2 text-xs">
+                            <div className="flex justify-between text-slate-600 font-medium">
+                                <span>Subtotal</span>
+                                <span className="font-bold text-slate-900">₹{subtotal}</span>
+                            </div>
+                            <div className="flex justify-between text-slate-600 font-medium">
+                                <span>Delivery Fee</span>
+                                <span className="font-bold text-slate-900">{deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}</span>
+                            </div>
+                            {discountAmount > 0 && (
+                                <div className="flex justify-between text-emerald-600 font-bold">
+                                    <span>Discount ({couponCode})</span>
+                                    <span>- ₹{discountAmount}</span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Grand Total */}
+                        <div className="mt-4 pt-3 border-t border-slate-100 flex justify-between items-baseline text-slate-900">
+                            <span className="text-base font-black">Grand Total</span>
+                            <span className="text-xl font-black text-slate-900">₹{grandTotal}</span>
+                        </div>
+
+                        {/* Place Order CTA Button */}
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="w-full rounded-lg bg-emerald-600 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95 disabled:opacity-50"
+                            className="w-full mt-4 rounded-xl bg-[#0c5936] hover:bg-[#084227] text-white py-3.5 px-4 font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.99] cursor-pointer disabled:opacity-50"
                         >
-                            {submitting ? "Placing Order..." : `Confirm & Place Order — ₹${grandTotal}`}
+                            {submitting ? (
+                                <span>Placing Order...</span>
+                            ) : (
+                                <>
+                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                    </svg>
+                                    <span>Place Order | ₹{grandTotal}</span>
+                                    <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </>
+                            )}
                         </button>
-                    </div>
+
+                        {/* Trust badge */}
+                        <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-slate-600 font-medium">
+                            <svg className="h-3.5 w-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            <span>100% secure payments</span>
+                            <span className="text-slate-300">|</span>
+                            <span>Quick & safe delivery</span>
+                        </div>
+                    </aside>
                 </form>
-
-                {/* Order Summary */}
-                <aside className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs h-fit sticky top-20">
-                    <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 shrink-0">
-                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                                    Order Summary
-                                </h2>
-                                <p className="text-xs text-slate-500">{totalItems} {totalItems === 1 ? "item" : "items"} in cart</p>
-                            </div>
-                        </div>
-                        <span className="text-xs font-bold bg-slate-100 text-slate-800 px-2.5 py-1 rounded-lg">
-                            ₹{grandTotal}
-                        </span>
-                    </div>
-
-                    <ul className="mt-4 space-y-2.5 divide-y divide-slate-100 max-h-[320px] overflow-y-auto pr-1">
-                        {items.map((item, idx) => (
-                            <li key={idx} className="flex items-start justify-between pt-2.5 text-xs sm:text-sm">
-                                <div className="pr-2">
-                                    <p className="font-bold text-slate-800 leading-snug">{item.name || item.title}</p>
-                                    <span className="text-[11px] text-slate-400 font-medium">Qty: {item.quantity || 1}</span>
-                                </div>
-                                <span className="font-extrabold text-slate-900 shrink-0">
-                                    ₹{(item.price || item.caloriesPerServing || 0) * (item.quantity || 1)}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
-
-                    <div className="mt-5 space-y-2 border-t border-slate-100 pt-3.5 text-xs font-medium text-slate-600">
-                        <div className="flex justify-between">
-                            <span>Item Total</span>
-                            <span className="font-bold text-slate-900">₹{subtotal}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <span>Delivery Partner Fee</span>
-                            <span className="font-bold text-slate-900">
-                                {deliveryFee === 0 ? (
-                                    <span className="text-emerald-700 font-extrabold bg-emerald-50 px-2 py-0.5 rounded text-[11px]">FREE</span>
-                                ) : (
-                                    `₹${deliveryFee}`
-                                )}
-                            </span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span>Govt. Taxes ({settings.taxRate ?? 5}% GST)</span>
-                            <span className="font-bold text-slate-900">₹{taxes}</span>
-                        </div>
-                    </div>
-
-                    <div className="mt-4 flex justify-between border-t border-slate-200 pt-3.5 text-base font-black text-slate-900">
-                        <span>Grand Total</span>
-                        <span className="text-emerald-700">₹{grandTotal}</span>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-dashed border-slate-200 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
-                        <svg className="h-3.5 w-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                        <span>100% Safe & Contactless Delivery</span>
-                    </div>
-                </aside>
+            </div>
+        </section>
+    );
             </div>
         </section>
     );
