@@ -52,7 +52,7 @@ const CustomDropdown = ({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <label className="block font-bold text-slate-700 mb-1 flex items-center justify-between">
+      <label className="block font-bold text-slate-700 mb-1 flex items-center justify-between text-[11px]">
         <span>{label}</span>
         {sublabel && <span className="text-[10px] text-slate-400 font-normal">{sublabel}</span>}
       </label>
@@ -61,7 +61,7 @@ const CustomDropdown = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full rounded-xl border px-3 py-2 text-xs flex items-center justify-between bg-white transition cursor-pointer text-left ${
+        className={`w-full rounded-xl border px-3 py-1.5 text-xs flex items-center justify-between bg-white transition cursor-pointer text-left ${
           isOpen
             ? "border-emerald-600 ring-2 ring-emerald-500/20"
             : "border-slate-300 hover:border-slate-400"
@@ -71,7 +71,7 @@ const CustomDropdown = ({
           {value || placeholder}
         </span>
         <svg
-          className={`h-4 w-4 text-slate-400 transition-transform duration-200 shrink-0 ml-1 ${
+          className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 shrink-0 ml-1 ${
             isOpen ? "rotate-180 text-emerald-600" : ""
           }`}
           fill="none"
@@ -85,8 +85,8 @@ const CustomDropdown = ({
 
       {/* Floating Dropdown Panel */}
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl bg-white border border-slate-200 shadow-xl overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150">
-          <div className="max-h-48 overflow-y-auto divide-y divide-slate-50">
+        <div className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl bg-white border border-slate-200 shadow-xl overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150">
+          <div className="max-h-44 overflow-y-auto divide-y divide-slate-50">
             {options.map((opt) => {
               const isSelected = opt === value;
               return (
@@ -97,7 +97,7 @@ const CustomDropdown = ({
                     onChange(opt);
                     setIsOpen(false);
                   }}
-                  className={`w-full px-3 py-2 text-xs flex items-center justify-between text-left transition cursor-pointer ${
+                  className={`w-full px-3 py-1.5 text-xs flex items-center justify-between text-left transition cursor-pointer ${
                     isSelected
                       ? "bg-emerald-50 text-emerald-900 font-bold"
                       : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
@@ -116,7 +116,7 @@ const CustomDropdown = ({
 
           {/* Add Custom Option Footer (e.g. for Cuisines) */}
           {allowAdd && (
-            <div className="border-t border-slate-100 p-2 bg-slate-50/80">
+            <div className="border-t border-slate-100 p-1.5 bg-slate-50/80">
               {isAdding ? (
                 <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                   <input
@@ -134,7 +134,7 @@ const CustomDropdown = ({
                   <button
                     type="button"
                     onClick={handleCreateNew}
-                    className="rounded-lg bg-emerald-700 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-emerald-800 transition shrink-0 cursor-pointer"
+                    className="rounded-lg bg-emerald-700 px-2 py-1 text-[11px] font-bold text-white hover:bg-emerald-800 transition shrink-0 cursor-pointer"
                   >
                     Add
                   </button>
@@ -224,20 +224,21 @@ const FoodDishModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto"
       onClick={onClose}
     >
+      {/* Modal Dialog with max-h-[92vh] flex-col to never overflow laptop screens */}
       <div
-        className="relative w-full max-w-3xl rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden my-6 animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-3xl max-h-[92vh] flex flex-col rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/90 px-6 py-4">
-          <div className="flex items-center gap-3">
+        {/* Modal Header (Fixed at top) */}
+        <div className="shrink-0 flex items-center justify-between border-b border-slate-100 bg-slate-50/90 px-5 py-3">
+          <div className="flex items-center gap-2.5">
             {/* Elegant Food Cloche / Dining Icon */}
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800">
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 shrink-0">
               <svg
-                className="h-5 w-5"
+                className="h-4.5 w-4.5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -253,7 +254,7 @@ const FoodDishModal = ({
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm sm:text-base font-extrabold text-slate-900 truncate max-w-md">
+                <h3 className="text-sm font-extrabold text-slate-900 truncate max-w-md">
                   {editingFoodId
                     ? (foodForm.name ? `Edit ${foodForm.name}` : "Edit Food Dish")
                     : "Add New Food Dish"}
@@ -264,7 +265,7 @@ const FoodDishModal = ({
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-[11px] text-slate-400">
                 {editingFoodId
                   ? "Update dish pricing, dietary classification, ingredients, and specs"
                   : "Fill in the details to publish a new authentic dish to the customer menu"}
@@ -276,7 +277,7 @@ const FoodDishModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 transition cursor-pointer"
+            className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 transition cursor-pointer"
             aria-label="Close modal"
           >
             <svg
@@ -293,26 +294,26 @@ const FoodDishModal = ({
           </button>
         </div>
 
-        {/* Modal Form Body */}
-        <form onSubmit={onSave} className="p-6 space-y-4 text-xs">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+        {/* Modal Form Body (Scrollable if viewport is small) */}
+        <form onSubmit={onSave} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             
             {/* Left Column: Essential Dish Specifications & Ingredients */}
-            <div className="space-y-3.5">
+            <div className="space-y-3">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Dish Name *</label>
+                <label className="block font-bold text-slate-700 mb-1 text-[11px]">Dish Name *</label>
                 <input
                   type="text"
                   required
                   value={foodForm.name}
                   onChange={(e) => setFoodForm({ ...foodForm, name: e.target.value })}
                   placeholder="e.g. Hyderabadi Dum Biryani, Veg Club Burger"
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition"
                 />
               </div>
 
               {/* Category & Cuisine Dropdowns (Custom Tailwind Dropdowns) */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 <CustomDropdown
                   label="Category *"
                   sublabel="Menu section"
@@ -334,9 +335,9 @@ const FoodDishModal = ({
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Price (₹) *</label>
+                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">Price (₹) *</label>
                   <input
                     type="number"
                     required
@@ -344,41 +345,41 @@ const FoodDishModal = ({
                     value={foodForm.price}
                     onChange={(e) => setFoodForm({ ...foodForm, price: e.target.value })}
                     placeholder="199"
-                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                    className="w-full rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Calories (Kcal)</label>
+                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">Calories (Kcal)</label>
                   <input
                     type="number"
                     value={foodForm.caloriesPerServing}
                     onChange={(e) => setFoodForm({ ...foodForm, caloriesPerServing: e.target.value })}
                     placeholder="320"
-                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                    className="w-full rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Delivery Time</label>
+                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">Delivery Time</label>
                   <input
                     type="text"
                     value={foodForm.deliveryTime}
                     onChange={(e) => setFoodForm({ ...foodForm, deliveryTime: e.target.value })}
                     placeholder="25-30 mins"
-                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
+                    className="w-full rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>
 
               {/* Dietary / Food Type */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1.5">Dietary / Food Classification *</label>
+                <label className="block font-bold text-slate-700 mb-1 text-[11px]">Dietary / Food Classification *</label>
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => setFoodForm({ ...foodForm, dietary: "Veg", isVeg: true })}
-                    className={`flex items-center justify-center gap-1.5 rounded-xl border py-2 px-1 text-xs font-bold transition cursor-pointer ${
+                    className={`flex items-center justify-center gap-1.5 rounded-xl border py-1.5 px-1 text-xs font-bold transition cursor-pointer ${
                       (foodForm.dietary || (isVeg ? "Veg" : "Non-Veg")) === "Veg"
                         ? "border-green-600 bg-green-50 text-green-700 ring-1 ring-green-600/30"
                         : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -393,7 +394,7 @@ const FoodDishModal = ({
                   <button
                     type="button"
                     onClick={() => setFoodForm({ ...foodForm, dietary: "Non-Veg", isVeg: false })}
-                    className={`flex items-center justify-center gap-1.5 rounded-xl border py-2 px-1 text-xs font-bold transition cursor-pointer ${
+                    className={`flex items-center justify-center gap-1.5 rounded-xl border py-1.5 px-1 text-xs font-bold transition cursor-pointer ${
                       (foodForm.dietary || (isVeg ? "Veg" : "Non-Veg")) === "Non-Veg"
                         ? "border-red-600 bg-red-50 text-red-700 ring-1 ring-red-600/30"
                         : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -408,7 +409,7 @@ const FoodDishModal = ({
                   <button
                     type="button"
                     onClick={() => setFoodForm({ ...foodForm, dietary: "Vegan", isVeg: true })}
-                    className={`flex items-center justify-center gap-1.5 rounded-xl border py-2 px-1 text-xs font-bold transition cursor-pointer ${
+                    className={`flex items-center justify-center gap-1.5 rounded-xl border py-1.5 px-1 text-xs font-bold transition cursor-pointer ${
                       foodForm.dietary === "Vegan"
                         ? "border-emerald-600 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600/30"
                         : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
@@ -424,23 +425,22 @@ const FoodDishModal = ({
 
               {/* Key Ingredients */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Key Ingredients (Comma Separated)</label>
+                <label className="block font-bold text-slate-700 mb-1 text-[11px]">Key Ingredients (Comma Separated)</label>
                 <input
                   type="text"
                   value={Array.isArray(foodForm.ingredients) ? foodForm.ingredients.join(", ") : foodForm.ingredients}
                   onChange={(e) => setFoodForm({ ...foodForm, ingredients: e.target.value })}
-                  placeholder="Basmati Rice, Spices, Ghee, Mint, Caramelized Onions"
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition"
+                  placeholder="Basmati Rice, Spices, Ghee, Mint"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition"
                 />
-                <span className="text-[10px] text-slate-400 mt-1 block">Separated by comma for tags in product view</span>
               </div>
             </div>
 
-            {/* Right Column: Visuals & Expanded Description */}
-            <div className="space-y-3.5">
+            {/* Right Column: Visuals & Description */}
+            <div className="space-y-3">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block font-bold text-slate-700">Image URL (Direct Link) *</label>
+                  <label className="block font-bold text-slate-700 text-[11px]">Image URL (Direct Link) *</label>
                   {foodForm.image && (
                     <button
                       type="button"
@@ -462,7 +462,7 @@ const FoodDishModal = ({
                       setFoodForm({ ...foodForm, image: e.target.value });
                     }}
                     placeholder="https://images.unsplash.com/photo-..."
-                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition pr-7"
+                    className="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition pr-7"
                   />
                   {foodForm.image && (
                     <button
@@ -476,18 +476,18 @@ const FoodDishModal = ({
                   )}
                 </div>
 
-                {/* Realistic 16:9 Live Food Card Preview (No Cropped Burger Platters) */}
-                <div className="mt-2.5 rounded-xl border border-slate-200 bg-slate-50/80 p-2.5 space-y-2">
+                {/* Compact 16:9 Food Card Preview */}
+                <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50/80 p-2 space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
-                      <svg className="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <span className="text-[10px] font-bold text-slate-600 flex items-center gap-1">
+                      <svg className="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
                       <span>Card Preview</span>
                     </span>
 
-                    {/* Image Fit Mode Switcher: Contain (Full Platter) vs Cover (Full Bleed) */}
+                    {/* Image Fit Mode Switcher */}
                     <div className="inline-flex items-center rounded-lg border border-slate-200 bg-white p-0.5 text-[10px] font-bold">
                       <button
                         type="button"
@@ -497,7 +497,7 @@ const FoodDishModal = ({
                             ? "bg-emerald-700 text-white shadow-2xs"
                             : "text-slate-500 hover:text-slate-800"
                         }`}
-                        title="Preserves entire plate/platter without cropping sides (Best for burgers, dishes with background)"
+                        title="Preserves entire platter without cropping (Best for burgers/plated dishes)"
                       >
                         Contain (Full Platter)
                       </button>
@@ -516,89 +516,84 @@ const FoodDishModal = ({
                     </div>
                   </div>
 
-                  {/* 16:9 Proportion Box */}
-                  <div className="relative h-32 w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-2xs flex items-center justify-center">
+                  {/* Proportional Box (Compact height ~90px) */}
+                  <div className="relative h-24 w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-2xs flex items-center justify-center">
                     {foodForm.image && !imageLoadError ? (
                       <img
                         src={foodForm.image}
                         alt={foodForm.name || "Preview"}
                         className={`h-full w-full ${
-                          imageFitMode === "contain" ? "object-contain p-2" : "object-cover"
+                          imageFitMode === "contain" ? "object-contain p-1.5" : "object-cover"
                         }`}
                         onError={() => setImageLoadError(true)}
                       />
                     ) : (
-                      <div className="flex flex-col items-center justify-center p-4 text-center">
-                        <svg className="h-6 w-6 text-slate-300 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="flex flex-col items-center justify-center p-2 text-center">
+                        <svg className="h-5 w-5 text-slate-300 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         <span className="text-[10px] text-slate-400">
                           {imageLoadError
-                            ? "⚠️ Image failed to load. Make sure URL is direct .jpg or .png"
-                            : "Paste valid direct image link to preview"}
+                            ? "⚠️ Image failed to load. Use direct .jpg or .png URL"
+                            : "Paste image link above to preview"}
                         </span>
                       </div>
                     )}
 
                     {/* Veg / Non-Veg badge on preview */}
-                    <div className="absolute left-2.5 top-2.5 rounded-md bg-white/95 p-1 shadow-xs border border-slate-100">
-                      <div className={`flex items-center justify-center h-3 w-3 rounded-xs border ${foodForm.dietary === "Non-Veg" ? "border-red-600" : "border-green-600"} p-[1.5px]`}>
-                        <div className={`h-1.5 w-1.5 rounded-full ${foodForm.dietary === "Non-Veg" ? "bg-red-600" : "bg-green-600"}`} />
+                    <div className="absolute left-2 top-2 rounded-md bg-white/95 p-1 shadow-xs border border-slate-100">
+                      <div className={`flex items-center justify-center h-2.5 w-2.5 rounded-xs border ${foodForm.dietary === "Non-Veg" ? "border-red-600" : "border-green-600"} p-[1px]`}>
+                        <div className={`h-1 w-1 rounded-full ${foodForm.dietary === "Non-Veg" ? "bg-red-600" : "bg-green-600"}`} />
                       </div>
                     </div>
 
                     {/* Price pill on preview */}
                     {foodForm.price && (
-                      <div className="absolute bottom-2 left-2.5 rounded-md bg-slate-900/90 backdrop-blur-xs text-white px-2 py-0.5 text-[10px] font-bold font-mono shadow-xs">
+                      <div className="absolute bottom-1.5 left-2 rounded-md bg-slate-900/90 backdrop-blur-xs text-white px-1.5 py-0.5 text-[9px] font-bold font-mono shadow-xs">
                         ₹{foodForm.price}
                       </div>
                     )}
                   </div>
-
-                  {/* Helper note */}
-                  <p className="text-[10px] text-slate-400 leading-tight">
-                    Tip: In Google Images, right-click on the image and choose <strong className="text-slate-600">Copy Image Address</strong> (not the page URL).
-                  </p>
                 </div>
               </div>
 
-              {/* Description / Summary with expanded height */}
+              {/* Description / Summary with compact 3 rows */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Description / Summary</label>
+                <label className="block font-bold text-slate-700 mb-1 text-[11px]">Description / Summary</label>
                 <textarea
-                  rows={5}
+                  rows={3}
                   value={foodForm.description}
                   onChange={(e) => setFoodForm({ ...foodForm, description: e.target.value })}
                   placeholder="Authentic dish prepared fresh with traditional herbs and premium ingredients."
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition resize-none leading-relaxed"
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition resize-none leading-relaxed"
                 />
-                <span className="text-[10px] text-slate-400 mt-1 block">Full description shown on dish detail & checkout views</span>
               </div>
             </div>
 
           </div>
-
-          {/* Modal Footer Actions */}
-          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-xl border border-slate-300 px-5 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-xl bg-emerald-700 px-6 py-2.5 text-xs font-bold text-white hover:bg-emerald-800 transition disabled:opacity-50 shadow-2xs cursor-pointer flex items-center gap-1.5"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-              <span>{saving ? "Saving..." : editingFoodId ? "Save Changes" : "Add Dish to Menu"}</span>
-            </button>
-          </div>
         </form>
+
+        {/* Modal Footer Actions (Fixed at bottom) */}
+        <div className="shrink-0 flex items-center justify-end gap-2.5 px-5 py-3 border-t border-slate-100 bg-slate-50/70">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            onClick={onSave}
+            className="rounded-xl bg-emerald-700 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800 transition disabled:opacity-50 shadow-2xs cursor-pointer flex items-center gap-1.5"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>{saving ? "Saving..." : editingFoodId ? "Save Changes" : "Add Dish to Menu"}</span>
+          </button>
+        </div>
       </div>
     </div>
   );
