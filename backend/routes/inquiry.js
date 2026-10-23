@@ -4,7 +4,8 @@ const {
   createInquiry,
   getInquiries,
   deleteInquiry,
-  replyInquiry
+  replyInquiry,
+  resolveInquiry
 } = require("../controller/inquiry");
 
 router.route("/")
@@ -16,5 +17,9 @@ router.route("/:id")
 
 router.route("/:id/reply")
   .put(replyInquiry);
+
+router.route("/:id/resolve")
+  .patch(resolveInquiry)
+  .put(resolveInquiry);
 
 module.exports = router;

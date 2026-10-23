@@ -163,7 +163,7 @@ const AdminFoods = (props) => {
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[400px_1fr]">
+    <div className="grid gap-6 lg:grid-cols-[400px_minmax(0,1fr)] min-w-0">
       {/* Food Form */}
       <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs h-fit">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
@@ -360,7 +360,7 @@ const AdminFoods = (props) => {
       </div>
 
       {/* Food Dishes Table & Live Inventory Management */}
-      <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
+      <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs space-y-4 min-w-0 overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
             <h3 className="font-bold text-slate-900 text-sm">

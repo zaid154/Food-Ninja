@@ -145,6 +145,15 @@ const MenuPage = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  const categoryCarouselRef = useRef(null);
+
+  const scrollCategories = (direction) => {
+    if (categoryCarouselRef.current) {
+      const scrollAmount = direction === "left" ? -340 : 340;
+      categoryCarouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
   // Fetch dynamic categories created by Admin
   useEffect(() => {
     if (typeof fetch !== "undefined") {
@@ -490,10 +499,38 @@ const MenuPage = () => {
         </div>
 
         {/* ========================================================
-            2. 7 CATEGORY CARDS (Responsive: Swipe on mobile, 7-col on laptop/desktop)
+            2. CATEGORY CAROUSEL (Scalable: Supports 8 to 90+ categories with Arrow Navigation)
         ======================================================== */}
-        <div className="mb-4 sm:mb-5">
-          <div className="flex sm:grid sm:grid-cols-4 lg:grid-flow-col lg:auto-cols-fr gap-2.5 sm:gap-3.5 overflow-x-auto pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
+        <div className="relative mb-4 sm:mb-5 group/carousel">
+          {/* Left Arrow Button */}
+          <button
+            type="button"
+            onClick={() => scrollCategories("left")}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 shadow-md border border-slate-200 text-slate-700 hover:bg-slate-900 hover:text-white transition -ml-2 sm:-ml-4 cursor-pointer hidden sm:flex"
+            aria-label="Scroll categories left"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+
+          {/* Right Arrow Button */}
+          <button
+            type="button"
+            onClick={() => scrollCategories("right")}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 shadow-md border border-slate-200 text-slate-700 hover:bg-slate-900 hover:text-white transition -mr-2 sm:-mr-4 cursor-pointer hidden sm:flex"
+            aria-label="Scroll categories right"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+
+          {/* Horizontal Scroll Track */}
+          <div
+            ref={categoryCarouselRef}
+            className="flex gap-2.5 sm:gap-3.5 overflow-x-auto pb-2 scrollbar-none scroll-smooth px-1"
+          >
             {menuCategories.map((cat) => {
               const isActive = currentCategory.toLowerCase() === cat.name.toLowerCase();
 
@@ -502,29 +539,30 @@ const MenuPage = () => {
                   key={cat.name}
                   type="button"
                   onClick={() => handleCategorySelect(isActive ? "All" : cat.name)}
-                  className={`group relative flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl transition-all duration-200 border-2 text-center cursor-pointer min-w-[100px] sm:min-w-0 shrink-0 sm:shrink ${cat.bg} ${
+                  className={`group relative flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl transition-all duration-200 border-2 text-center cursor-pointer w-[105px] sm:w-[120px] shrink-0 ${cat.bg || "bg-slate-50"} ${
                     isActive
-                      ? "border-emerald-600 shadow-md bg-white/90"
+                      ? "border-emerald-600 shadow-md bg-white/95 ring-2 ring-emerald-500/20"
                       : "border-transparent hover:border-slate-300/80 hover:shadow-md hover:-translate-y-0.5"
                   }`}
                 >
                   {/* Circular Image */}
-                  <div className="h-13 w-13 sm:h-16 sm:w-16 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-2 shrink-0">
+                  <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full overflow-hidden bg-white shadow-xs p-0.5 mb-2 shrink-0">
                     <img
                       src={cat.img}
                       alt={cat.name}
                       className="h-full w-full object-cover rounded-full group-hover:scale-105 transition duration-300"
+                      onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&auto=format&fit=crop&q=80"; }}
                     />
                   </div>
 
                   {/* Category Name */}
-                  <span className="text-xs sm:text-sm font-extrabold text-slate-800 mb-1.5 tracking-tight whitespace-nowrap">
+                  <span className="text-xs font-extrabold text-slate-800 mb-1.5 tracking-tight truncate w-full px-1">
                     {cat.name}
                   </span>
 
                   {/* Circular Indicator */}
                   <div
-                    className={`flex h-5 w-5 sm:h-5.5 sm:w-5.5 items-center justify-center rounded-full shadow-xs transition duration-200 ${
+                    className={`flex h-5 w-5 items-center justify-center rounded-full shadow-xs transition duration-200 ${
                       isActive
                         ? "bg-emerald-700 text-white"
                         : "bg-white text-slate-600 group-hover:bg-emerald-700 group-hover:text-white"

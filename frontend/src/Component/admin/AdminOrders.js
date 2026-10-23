@@ -7,6 +7,7 @@ const STATUSES = ["All", "Placed", "Preparing", "Out for Delivery", "Delivered",
 const AdminOrders = (props) => {
   const context = useOutletContext() || {};
   const orders = props.orders || context.orders || [];
+  const inquiries = props.inquiries || context.inquiries || [];
   const onUpdateStatus = props.onUpdateStatus || context.handleUpdateOrderStatus;
 
   const [search, setSearch] = useState("");
@@ -97,20 +98,37 @@ const AdminOrders = (props) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredOrders.map((o) => (
-                <tr key={o.id} className="text-slate-700 hover:bg-slate-50/50 transition">
-                  <td className="py-3.5 align-top">
-                    <a
-                      href={`/orders/${o.id}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-mono font-bold text-emerald-700 hover:underline"
-                      title="View live order details"
-                    >
-                      #{o.id} ↗
-                    </a>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{o.date}</p>
-                  </td>
+              {filteredOrders.map((o) => {
+                const unresolvedIssue = (inquiries || []).find(
+                  (i) => String(i.orderId) === String(o.id) && !i.isResolved
+                );
+
+                return (
+                  <tr key={o.id} className="text-slate-700 hover:bg-slate-50/50 transition">
+                    <td className="py-3.5 align-top">
+                      <a
+                        href={`/orders/${o.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-mono font-bold text-emerald-700 hover:underline"
+                        title="View live order details"
+                      >
+                        #{o.id} ↗
+                      </a>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{o.date}</p>
+                      {unresolvedIssue && (
+                        <div className="mt-1.5">
+                          <a
+                            href="/admin/inquiries"
+                            className="inline-flex items-center gap-1 rounded-md bg-rose-50 border border-rose-300 px-2 py-0.5 text-[10px] font-bold text-rose-800 hover:bg-rose-100 transition shadow-2xs"
+                            title={`Customer help requested: ${unresolvedIssue.message}`}
+                          >
+                            <span className="h-1.5 w-1.5 rounded-full bg-rose-600 animate-pulse" />
+                            <span>Help Requested</span>
+                          </a>
+                        </div>
+                      )}
+                    </td>
                   <td className="py-3.5 align-top max-w-[280px]">
                     <p className="font-bold text-slate-900">{o.customerName}</p>
                     <p className="text-[11px] text-slate-500 font-mono">+91 {o.phone}</p>
@@ -172,7 +190,8 @@ const AdminOrders = (props) => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              );
+            })}
             </tbody>
           </table>
         </div>

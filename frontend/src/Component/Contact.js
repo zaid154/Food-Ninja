@@ -26,6 +26,18 @@ const FAQS = [
 
 const Contact = () => {
   const [profile, setProfile] = useState(null);
+  const [activeOrderId, setActiveOrderId] = useState(() => {
+    if (typeof window !== "undefined" && window.location && window.location.search) {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("orderId") || "";
+      } catch {
+        return "";
+      }
+    }
+    return "";
+  });
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -39,12 +51,21 @@ const Contact = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (typeof window !== "undefined" && window.scrollTo) {
+      window.scrollTo(0, 0);
+    }
+    if (activeOrderId) {
+      setForm((prev) => ({
+        ...prev,
+        subject: "Delivery Issue",
+        message: prev.message || `Assistance requested for Order #${activeOrderId}: `
+      }));
+    }
     fetch("https://api.github.com/users/zaid154")
       .then((res) => res.json())
       .then((data) => setProfile(data))
       .catch(() => {});
-  }, []);
+  }, [activeOrderId]);
 
   const handleChange = (field) => (e) => {
     setForm({ ...form, [field]: e.target.value });
@@ -55,11 +76,18 @@ const Contact = () => {
     setSubmitting(true);
     setErrorMsg("");
 
+    const payload = {
+      ...form,
+      orderId: activeOrderId || "",
+      type: activeOrderId ? "order_issue" : "general",
+      priority: activeOrderId ? "urgent" : "normal"
+    };
+
     try {
       const res = await fetch(`${API_BASE_URL}/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -111,6 +139,31 @@ const Contact = () => {
             <p className="text-xs text-slate-500 mb-6">
               Our support team reviews customer tickets around the clock. Typical response turnaround is under 2 hours.
             </p>
+
+            {activeOrderId && !submitted && (
+              <div className="mb-5 flex items-center justify-between rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-700 text-white font-mono font-bold text-[10px]">
+                    #{activeOrderId}
+                  </span>
+                  <div>
+                    <p className="font-bold text-slate-900">
+                      Assisting with Order #{activeOrderId}
+                    </p>
+                    <p className="text-[11px] text-slate-500">
+                      Ticket will be flagged as High Priority for the kitchen supervisor
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveOrderId("")}
+                  className="text-[11px] font-semibold text-slate-400 hover:text-slate-700 underline"
+                >
+                  Clear Order Context
+                </button>
+              </div>
+            )}
 
             {submitted ? (
               <div className="rounded-2xl bg-[#f4faee] border border-emerald-200 p-6 text-center">

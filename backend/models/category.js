@@ -11,6 +11,7 @@ const categorySchema = new mongoose.Schema(
     bg: { type: String, default: "bg-[#f4faee]" },
     description: { type: String, default: "" },
     isActive: { type: Boolean, default: true },
+    isFeatured: { type: Boolean, default: false },
     displayOrder: { type: Number, default: 0 },
   },
   { timestamps: true }

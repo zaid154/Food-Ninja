@@ -47,32 +47,43 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [addressQuery, setAddressQuery] = useState("");
   const [rawDishes, setRawDishes] = useState([]);
+  const [featuredCategories, setFeaturedCategories] = useState(PRESET_CATEGORIES);
   const [loading, setLoading] = useState(true);
 
-  // Fetch dishes from API
+  // Fetch dishes and featured categories from API
   useEffect(() => {
     let isMounted = true;
     const fetchPopular = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE_URL}/recipes?all=true`);
-        if (res.ok) {
-          const json = await res.json();
+        const [dishesRes, catRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/recipes?all=true`).catch(() => null),
+          fetch(`${API_BASE_URL}/categories?featured=true`).catch(() => null),
+        ]);
+
+        if (dishesRes && dishesRes.ok) {
+          const json = await dishesRes.json();
           if (isMounted && json && Array.isArray(json.recipes) && json.recipes.length > 0) {
             setRawDishes(json.recipes);
-            setLoading(false);
-            return;
+          } else if (isMounted) {
+            setRawDishes(FALLBACK_RECIPES);
           }
-        }
-        if (isMounted) {
+        } else if (isMounted) {
           setRawDishes(FALLBACK_RECIPES);
-          setLoading(false);
+        }
+
+        if (catRes && catRes.ok) {
+          const catJson = await catRes.json();
+          if (isMounted && catJson && Array.isArray(catJson.categories) && catJson.categories.length > 0) {
+            setFeaturedCategories(catJson.categories.slice(0, 8));
+          }
         }
       } catch {
         if (isMounted) {
           setRawDishes(FALLBACK_RECIPES);
-          setLoading(false);
         }
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
@@ -254,17 +265,22 @@ const LandingPage = () => {
             </Link>
           </div>
 
-          {/* 7 Pastel Category Cards in exact order */}
+          {/* Featured Category Cards (Curated 7-8 Cards) */}
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
-            {PRESET_CATEGORIES.map((cat) => (
+            {featuredCategories.map((cat) => (
               <button
                 key={cat.name}
                 type="button"
                 onClick={() => handleCategoryClick(cat.name)}
-                className={`flex flex-col items-center justify-between p-4 rounded-2xl transition-all duration-200 border border-transparent hover:border-slate-300 hover:shadow-xs text-center cursor-pointer ${cat.bg}`}
+                className={`flex flex-col items-center justify-between p-4 rounded-2xl transition-all duration-200 border border-transparent hover:border-slate-300 hover:shadow-xs text-center cursor-pointer ${cat.bg || "bg-[#f4faee]"}`}
               >
                 <div className="h-20 w-20 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-3">
-                  <img src={cat.img} alt={cat.name} className="h-full w-full object-cover rounded-full" />
+                  <img
+                    src={cat.img}
+                    alt={cat.name}
+                    className="h-full w-full object-cover rounded-full"
+                    onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&auto=format&fit=crop&q=80"; }}
+                  />
                 </div>
                 <span className="text-xs font-bold text-slate-800 mb-3">{cat.name}</span>
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-xs text-slate-600 transition">

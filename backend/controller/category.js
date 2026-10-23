@@ -10,6 +10,7 @@ const DEFAULT_CATEGORIES = [
     description: "Aromatic dum biryanis layered with fragrant basmati rice and rich spices.",
     displayOrder: 1,
     isActive: true,
+    isFeatured: true,
   },
   {
     name: "Pizza",
@@ -19,6 +20,7 @@ const DEFAULT_CATEGORIES = [
     description: "Wood-fired and pan-crust artisanal pizzas with gourmet cheese.",
     displayOrder: 2,
     isActive: true,
+    isFeatured: true,
   },
   {
     name: "Burgers",
@@ -28,6 +30,7 @@ const DEFAULT_CATEGORIES = [
     description: "Juicy grilled patties in toasted brioche buns with signature dressings.",
     displayOrder: 3,
     isActive: true,
+    isFeatured: true,
   },
   {
     name: "Chinese",
@@ -37,6 +40,7 @@ const DEFAULT_CATEGORIES = [
     description: "Sizzling wok tossed noodles, Manchurian, fried rice, and dimsums.",
     displayOrder: 4,
     isActive: true,
+    isFeatured: true,
   },
   {
     name: "Indian",
@@ -46,6 +50,7 @@ const DEFAULT_CATEGORIES = [
     description: "Authentic regional specialties from across 24 Indian states.",
     displayOrder: 5,
     isActive: true,
+    isFeatured: true,
   },
   {
     name: "Italian",
@@ -55,6 +60,7 @@ const DEFAULT_CATEGORIES = [
     description: "Classic risottos, creamy fettuccine, lasagna, and authentic tiramisu.",
     displayOrder: 6,
     isActive: true,
+    isFeatured: true,
   },
   {
     name: "Beverages",
@@ -64,6 +70,7 @@ const DEFAULT_CATEGORIES = [
     description: "Cold-pressed juices, thick milkshakes, mojitos, and specialty teas.",
     displayOrder: 7,
     isActive: true,
+    isFeatured: true,
   },
 ];
 
@@ -73,6 +80,16 @@ const ensureDefaultCategories = async () => {
   if (count === 0) {
     await Category.insertMany(DEFAULT_CATEGORIES);
     console.log("Seeded initial 7 default food categories.");
+  } else {
+    // Ensure default 7 categories have isFeatured: true if none is currently featured
+    const featuredCount = await Category.countDocuments({ isFeatured: true });
+    if (featuredCount === 0) {
+      const defaultNames = DEFAULT_CATEGORIES.map((c) => c.name);
+      await Category.updateMany(
+        { name: { $in: defaultNames } },
+        { $set: { isFeatured: true } }
+      );
+    }
   }
 };
 
@@ -81,8 +98,11 @@ const getCategories = async (req, res) => {
   try {
     await ensureDefaultCategories();
 
-    const { includeInactive } = req.query;
+    const { includeInactive, featured } = req.query;
     const filter = includeInactive === "true" ? {} : { isActive: true };
+    if (featured === "true") {
+      filter.isFeatured = true;
+    }
 
     const categories = await Category.find(filter).sort({ displayOrder: 1, createdAt: 1 });
 
@@ -119,7 +139,7 @@ const getCategories = async (req, res) => {
 // POST /api/categories (Admin creates new category)
 const createCategory = async (req, res) => {
   try {
-    const { name, img, bg, description, displayOrder } = req.body;
+    const { name, img, bg, description, displayOrder, isFeatured } = req.body;
 
     if (!name || !name.trim()) {
       return res.status(400).json({ message: "Category name is required." });
@@ -140,6 +160,7 @@ const createCategory = async (req, res) => {
       description: description || `Freshly prepared ${trimmedName} specialty items.`,
       displayOrder: displayOrder !== undefined ? Number(displayOrder) : totalCount + 1,
       isActive: true,
+      isFeatured: isFeatured !== undefined ? Boolean(isFeatured) : false,
     });
 
     await newCategory.save();
@@ -157,7 +178,7 @@ const createCategory = async (req, res) => {
 const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, img, bg, description, isActive, displayOrder } = req.body;
+    const { name, img, bg, description, isActive, displayOrder, isFeatured } = req.body;
 
     const updateData = {};
     if (name) {
@@ -169,6 +190,7 @@ const updateCategory = async (req, res) => {
     if (description !== undefined) updateData.description = description;
     if (isActive !== undefined) updateData.isActive = Boolean(isActive);
     if (displayOrder !== undefined) updateData.displayOrder = Number(displayOrder);
+    if (isFeatured !== undefined) updateData.isFeatured = Boolean(isFeatured);
 
     const updated = await Category.findByIdAndUpdate(id, { $set: updateData }, { new: true });
     if (!updated) {

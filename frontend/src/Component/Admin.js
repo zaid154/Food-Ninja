@@ -296,7 +296,7 @@ const Admin = () => {
       </header>
 
       {/* Main Full-Width Content Area */}
-      <main className="mx-auto max-w-7xl w-full flex-1 px-4 sm:px-6 lg:px-8 py-6">
+      <main className="mx-auto max-w-7xl w-full flex-1 px-4 sm:px-6 lg:px-8 py-6 min-w-0">
         {msg && (
           <div className="mb-5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm flex items-center justify-between">
             <span>{msg}</span>

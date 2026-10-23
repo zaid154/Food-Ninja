@@ -3,7 +3,19 @@ const Inquiry = require("../models/inquiry");
 // Submit new customer inquiry
 const createInquiry = async (req, res) => {
   try {
-    const { name, email, phone, subject, message } = req.body;
+    const {
+      name,
+      email,
+      phone,
+      subject,
+      message,
+      orderId,
+      type,
+      issueCategory,
+      orderStatus,
+      orderTotal,
+      priority
+    } = req.body;
 
     if (!name || !email || !message) {
       return res.status(400).json({
@@ -16,13 +28,22 @@ const createInquiry = async (req, res) => {
       name,
       email,
       phone: phone || "",
-      subject: subject || "General Inquiry",
-      message
+      subject: subject || (orderId ? `Order #${orderId} Help` : "General Inquiry"),
+      message,
+      orderId: orderId ? String(orderId) : "",
+      type: type || (orderId ? "order_issue" : "general"),
+      issueCategory: issueCategory || "",
+      orderStatus: orderStatus || "",
+      orderTotal: orderTotal ? Number(orderTotal) : 0,
+      priority: priority || (orderId ? "high" : "normal"),
+      isResolved: false
     });
 
     return res.status(201).json({
       success: true,
-      message: "Thank you for reaching out! Your message has been received.",
+      message: orderId
+        ? `Support ticket for Order #${orderId} submitted. Our kitchen team has been alerted!`
+        : "Thank you for reaching out! Your message has been received.",
       inquiry: newInquiry
     });
   } catch (error) {
@@ -85,9 +106,37 @@ const replyInquiry = async (req, res) => {
   }
 };
 
+// Admin: Toggle or set resolve status for an inquiry / order issue
+const resolveInquiry = async (req, res) => {
+  try {
+    const existing = await Inquiry.findById(req.params.id);
+    if (!existing) {
+      return res.status(404).json({ success: false, message: "Inquiry not found." });
+    }
+
+    const nextResolvedState =
+      req.body.isResolved !== undefined ? Boolean(req.body.isResolved) : !existing.isResolved;
+
+    existing.isResolved = nextResolvedState;
+    if (nextResolvedState && existing.status === "New") {
+      existing.status = "Replied";
+    }
+    await existing.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Inquiry marked as ${nextResolvedState ? "Resolved" : "Pending"}`,
+      inquiry: existing
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   createInquiry,
   getInquiries,
   deleteInquiry,
-  replyInquiry
+  replyInquiry,
+  resolveInquiry
 };
