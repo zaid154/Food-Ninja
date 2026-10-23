@@ -318,124 +318,113 @@ const Checkout = () => {
         }
     };
 
-    // Full Order Confirmation Screen — matches mockup exactly
+    // Full Order Confirmation Screen — compact single-viewport
     if (confirmedOrder) {
         const orderTime = new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
         return (
-            <section className="min-h-[85vh] bg-[#f8fafc] px-4 py-8 sm:py-10">
-                <div className="mx-auto max-w-3xl">
+            <section className="bg-[#f8fafc] px-4 py-5">
+                <div className="mx-auto max-w-3xl rounded-2xl bg-white border border-slate-200/80 shadow-sm overflow-hidden">
 
                     {/* ─── Top Hero: Checkmark + Thank You ─── */}
-                    <div className="rounded-2xl bg-white border border-slate-200/80 shadow-sm p-6 sm:p-8 text-center">
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white mb-4 shadow-lg shadow-emerald-200">
-                            <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                    <div className="text-center px-5 pt-5 pb-3.5 border-b border-slate-100">
+                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white mb-2.5 shadow-lg shadow-emerald-200">
+                            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
-                        <span className="inline-block rounded-full bg-emerald-50 border border-emerald-300 px-4 py-1 text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                        <span className="inline-block rounded-full bg-emerald-50 border border-emerald-300 px-3.5 py-0.5 text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
                             Order Confirmed
                         </span>
-                        <h1 className="mt-3 text-2xl sm:text-3xl font-black text-slate-900">
+                        <h1 className="mt-1.5 text-xl sm:text-2xl font-black text-slate-900">
                             Thank You, {confirmedOrder.customerName}!
                         </h1>
-                        <p className="mt-1.5 text-sm text-slate-500">
+                        <p className="mt-0.5 text-xs text-slate-500">
                             Your order is confirmed and the kitchen is getting started.
                         </p>
                     </div>
 
-                    {/* ─── Meta Info Bar: Order ID | Estimated Delivery | Payment Mode ─── */}
-                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        {/* Order ID */}
-                        <div className="flex items-center gap-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-sm p-4">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
-                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    {/* ─── Meta Bar: Order ID | Estimated Delivery | Payment Mode ─── */}
+                    <div className="grid grid-cols-3 divide-x divide-slate-100 border-b border-slate-100">
+                        <div className="flex items-center gap-2.5 px-4 py-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 shrink-0">
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                     <rect x="3" y="4" width="18" height="18" rx="2" />
                                     <path d="M16 2v4M8 2v4M3 10h18" />
                                 </svg>
                             </div>
-                            <div>
-                                <p className="text-[11px] text-slate-400 font-medium">Order ID</p>
-                                <p className="text-sm font-bold text-slate-900 font-mono">#{confirmedOrder.id}</p>
+                            <div className="min-w-0">
+                                <p className="text-[10px] text-slate-400 font-medium">Order ID</p>
+                                <p className="text-xs font-bold text-slate-900 font-mono truncate">#{confirmedOrder.id}</p>
                             </div>
                         </div>
-
-                        {/* Estimated Delivery */}
-                        <div className="flex items-center gap-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-sm p-4">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
-                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <div className="flex items-center gap-2.5 px-4 py-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 shrink-0">
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                     <circle cx="12" cy="12" r="10" />
                                     <polyline points="12 6 12 12 16 14" />
                                 </svg>
                             </div>
                             <div>
-                                <p className="text-[11px] text-slate-400 font-medium">Estimated Delivery</p>
-                                <p className="text-sm font-bold text-slate-900">{confirmedOrder.estDelivery}</p>
+                                <p className="text-[10px] text-slate-400 font-medium">Estimated Delivery</p>
+                                <p className="text-xs font-bold text-slate-900">{confirmedOrder.estDelivery}</p>
                             </div>
                         </div>
-
-                        {/* Payment Mode */}
-                        <div className="flex items-center gap-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-sm p-4">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
-                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <div className="flex items-center gap-2.5 px-4 py-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 shrink-0">
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                     <rect x="2" y="5" width="20" height="14" rx="2" />
                                     <line x1="2" y1="10" x2="22" y2="10" />
                                 </svg>
                             </div>
                             <div>
-                                <p className="text-[11px] text-slate-400 font-medium">Payment Mode</p>
-                                <p className="text-sm font-bold text-slate-900">{confirmedOrder.payment}</p>
-                                {confirmedOrder.razorpayPaymentId && (
-                                    <p className="text-[10px] font-mono text-slate-400 mt-0.5">Ref: {confirmedOrder.razorpayPaymentId}</p>
-                                )}
+                                <p className="text-[10px] text-slate-400 font-medium">Payment Mode</p>
+                                <p className="text-xs font-bold text-slate-900">{confirmedOrder.payment}</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* ─── Address + Payment Summary (2 Columns) ─── */}
-                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-[1.3fr_1fr] gap-5">
-
-                        {/* Delivery Address Card */}
-                        <div className="rounded-2xl bg-white border border-slate-200/80 shadow-sm p-5">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
-                                        <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    {/* ─── Address + Payment Summary (side by side inside card) ─── */}
+                    <div className="grid grid-cols-1 sm:grid-cols-[1.3fr_1fr] divide-y sm:divide-y-0 sm:divide-x divide-slate-100 border-b border-slate-100">
+                        {/* Delivery Address */}
+                        <div className="px-5 py-3.5">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 shrink-0">
+                                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                     </div>
-                                    <h2 className="text-base font-bold text-slate-900">Delivery Address</h2>
+                                    <h2 className="text-sm font-bold text-slate-900">Delivery Address</h2>
                                 </div>
-                                <Link to="/checkout" className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition">
+                                <Link to="/checkout" className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
                                     <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                     </svg>
-                                    <span>Change address</span>
+                                    Change address
                                 </Link>
                             </div>
-                            <div className="text-sm text-slate-700 leading-relaxed">
-                                <p className="font-medium">{confirmedOrder.address}</p>
-                            </div>
-                            <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
-                                <svg className="h-4 w-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <p className="text-xs text-slate-600 leading-relaxed">{confirmedOrder.address}</p>
+                            <div className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-500">
+                                <svg className="h-3.5 w-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                 </svg>
                                 <span className="font-medium">+91 {confirmedOrder.phone}</span>
                             </div>
                         </div>
 
-                        {/* Payment Summary Card */}
-                        <div className="rounded-2xl bg-white border border-slate-200/80 shadow-sm p-5">
-                            <div className="flex items-center gap-2.5 mb-4">
-                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
-                                    <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        {/* Payment Summary */}
+                        <div className="px-5 py-3.5">
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 shrink-0">
+                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                         <rect x="2" y="3" width="20" height="18" rx="2" />
                                         <path d="M8 7h8M8 11h4M8 15h6" />
                                     </svg>
                                 </div>
-                                <h2 className="text-base font-bold text-slate-900">Payment Summary</h2>
+                                <h2 className="text-sm font-bold text-slate-900">Payment Summary</h2>
                             </div>
-                            <div className="space-y-2.5 text-sm">
+                            <div className="space-y-1.5 text-xs">
                                 <div className="flex justify-between text-slate-600">
                                     <span>Item Total</span>
                                     <span className="font-semibold text-slate-800">₹{confirmedOrder.subtotal || subtotal}</span>
@@ -448,7 +437,7 @@ const Checkout = () => {
                                     <span>Discount</span>
                                     <span className="font-semibold text-emerald-600">₹{discountAmount}</span>
                                 </div>
-                                <div className="flex justify-between border-t border-slate-200 pt-2.5 text-base font-black text-slate-900">
+                                <div className="flex justify-between border-t border-slate-200 pt-1.5 text-sm font-black text-slate-900">
                                     <span>Grand Total</span>
                                     <span>₹{confirmedOrder.total}</span>
                                 </div>
@@ -457,107 +446,77 @@ const Checkout = () => {
                     </div>
 
                     {/* ─── Order Progress Stepper ─── */}
-                    <div className="mt-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm p-5 sm:p-6">
-                        <div className="flex items-center gap-2.5 mb-5">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
-                                <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <div className="px-5 py-3.5 border-b border-slate-100">
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 shrink-0">
+                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                 </svg>
                             </div>
                             <div>
-                                <h2 className="text-base font-bold text-slate-900">Order Progress</h2>
-                                <p className="text-xs text-slate-400">You can track your order in real time</p>
+                                <h2 className="text-sm font-bold text-slate-900">Order Progress</h2>
+                                <p className="text-[10px] text-slate-400">You can track your order in real time</p>
                             </div>
                         </div>
-
                         {/* Horizontal Stepper */}
-                        <div className="flex items-start justify-between relative">
-                            {/* Connecting Line */}
-                            <div className="absolute top-5 left-[12%] right-[12%] h-0.5 bg-slate-200 z-0" />
-                            <div className="absolute top-5 left-[12%] h-0.5 bg-emerald-500 z-[1]" style={{ width: "15%" }} />
-
-                            {/* Step 1: Confirmed */}
+                        <div className="flex items-start justify-between relative px-2">
+                            <div className="absolute top-[14px] left-[12%] right-[12%] h-[2px] bg-slate-200 z-0" />
+                            <div className="absolute top-[14px] left-[12%] h-[2px] bg-emerald-500 z-[1]" style={{ width: "18%" }} />
+                            {/* Confirmed */}
                             <div className="flex flex-col items-center text-center z-10 flex-1">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md shadow-emerald-200">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
+                                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white shadow shadow-emerald-200">
+                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                                 </div>
-                                <p className="mt-2 text-xs font-bold text-emerald-700">Confirmed</p>
-                                <p className="text-[10px] text-slate-400">{orderTime}</p>
+                                <p className="mt-1 text-[11px] font-bold text-emerald-700">Confirmed</p>
+                                <p className="text-[9px] text-slate-400">{orderTime}</p>
                             </div>
-
-                            {/* Step 2: Preparing */}
+                            {/* Preparing */}
                             <div className="flex flex-col items-center text-center z-10 flex-1">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md shadow-emerald-200 ring-4 ring-emerald-100">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
-                                        <path d="M12 6v6l4 2" />
-                                    </svg>
+                                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white ring-3 ring-emerald-100 shadow shadow-emerald-200">
+                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                                 </div>
-                                <p className="mt-2 text-xs font-bold text-emerald-700">Preparing</p>
-                                <p className="text-[10px] text-slate-400">Kitchen is cooking<br />your food</p>
+                                <p className="mt-1 text-[11px] font-bold text-emerald-700">Preparing</p>
+                                <p className="text-[9px] text-slate-400 leading-tight">Kitchen is cooking<br />your food</p>
                             </div>
-
-                            {/* Step 3: Out for delivery */}
+                            {/* Out for delivery */}
                             <div className="flex flex-col items-center text-center z-10 flex-1">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400 border-2 border-slate-200">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                        <rect x="1" y="3" width="15" height="13" rx="1" />
-                                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                                        <circle cx="5.5" cy="18.5" r="2.5" />
-                                        <circle cx="18.5" cy="18.5" r="2.5" />
-                                    </svg>
+                                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-400 border border-slate-200">
+                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13" rx="1" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>
                                 </div>
-                                <p className="mt-2 text-xs font-semibold text-slate-400">Out for delivery</p>
+                                <p className="mt-1 text-[11px] font-semibold text-slate-400">Out for delivery</p>
                             </div>
-
-                            {/* Step 4: Delivered */}
+                            {/* Delivered */}
                             <div className="flex flex-col items-center text-center z-10 flex-1">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400 border-2 border-slate-200">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                                        <polyline points="9 22 9 12 15 12 15 22" />
-                                    </svg>
+                                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-400 border border-slate-200">
+                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
                                 </div>
-                                <p className="mt-2 text-xs font-semibold text-slate-400">Delivered</p>
+                                <p className="mt-1 text-[11px] font-semibold text-slate-400">Delivered</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* ─── Action Buttons (Track Order + Continue Shopping) ─── */}
-                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* ─── Action Buttons ─── */}
+                    <div className="grid grid-cols-2 gap-3 px-5 py-3.5 border-b border-slate-100">
                         <Link
                             to={`/orders/${confirmedOrder.id}`}
-                            className="flex items-center justify-center gap-2.5 rounded-2xl bg-[#0c5936] hover:bg-[#084227] text-white py-4 px-6 font-bold text-sm shadow-sm transition active:scale-[0.98]"
+                            className="flex items-center justify-center gap-2 rounded-xl bg-[#0c5936] hover:bg-[#084227] text-white py-2.5 font-bold text-sm shadow-sm transition active:scale-[0.98]"
                         >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                             <span>Track Order</span>
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
+                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                         </Link>
                         <Link
                             to="/"
-                            className="flex items-center justify-center gap-2.5 rounded-2xl border-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-800 py-4 px-6 font-bold text-sm transition active:scale-[0.98]"
+                            className="flex items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-800 py-2.5 font-bold text-sm transition active:scale-[0.98]"
                         >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                <circle cx="9" cy="21" r="1" />
-                                <circle cx="20" cy="21" r="1" />
-                                <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
-                            </svg>
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" /></svg>
                             <span>Continue Shopping</span>
                         </Link>
                     </div>
 
                     {/* ─── Support Footer ─── */}
-                    <div className="mt-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm px-5 py-3.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-slate-500">
-                        <svg className="h-4 w-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
+                    <div className="px-5 py-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500 bg-slate-50/50">
+                        <svg className="h-3.5 w-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                         <span className="font-medium">Need help? Contact our support team</span>
                         <span className="text-slate-300">|</span>
                         <span className="font-semibold text-slate-700">+91 {settings.supportPhone || "9876543210"}</span>
