@@ -3,24 +3,6 @@ import { Link, useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
 import FoodDishModal from "./FoodDishModal";
 
-export const FOOD_CATEGORIES = [
-  "Biryani",
-  "North Indian",
-  "South Indian",
-  "Chinese",
-  "Pizza",
-  "Burgers",
-  "Rolls & Wraps",
-  "Momos & Dimsum",
-  "Pasta & Italian",
-  "Sandwiches & Snacks",
-  "Mughlai & Kebabs",
-  "Desserts & Sweets",
-  "Beverages & Drinks",
-  "Salads & Healthy Bowls",
-  "Street Food"
-];
-
 export const FOOD_CUISINES = [
   "Indian",
   "North Indian",
@@ -45,6 +27,11 @@ const AdminFoods = (props) => {
   const onRefresh = props.onRefresh || context.fetchData;
   const showToast = props.showToast || context.showToast || alert;
 
+  // Real categories dynamically mirrored from DB (/admin/categories)
+  const availableCategories = categories.length > 0
+    ? categories.map((c) => c.name)
+    : ["Biryani", "Pizza", "Burgers", "Chinese", "Indian", "Italian", "Beverages"];
+
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedStock, setSelectedStock] = useState("All"); // "All" | "In Stock" | "Sold Out"
@@ -53,7 +40,7 @@ const AdminFoods = (props) => {
 
   const initialFood = {
     name: "",
-    category: "Biryani",
+    category: availableCategories[0] || "Biryani",
     cuisine: "Hyderabadi",
     price: "",
     caloriesPerServing: "",
@@ -67,11 +54,6 @@ const AdminFoods = (props) => {
 
   const [foodForm, setFoodForm] = useState(initialFood);
   const [editingFoodId, setEditingFoodId] = useState(null);
-
-  // Combine dynamic categories with defaults
-  const availableCategories = categories.length > 0
-    ? Array.from(new Set([...categories.map((c) => c.name), ...FOOD_CATEGORIES]))
-    : FOOD_CATEGORIES;
 
   // Filter foods based on search query, category chip, and stock status
   const filteredFoods = foods.filter((f) => {
@@ -259,7 +241,7 @@ const AdminFoods = (props) => {
           {/* Category Quick Filter Chips */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
             <span className="text-slate-400 font-semibold mr-1 text-[11px] shrink-0">Category:</span>
-            {["All", ...availableCategories.slice(0, 12)].map((cat) => {
+            {["All", ...availableCategories].map((cat) => {
               const isSelected = selectedCategory === cat;
               return (
                 <button
