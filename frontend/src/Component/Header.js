@@ -221,9 +221,11 @@ const Header = () => {
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
             <span className="sr-only">Cart</span>
-            <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-emerald-600 px-1 text-[10px] font-bold text-white shadow-xs">
-              {cartCount > 0 ? cartCount : 2}
-            </span>
+            {cartCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-emerald-600 px-1 text-[10px] font-bold text-white shadow-xs">
+                {cartCount}
+              </span>
+            )}
           </Link>
 
           {/* User Profile Avatar with dropdown (Black circle with white 'M' and chevron) */}
