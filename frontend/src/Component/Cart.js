@@ -166,7 +166,9 @@ const Cart = () => {
             <div className="mt-4 rounded-xl bg-emerald-50/70 border border-emerald-200/80 p-3 text-xs">
               {isFreeDelivery ? (
                 <p className="font-bold text-emerald-800 flex items-center gap-1.5">
-                  <span>🎉</span>
+                  <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
                   <span>You've unlocked <strong>FREE Delivery!</strong></span>
                 </p>
               ) : (
