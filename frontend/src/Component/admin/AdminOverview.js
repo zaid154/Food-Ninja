@@ -40,14 +40,9 @@ const AdminOverview = (props) => {
       {/* 6 Professional Metric & Module Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {/* Total Revenue */}
-        <div className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Revenue</span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 text-slate-600 font-bold text-xs">
-              ₹
-            </span>
-          </div>
-          <div>
+        <div className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Revenue</span>
+          <div className="mt-3">
             <p className="text-2xl font-bold tracking-tight text-slate-900">₹{totalRevenue.toLocaleString("en-IN")}</p>
             <p className="mt-1 text-xs text-slate-400 font-medium">{deliveredCount} delivered orders</p>
           </div>
@@ -56,23 +51,16 @@ const AdminOverview = (props) => {
         {/* Live Orders Card */}
         <div
           onClick={() => navigate("/admin/orders")}
-          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto transition hover:border-slate-300 hover:shadow-xs group"
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between transition hover:border-slate-300 hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Live Orders</span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 text-slate-600">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
+            <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
+              Manage →
             </span>
           </div>
-          <div>
-            <div className="flex items-baseline justify-between">
-              <p className="text-2xl font-bold tracking-tight text-slate-900">{orders.length}</p>
-              <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
-                Manage →
-              </span>
-            </div>
+          <div className="mt-3">
+            <p className="text-2xl font-bold tracking-tight text-slate-900">{orders.length}</p>
             <p className="mt-1 text-xs text-slate-400 font-medium">{pendingOrders} active in progress</p>
           </div>
         </div>
@@ -80,23 +68,16 @@ const AdminOverview = (props) => {
         {/* Food Dishes Card */}
         <div
           onClick={() => navigate("/admin/foods")}
-          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto transition hover:border-slate-300 hover:shadow-xs group"
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between transition hover:border-slate-300 hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Food Dishes</span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 text-slate-600">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
+            <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
+              Edit Menu →
             </span>
           </div>
-          <div>
-            <div className="flex items-baseline justify-between">
-              <p className="text-2xl font-bold tracking-tight text-slate-900">{foods.length}</p>
-              <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
-                Edit Menu →
-              </span>
-            </div>
+          <div className="mt-3">
+            <p className="text-2xl font-bold tracking-tight text-slate-900">{foods.length}</p>
             <p className="mt-1 text-xs text-slate-400 font-medium">Active in online catalog</p>
           </div>
         </div>
@@ -104,23 +85,16 @@ const AdminOverview = (props) => {
         {/* Categories Card */}
         <div
           onClick={() => navigate("/admin/categories")}
-          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto transition hover:border-slate-300 hover:shadow-xs group"
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between transition hover:border-slate-300 hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Categories</span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 text-slate-600">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
+            <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
+              Create & Style →
             </span>
           </div>
-          <div>
-            <div className="flex items-baseline justify-between">
-              <p className="text-2xl font-bold tracking-tight text-slate-900">{categories.length || 7}</p>
-              <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
-                Create & Style →
-              </span>
-            </div>
+          <div className="mt-3">
+            <p className="text-2xl font-bold tracking-tight text-slate-900">{categories.length || 7}</p>
             <p className="mt-1 text-xs text-slate-400 font-medium">Menu sections & palettes</p>
           </div>
         </div>
@@ -128,24 +102,16 @@ const AdminOverview = (props) => {
         {/* Store Settings & Charges Card */}
         <div
           onClick={() => navigate("/admin/settings")}
-          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto transition hover:border-slate-300 hover:shadow-xs group"
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between transition hover:border-slate-300 hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Store Charges</span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 text-slate-600">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+            <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
+              Configure →
             </span>
           </div>
-          <div>
-            <div className="flex items-baseline justify-between">
-              <p className="text-2xl font-bold tracking-tight text-slate-900">Delivery & Fees</p>
-              <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
-                Configure →
-              </span>
-            </div>
+          <div className="mt-3">
+            <p className="text-2xl font-bold tracking-tight text-slate-900">Delivery & Fees</p>
             <p className="mt-1 text-xs text-slate-400 font-medium">Free delivery thresholds</p>
           </div>
         </div>
@@ -153,23 +119,16 @@ const AdminOverview = (props) => {
         {/* Customer Messages Card */}
         <div
           onClick={() => navigate("/admin/inquiries")}
-          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto transition hover:border-slate-300 hover:shadow-xs group"
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between transition hover:border-slate-300 hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Inquiries</span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 text-slate-600">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
+            <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
+              View →
             </span>
           </div>
-          <div>
-            <div className="flex items-baseline justify-between">
-              <p className="text-2xl font-bold tracking-tight text-slate-900">{inquiries.length}</p>
-              <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition">
-                View →
-              </span>
-            </div>
+          <div className="mt-3">
+            <p className="text-2xl font-bold tracking-tight text-slate-900">{inquiries.length}</p>
             <p className="mt-1 text-xs text-slate-400 font-medium">From contact form</p>
           </div>
         </div>

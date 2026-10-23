@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { NavLink, Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import AdminLogin from "./admin/AdminLogin";
 import Header from "./Header";
@@ -31,6 +31,19 @@ const Admin = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [userDropdown, setUserDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setUserDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const showToast = (text) => {
     setMsg(text);
@@ -219,55 +232,77 @@ const Admin = () => {
       {/* Top Admin Header Bar */}
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-2xs">
         {/* Top Branding Row */}
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3">
-          {/* Brand Logo */}
-          <BrandLogo to="/admin" size="sm" adminBadge />
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3.5">
+          {/* Brand Logo - identical to main store header */}
+          <BrandLogo to="/admin" size="md" hideSubtitle={true} />
 
-          {/* Right Tools & Admin Profile */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Sync Button */}
+          {/* User Profile Avatar with dropdown (exact match to main store header) */}
+          <div className="relative" ref={dropdownRef}>
             <button
               type="button"
-              onClick={fetchData}
-              disabled={loading}
-              className="flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition disabled:opacity-50"
-              title="Refresh store data"
+              onClick={() => setUserDropdown(!userDropdown)}
+              className="flex items-center gap-1.5 focus:outline-none cursor-pointer"
+              aria-label="Admin profile menu"
             >
-              <svg className={`h-3.5 w-3.5 ${loading ? "animate-spin text-emerald-600" : "text-slate-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white shadow-xs">
+                A
+              </div>
+              <svg viewBox="0 0 20 20" className="h-4 w-4 text-slate-500" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
-              <span className="hidden sm:inline">{loading ? "Syncing..." : "Sync Data"}</span>
             </button>
 
-            {/* View Customer Store Link */}
-            <Link
-              to="/"
-              target="_blank"
-              className="hidden sm:flex h-8 items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
-              title="Open customer website in new tab"
-            >
-              <span>View Store</span>
-              <span className="text-slate-400">↗</span>
-            </Link>
-
-            {/* Admin Profile */}
-            <div className="hidden md:block pl-2 border-l border-slate-200 text-right text-xs leading-tight">
-              <p className="font-semibold text-slate-800">Store Admin</p>
-              <p className="text-[11px] text-slate-400">admin@foodninja.com</p>
-            </div>
-
-            {/* Logout Button */}
-            <button
-              type="button"
-              onClick={handleAdminLogout}
-              className="flex h-8 items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-3 text-xs font-semibold text-red-700 hover:bg-red-100 transition"
-              title="Logout from Admin"
-            >
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              <span>Logout</span>
-            </button>
+            {userDropdown && (
+              <div className="absolute right-0 mt-2.5 w-56 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl z-50">
+                <div className="px-4 py-2.5 border-b border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold text-slate-900 truncate">Store Administrator</p>
+                    <span className="rounded bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 text-[9px] font-bold uppercase">
+                      Admin
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 truncate mt-0.5">admin@foodninja.com</p>
+                </div>
+                <Link
+                  to="/"
+                  target="_blank"
+                  onClick={() => setUserDropdown(false)}
+                  className="flex items-center justify-between px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  <span>View Customer Store</span>
+                  <span className="text-slate-400">↗</span>
+                </Link>
+                <Link
+                  to="/orders"
+                  onClick={() => setUserDropdown(false)}
+                  className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Customer Orders Page
+                </Link>
+                <Link
+                  to="/wishlist"
+                  onClick={() => setUserDropdown(false)}
+                  className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Customer Wishlist
+                </Link>
+                <div className="border-t border-slate-100 mt-1 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserDropdown(false);
+                      handleAdminLogout();
+                    }}
+                    className="w-full text-left px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Logout</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
