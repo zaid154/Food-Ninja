@@ -44,19 +44,33 @@ const FoodDishModal = ({
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/90 px-6 py-4">
           <div className="flex items-center gap-3">
+            {/* Elegant Food Cloche / Dining Icon */}
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 4v2" />
+                <path d="M4 18h16" />
+                <path d="M4 18a8 8 0 0 1 16 0" />
+                <path d="M10 4a2 2 0 1 1 4 0" />
               </svg>
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm sm:text-base font-extrabold text-slate-900">
-                  {editingFoodId ? `Edit Dish #${editingFoodId}` : "Add New Food Dish to Menu"}
+                <h3 className="text-sm sm:text-base font-extrabold text-slate-900 truncate max-w-md">
+                  {editingFoodId
+                    ? (foodForm.name ? `Edit ${foodForm.name}` : "Edit Food Dish")
+                    : "Add New Food Dish"}
                 </h3>
                 {editingFoodId && (
-                  <span className="rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 border border-amber-200">
-                    Editing Mode
+                  <span className="rounded-md bg-slate-100 text-slate-700 text-[10px] font-mono font-bold px-2 py-0.5 border border-slate-200">
+                    ID: {editingFoodId}
                   </span>
                 )}
               </div>
@@ -68,15 +82,23 @@ const FoodDishModal = ({
             </div>
           </div>
 
+          {/* Clean ✕ Close Button */}
           <button
             type="button"
             onClick={onClose}
             className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 transition cursor-pointer"
             aria-label="Close modal"
           >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="6" />
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -85,7 +107,7 @@ const FoodDishModal = ({
         <form onSubmit={onSave} className="p-6 space-y-4 text-xs">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
             
-            {/* Left Column: Essential Details */}
+            {/* Left Column: Essential Dish Specifications & Ingredients */}
             <div className="space-y-3.5">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Dish Name *</label>
@@ -214,9 +236,22 @@ const FoodDishModal = ({
                   </button>
                 </div>
               </div>
+
+              {/* Key Ingredients moved here under Dietary to fill space evenly */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Key Ingredients (Comma Separated)</label>
+                <input
+                  type="text"
+                  value={Array.isArray(foodForm.ingredients) ? foodForm.ingredients.join(", ") : foodForm.ingredients}
+                  onChange={(e) => setFoodForm({ ...foodForm, ingredients: e.target.value })}
+                  placeholder="Basmati Rice, Spices, Ghee, Mint, Caramelized Onions"
+                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition"
+                />
+                <span className="text-[10px] text-slate-400 mt-1 block">Separated by comma for tags in product view</span>
+              </div>
             </div>
 
-            {/* Right Column: Visuals & Descriptions */}
+            {/* Right Column: Visuals & Expanded Description */}
             <div className="space-y-3.5">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Image URL (Direct Link) *</label>
@@ -229,7 +264,7 @@ const FoodDishModal = ({
                   className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition"
                 />
 
-                {/* Instant Live Image Preview */}
+                {/* Instant Live Image Preview Card */}
                 <div className="mt-2.5 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
                   <div className="h-16 w-16 rounded-xl overflow-hidden bg-white border border-slate-200 shadow-2xs shrink-0 flex items-center justify-center">
                     {foodForm.image ? (
@@ -248,7 +283,7 @@ const FoodDishModal = ({
                     )}
                   </div>
                   <div className="min-w-0 text-[11px]">
-                    <p className="font-bold text-slate-800">
+                    <p className="font-bold text-slate-800 truncate">
                       {foodForm.name ? foodForm.name : "Dish Image Preview"}
                     </p>
                     <p className="text-slate-400 truncate">
@@ -263,27 +298,17 @@ const FoodDishModal = ({
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Key Ingredients (Comma Separated)</label>
-                <input
-                  type="text"
-                  value={Array.isArray(foodForm.ingredients) ? foodForm.ingredients.join(", ") : foodForm.ingredients}
-                  onChange={(e) => setFoodForm({ ...foodForm, ingredients: e.target.value })}
-                  placeholder="Basmati Rice, Spices, Ghee, Mint, Caramelized Onions"
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs outline-none focus:border-emerald-500"
-                />
-                <span className="text-[10px] text-slate-400 mt-0.5 block">Separated by comma for tags in product view</span>
-              </div>
-
+              {/* Description / Summary with expanded height */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Description / Summary</label>
                 <textarea
-                  rows={2}
+                  rows={5}
                   value={foodForm.description}
                   onChange={(e) => setFoodForm({ ...foodForm, description: e.target.value })}
                   placeholder="Authentic dish prepared fresh with traditional herbs and premium ingredients."
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs outline-none focus:border-emerald-500 resize-none"
+                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition resize-none leading-relaxed"
                 />
+                <span className="text-[10px] text-slate-400 mt-1 block">Full description shown on dish detail & checkout views</span>
               </div>
             </div>
 
