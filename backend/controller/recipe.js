@@ -136,7 +136,25 @@ const getRecipe = async (req, res) => {
 // Admin: Add new food item
 const addRecipe = async (req, res) => {
   try {
-    const { name, category, price, image, imageFit, isVeg, dietary, deliveryTime, description, ingredients, cuisine, inStock } = req.body;
+    const {
+      name,
+      category,
+      price,
+      image,
+      imageFit,
+      isVeg,
+      dietary,
+      deliveryTime,
+      description,
+      ingredients,
+      cuisine,
+      inStock,
+      caloriesPerServing,
+      servingInfo,
+      hasPortions,
+      halfPrice,
+      originalPrice,
+    } = req.body;
     
     if (!name || !price || !image) {
       return res.status(400).json({ message: "Name, price and image are required." });
@@ -150,7 +168,11 @@ const addRecipe = async (req, res) => {
       name,
       category: category || "Fast Food",
       price: Number(price),
-      caloriesPerServing: Number(price),
+      caloriesPerServing: caloriesPerServing ? Number(caloriesPerServing) : 350,
+      servingInfo: servingInfo ? String(servingInfo).trim() : "",
+      hasPortions: Boolean(hasPortions),
+      halfPrice: halfPrice ? Number(halfPrice) : 0,
+      originalPrice: originalPrice ? Number(originalPrice) : 0,
       image,
       imageFit: imageFit || "cover",
       isVeg: isVeg === undefined ? (dietary === "Non-Veg" ? false : true) : Boolean(isVeg),
@@ -175,13 +197,31 @@ const addRecipe = async (req, res) => {
 // Admin: Update food item
 const updateRecipe = async (req, res) => {
   try {
-    const { name, category, price, image, imageFit, isVeg, dietary, deliveryTime, description, cuisine, inStock } = req.body;
+    const {
+      name,
+      category,
+      price,
+      image,
+      imageFit,
+      isVeg,
+      dietary,
+      deliveryTime,
+      description,
+      cuisine,
+      inStock,
+      ingredients,
+      caloriesPerServing,
+      servingInfo,
+      hasPortions,
+      halfPrice,
+      originalPrice,
+    } = req.body;
     
     const updateData = {
       name,
       category,
       price: Number(price),
-      caloriesPerServing: Number(price),
+      caloriesPerServing: caloriesPerServing !== undefined ? Number(caloriesPerServing) : 350,
       image,
       imageFit: imageFit || "cover",
       isVeg: isVeg === undefined ? (dietary === "Non-Veg" ? false : true) : Boolean(isVeg),
@@ -191,6 +231,13 @@ const updateRecipe = async (req, res) => {
       cuisine
     };
 
+    if (servingInfo !== undefined) updateData.servingInfo = String(servingInfo).trim();
+    if (hasPortions !== undefined) updateData.hasPortions = Boolean(hasPortions);
+    if (halfPrice !== undefined) updateData.halfPrice = Number(halfPrice);
+    if (originalPrice !== undefined) updateData.originalPrice = Number(originalPrice);
+    if (ingredients !== undefined) {
+      updateData.ingredients = Array.isArray(ingredients) ? ingredients : ingredients.split(",").map(s => s.trim()).filter(Boolean);
+    }
     if (inStock !== undefined) {
       updateData.inStock = Boolean(inStock);
     }

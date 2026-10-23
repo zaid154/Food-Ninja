@@ -52,6 +52,7 @@ const Admin = () => {
   const handleAdminLogout = () => {
     sessionStorage.removeItem("adminAuth");
     localStorage.removeItem("adminAuth");
+    localStorage.removeItem("loggedUser");
     setIsAdminAuth(false);
     navigate("/");
   };
@@ -77,7 +78,11 @@ const Admin = () => {
   };
 
   useEffect(() => {
-    if (isAdminAuth) fetchData();
+    if (isAdminAuth) {
+      fetchData();
+      const interval = setInterval(fetchData, 30000);
+      return () => clearInterval(interval);
+    }
   }, [isAdminAuth]);
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {

@@ -7,6 +7,12 @@ const getSettings = async (req, res) => {
     if (!settings) {
       settings = await Settings.create({
         key: "store_settings",
+        restaurantName: "Food Ninja",
+        fssaiNumber: "10020011000123",
+        gstinNumber: "07AAAAF1234A1Z5",
+        storePhone: "+91 98765 43210",
+        storeEmail: "support@foodninja.com",
+        storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
         deliveryFee: 30,
         freeDeliveryThreshold: 499,
         packagingFee: 15,
@@ -26,6 +32,12 @@ const getSettings = async (req, res) => {
 const updateSettings = async (req, res) => {
   try {
     const {
+      restaurantName,
+      fssaiNumber,
+      gstinNumber,
+      storePhone,
+      storeEmail,
+      storeAddress,
       deliveryFee,
       freeDeliveryThreshold,
       packagingFee,
@@ -36,6 +48,12 @@ const updateSettings = async (req, res) => {
     } = req.body;
 
     const updateData = {};
+    if (restaurantName !== undefined) updateData.restaurantName = restaurantName.trim();
+    if (fssaiNumber !== undefined) updateData.fssaiNumber = fssaiNumber.trim();
+    if (gstinNumber !== undefined) updateData.gstinNumber = gstinNumber.trim();
+    if (storePhone !== undefined) updateData.storePhone = storePhone.trim();
+    if (storeEmail !== undefined) updateData.storeEmail = storeEmail.trim();
+    if (storeAddress !== undefined) updateData.storeAddress = storeAddress.trim();
     if (deliveryFee !== undefined) updateData.deliveryFee = Number(deliveryFee);
     if (freeDeliveryThreshold !== undefined) updateData.freeDeliveryThreshold = Number(freeDeliveryThreshold);
     if (packagingFee !== undefined) updateData.packagingFee = Number(packagingFee);

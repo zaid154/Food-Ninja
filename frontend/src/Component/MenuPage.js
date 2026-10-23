@@ -539,14 +539,14 @@ const MenuPage = () => {
                   key={cat.name}
                   type="button"
                   onClick={() => handleCategorySelect(isActive ? "All" : cat.name)}
-                  className={`group relative flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl transition-all duration-200 border-2 text-center cursor-pointer w-[105px] sm:w-[120px] shrink-0 ${cat.bg || "bg-slate-50"} ${
+                  className={`group relative flex flex-col items-center justify-between p-3.5 sm:p-4 rounded-2xl transition-all duration-200 border-2 text-center cursor-pointer w-[120px] sm:w-[140px] shrink-0 ${cat.bg || "bg-slate-50"} ${
                     isActive
                       ? "border-emerald-600 shadow-md bg-white/95 ring-2 ring-emerald-500/20"
                       : "border-transparent hover:border-slate-300/80 hover:shadow-md hover:-translate-y-0.5"
                   }`}
                 >
                   {/* Circular Image */}
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full overflow-hidden bg-white shadow-xs p-0.5 mb-2 shrink-0">
+                  <div className="h-16 w-16 sm:h-18 sm:w-18 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-2.5 shrink-0">
                     <img
                       src={cat.img}
                       alt={cat.name}

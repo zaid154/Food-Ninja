@@ -40,7 +40,7 @@ const AdminOverview = (props) => {
       {/* 6 Professional Metric & Module Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {/* Total Revenue */}
-        <div className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-34">
+        <div className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Revenue</span>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 text-slate-600 font-bold text-xs">
@@ -56,7 +56,7 @@ const AdminOverview = (props) => {
         {/* Live Orders Card */}
         <div
           onClick={() => navigate("/admin/orders")}
-          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-34 transition hover:border-slate-300 hover:shadow-xs group"
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto transition hover:border-slate-300 hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Live Orders</span>
@@ -80,7 +80,7 @@ const AdminOverview = (props) => {
         {/* Food Dishes Card */}
         <div
           onClick={() => navigate("/admin/foods")}
-          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-34 transition hover:border-slate-300 hover:shadow-xs group"
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto transition hover:border-slate-300 hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Food Dishes</span>
@@ -104,7 +104,7 @@ const AdminOverview = (props) => {
         {/* Categories Card */}
         <div
           onClick={() => navigate("/admin/categories")}
-          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-34 transition hover:border-slate-300 hover:shadow-xs group"
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto transition hover:border-slate-300 hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Categories</span>
@@ -128,7 +128,7 @@ const AdminOverview = (props) => {
         {/* Store Settings & Charges Card */}
         <div
           onClick={() => navigate("/admin/settings")}
-          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-34 transition hover:border-slate-300 hover:shadow-xs group"
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto transition hover:border-slate-300 hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Store Charges</span>
@@ -153,7 +153,7 @@ const AdminOverview = (props) => {
         {/* Customer Messages Card */}
         <div
           onClick={() => navigate("/admin/inquiries")}
-          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-34 transition hover:border-slate-300 hover:shadow-xs group"
+          className="cursor-pointer rounded-xl border border-slate-200/90 bg-white p-5 shadow-2xs flex flex-col justify-between h-auto transition hover:border-slate-300 hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Inquiries</span>

@@ -35,17 +35,27 @@ const Checkout = () => {
         : cartItems;
 
     // Structured address fields to ensure 100% valid delivery information
-    const [name, setName] = useState(user ? user.name : "");
-    const [phone, setPhone] = useState("");
-    const [house, setHouse] = useState("");
-    const [street, setStreet] = useState("");
-    const [landmark, setLandmark] = useState("");
-    const [city, setCity] = useState("Delhi NCR");
-    const [pincode, setPincode] = useState("");
+    // Auto-fill from last saved address
+    const lastAddr = (() => { try { const arr = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]"); return arr.length > 0 ? arr[arr.length - 1] : null; } catch { return null; } })();
+    const [name, setName] = useState(user ? user.name : (lastAddr?.name || ""));
+    const [phone, setPhone] = useState(lastAddr?.phone || "");
+    const [house, setHouse] = useState(lastAddr?.house || "");
+    const [street, setStreet] = useState(lastAddr?.street || "");
+    const [landmark, setLandmark] = useState(lastAddr?.landmark || "");
+    const [city, setCity] = useState(lastAddr?.city || "Delhi NCR");
+    const [pincode, setPincode] = useState(lastAddr?.pincode || "");
     const [payment, setPayment] = useState("Cash on Delivery");
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [confirmedOrder, setConfirmedOrder] = useState(null);
+
+    // Load saved address from localStorage on mount
+    const [savedAddresses, setSavedAddresses] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]");
+        } catch { return []; }
+    });
+    const [showSaved, setShowSaved] = useState(false);
 
     const totalItems = items.reduce((n, i) => n + (i.quantity || 1), 0);
     const subtotal = items.reduce(
@@ -146,12 +156,25 @@ const Checkout = () => {
                 dispatch(clearCart());
             }
 
+            // Save address for future auto-fill
+            try {
+                const addrs = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]");
+                const newAddr = { name: name.trim(), phone: cleanPhone, house: house.trim(), street: street.trim(), landmark: landmark.trim(), city: city.trim(), pincode: cleanPincode, label: `${house.trim()}, ${street.trim()}, ${city.trim()}` };
+                const exists = addrs.some(a => a.house === newAddr.house && a.street === newAddr.street && a.pincode === newAddr.pincode);
+                if (!exists) { addrs.push(newAddr); localStorage.setItem("fn_saved_addresses", JSON.stringify(addrs.slice(-5))); }
+            } catch {}
             setConfirmedOrder(newOrder);
         } catch (err) {
             console.error("Order error:", err);
             // Fallback: save to local store even if offline
             dispatch(addOrder(newOrder));
             if (!isBuyNow) dispatch(clearCart());
+            try {
+                const addrs = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]");
+                const newAddr = { name: name.trim(), phone: cleanPhone, house: house.trim(), street: street.trim(), landmark: landmark.trim(), city: city.trim(), pincode: cleanPincode, label: `${house.trim()}, ${street.trim()}, ${city.trim()}` };
+                const exists = addrs.some(a => a.house === newAddr.house && a.street === newAddr.street && a.pincode === newAddr.pincode);
+                if (!exists) { addrs.push(newAddr); localStorage.setItem("fn_saved_addresses", JSON.stringify(addrs.slice(-5))); }
+            } catch {}
             setConfirmedOrder(newOrder);
         } finally {
             setSubmitting(false);
@@ -286,7 +309,7 @@ const Checkout = () => {
                     <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                         <div>
                             <h1 className="text-xl font-black text-slate-900">
-                                Delivery Address & Payment
+                                Delivery & Payment
                             </h1>
                             <p className="text-xs text-slate-500 mt-0.5">Please provide where you want your food delivered.</p>
                         </div>
@@ -296,6 +319,34 @@ const Checkout = () => {
                             </span>
                         )}
                     </div>
+
+                    {/* Saved Addresses Quick-Fill */}
+                    {savedAddresses.length > 0 && (
+                        <div className="mt-4 rounded-lg border border-dashed border-slate-300 bg-slate-50/50 p-3">
+                            <button type="button" onClick={() => setShowSaved(!showSaved)} className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 cursor-pointer">
+                                <span className="flex items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                                    Saved Addresses ({savedAddresses.length})
+                                </span>
+                                <span className="text-slate-400">{showSaved ? "Hide" : "Show"}</span>
+                            </button>
+                            {showSaved && (
+                                <div className="mt-2 space-y-1.5">
+                                    {savedAddresses.map((addr, idx) => (
+                                        <button key={idx} type="button" onClick={() => {
+                                            setName(addr.name || name); setPhone(addr.phone || phone);
+                                            setHouse(addr.house || ""); setStreet(addr.street || "");
+                                            setLandmark(addr.landmark || ""); setCity(addr.city || "Delhi NCR");
+                                            setPincode(addr.pincode || ""); setShowSaved(false);
+                                        }} className="w-full text-left rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 hover:border-emerald-400 hover:bg-emerald-50/40 transition cursor-pointer">
+                                            <p className="font-bold text-slate-800">{addr.label || `${addr.house}, ${addr.street}`}</p>
+                                            <p className="text-[11px] text-slate-400 mt-0.5">{addr.city} - {addr.pincode} | {addr.phone}</p>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     <div className="mt-5 space-y-4">
                         {/* Name and Mobile Grid */}
@@ -441,7 +492,7 @@ const Checkout = () => {
 
                 {/* Order Summary */}
                 <aside className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm h-fit">
-                    <h2 className="text-lg font-black text-slate-900 pb-3 border-b border-slate-100">Order Summary</h2>
+                    <h2 className="text-sm font-black text-slate-900 pb-3 border-b border-slate-100">Order Summary</h2>
 
                     <ul className="mt-4 space-y-3 divide-y divide-slate-100">
                         {items.map((item, idx) => (

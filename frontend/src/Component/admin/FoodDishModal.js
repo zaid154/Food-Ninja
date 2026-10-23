@@ -373,6 +373,76 @@ const FoodDishModal = ({
                 </div>
               </div>
 
+              {/* Portion / Serving Info & Original MRP */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">Portion / Serving Info (Optional)</label>
+                  <input
+                    type="text"
+                    value={foodForm.servingInfo || ""}
+                    onChange={(e) => setFoodForm({ ...foodForm, servingInfo: e.target.value })}
+                    placeholder="e.g. Serves 1-2, 6 Pcs, 500 ml"
+                    className="w-full rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">Original MRP (₹) (Optional)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={foodForm.originalPrice || ""}
+                    onChange={(e) => setFoodForm({ ...foodForm, originalPrice: e.target.value })}
+                    placeholder="e.g. 300 (only for real discount)"
+                    className="w-full rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              {/* Half & Full Plate Option */}
+              <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-2.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(foodForm.hasPortions)}
+                      onChange={(e) => setFoodForm({ ...foodForm, hasPortions: e.target.checked })}
+                      className="h-4 w-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
+                    />
+                    <span className="font-bold text-slate-800 text-[11px]">Enable Half Plate & Full Plate Options</span>
+                  </label>
+                  <span className="text-[10px] text-slate-400 font-medium">Half / Full variant</span>
+                </div>
+
+                {foodForm.hasPortions && (
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-0.5 text-[10px]">Half Plate Price (₹) *</label>
+                      <input
+                        type="number"
+                        min="1"
+                        required={foodForm.hasPortions}
+                        value={foodForm.halfPrice || ""}
+                        onChange={(e) => setFoodForm({ ...foodForm, halfPrice: e.target.value })}
+                        placeholder="e.g. 130"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs outline-none focus:border-emerald-500 font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-0.5 text-[10px]">Full Plate Price (₹) *</label>
+                      <input
+                        type="number"
+                        min="1"
+                        required
+                        value={foodForm.price || ""}
+                        onChange={(e) => setFoodForm({ ...foodForm, price: e.target.value })}
+                        placeholder="e.g. 240"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs outline-none focus:border-emerald-500 font-mono"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Dietary / Food Type */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1 text-[11px]">Dietary / Food Classification *</label>
