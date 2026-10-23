@@ -384,7 +384,7 @@ const AdminSettings = (props) => {
                   {settings.restaurantName || "FOOD NINJA"}
                 </h3>
                 <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
-                  Kitchen Order Ticket & Tax Invoice
+                  Tax Invoice & Delivery Bill
                 </p>
                 <p className="text-[9px] text-slate-600 mt-1 font-semibold">
                   FSSAI: {settings.fssaiNumber || "10020011000123"}
@@ -410,9 +410,11 @@ const AdminSettings = (props) => {
                   <span className="font-bold">ORDER #LIVE-PREVIEW</span>
                   <span className="text-slate-400">Today</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span>CUSTOMER: Mohd Zaid</span>
-                  <span className="font-bold text-emerald-700">PLACED</span>
+                  <span className="rounded bg-amber-100 text-amber-950 font-black px-1.5 py-0.5 border border-amber-300 text-[9px]">
+                    COD: COLLECT ₹{previewGrandTotal}
+                  </span>
                 </div>
               </div>
 
@@ -436,8 +438,14 @@ const AdminSettings = (props) => {
                 </div>
               </div>
 
+              {/* Rider Note Preview */}
+              <div className="p-1.5 rounded-lg border border-amber-300 bg-amber-50 text-center text-[9px] text-amber-950">
+                <span className="font-black block">★ CASH TO COLLECT: ₹{previewGrandTotal} ★</span>
+                <span className="text-[8px] text-slate-600">Rider Note: Collect cash before handover</span>
+              </div>
+
               <div className="pt-2 border-t border-dashed border-slate-300 text-center text-[9px] text-slate-400">
-                <p className="font-bold text-slate-600">*** LIVE DYNAMIC PREVIEW ***</p>
+                <p className="font-bold text-slate-600">*** CUSTOMER BILL & DELIVERY CHALLAN ***</p>
                 <p className="mt-0.5">Edits above update on printed slips immediately</p>
               </div>
             </div>

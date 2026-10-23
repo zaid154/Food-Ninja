@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../utils/cartSlice";
@@ -36,7 +36,7 @@ const Checkout = () => {
 
     // Structured address fields to ensure 100% valid delivery information
     // Auto-fill from last saved address
-    const lastAddr = (() => { try { const arr = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]"); return arr.length > 0 ? arr[arr.length - 1] : null; } catch { return null; } })();
+    const lastAddr = (() => { try { const arr = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]"); return Array.isArray(arr) && arr.length > 0 ? arr[arr.length - 1] : null; } catch { return null; } })();
     const [name, setName] = useState(user ? user.name : (lastAddr?.name || ""));
     const [phone, setPhone] = useState(lastAddr?.phone || "");
     const [house, setHouse] = useState(lastAddr?.house || "");
@@ -52,7 +52,8 @@ const Checkout = () => {
     // Load saved address from localStorage on mount
     const [savedAddresses, setSavedAddresses] = useState(() => {
         try {
-            return JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]");
+            const arr = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]");
+            return Array.isArray(arr) ? arr : [];
         } catch { return []; }
     });
     const [showSaved, setShowSaved] = useState(false);

@@ -42,6 +42,18 @@ const OrderInvoiceModal = ({ order, onClose }) => {
   const taxes = order.taxes !== undefined ? order.taxes : Math.max(0, (order.total || 0) - subtotal - deliveryFee);
   const grandTotal = order.total || (subtotal + deliveryFee + taxes);
 
+  // Check payment mode for Delivery Rider & Customer Cash Collection
+  const isPaidOnline = Boolean(
+    order.payment && (
+      order.payment.toLowerCase().includes("online") ||
+      order.payment.toLowerCase().includes("upi") ||
+      order.payment.toLowerCase().includes("card") ||
+      order.payment.toLowerCase().includes("netbanking") ||
+      order.payment.toLowerCase().includes("prepaid")
+    )
+  );
+  const isCod = !isPaidOnline;
+
   // Isolated Thermal Printer (80mm) Print Engine
   const handlePrint = () => {
     const printContent = document.getElementById("printable-thermal-slip");
@@ -112,7 +124,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             <div style="font-size: 9px; color: #333; margin-top: 2px;">FSSAI: ${settings.fssaiNumber || "10020011000123"} • GSTIN: ${settings.gstinNumber || "07AAAAF1234A1Z5"}</div>
             ${settings.storePhone ? `<div style="font-size: 9px; color: #444; margin-top: 1px;">PHONE: ${settings.storePhone}</div>` : ""}
             <div class="double-divider"></div>
-            <div style="font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">KITCHEN ORDER TICKET (KOT) / TAX INVOICE</div>
+            <div style="font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">TAX INVOICE & DELIVERY BILL</div>
             <div class="divider"></div>
           </div>
 
@@ -122,9 +134,11 @@ const OrderInvoiceModal = ({ order, onClose }) => {
               <span class="font-bold">ORDER ID: #${order.id}</span>
               <span>${order.date || new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
             </div>
-            <div class="row">
-              <span>TYPE: ONLINE DELIVERY</span>
-              <span class="font-bold">[ ${order.status || "PLACED"} ]</span>
+            <div class="row" style="margin-top: 3px; align-items: center;">
+              <span>TYPE: HOME DELIVERY</span>
+              <span style="border: 1.5px solid #000; padding: 1px 6px; font-weight: bold; font-size: 10px;">
+                ${isCod ? `COD: COLLECT ₹${grandTotal}` : "PAID ONLINE (₹0 DUE)"}
+              </span>
             </div>
             <div class="divider"></div>
             <div style="margin: 2px 0;">
@@ -190,18 +204,26 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             <div class="double-divider"></div>
           </div>
 
-          <!-- Payment Info -->
-          <div style="font-size: 10px; margin-top: 4px;">
-            <div class="row">
-              <span class="font-bold">PAYMENT: ${order.payment || "Cash on Delivery"}</span>
-              <span class="font-bold">${order.payment?.includes("UPI") || order.payment?.includes("Card") ? "PAID ONLINE" : "COLLECT CASH"}</span>
+          <!-- Payment Info & Rider Collection Box -->
+          <div style="border: 1.5px solid #000; padding: 5px 6px; margin: 6px 0; text-align: center;">
+            <div style="font-size: 12px; font-weight: 900; letter-spacing: 0.5px;">
+              ${isCod ? `★ CASH TO COLLECT: ₹${grandTotal} ★` : "✓ PAID ONLINE — ₹0 TO COLLECT"}
             </div>
+            <div style="font-size: 8.5px; font-weight: bold; margin-top: 2px;">
+              ${isCod ? "RIDER: Collect exact cash from customer before food handover" : "RIDER: Order prepaid online. Do NOT collect cash from customer"}
+            </div>
+          </div>
+
+          <!-- Handover Signatures -->
+          <div class="row" style="font-size: 9px; margin-top: 6px; padding-top: 4px; border-top: 1px dashed #000;">
+            <span>Rider: ________________</span>
+            <span>Customer: ________________</span>
           </div>
 
           <div class="divider"></div>
           <div class="text-center" style="font-size: 9px; margin-top: 6px;">
-            <div>*** THANK YOU FOR ORDERING ***</div>
-            <div>FRESH • HYGIENIC • FAST DELIVERY</div>
+            <div class="font-bold">*** CUSTOMER TAX INVOICE & DELIVERY BILL ***</div>
+            <div>Thank you for ordering with ${(settings.restaurantName || "FOOD NINJA").toUpperCase()}!</div>
           </div>
         </body>
       </html>
@@ -253,8 +275,8 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             <h2 className="text-base font-black tracking-wider text-slate-900 uppercase">
               {settings.restaurantName || "FOOD NINJA"}
             </h2>
-            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
-              Kitchen Order Ticket & Tax Invoice
+            <p className="text-[9.5px] font-bold text-slate-600 uppercase tracking-widest mt-0.5">
+              Tax Invoice & Delivery Bill
             </p>
             <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
               FSSAI: {settings.fssaiNumber || "10020011000123"} • GST: {settings.gstinNumber || "07AAAAF1234A1Z5"}
@@ -273,10 +295,16 @@ const OrderInvoiceModal = ({ order, onClose }) => {
               <span className="text-slate-500 text-[10px]">{order.date || "Today"}</span>
             </div>
             <div className="flex justify-between items-center text-[10px]">
-              <span className="text-slate-500">TYPE: ONLINE DELIVERY</span>
-              <span className="rounded bg-emerald-50 text-emerald-800 font-bold px-1.5 py-0.5 border border-emerald-200">
-                {order.status || "Placed"}
-              </span>
+              <span className="text-slate-500 font-bold">TYPE: HOME DELIVERY</span>
+              {isCod ? (
+                <span className="rounded-md bg-amber-100 text-amber-950 font-black px-2 py-0.5 border border-amber-300 text-[10px] tracking-wide">
+                  COD: COLLECT ₹{grandTotal}
+                </span>
+              ) : (
+                <span className="rounded-md bg-emerald-100 text-emerald-950 font-black px-2 py-0.5 border border-emerald-300 text-[10px] tracking-wide">
+                  PAID ONLINE (₹0 DUE)
+                </span>
+              )}
             </div>
             <div className="pt-1.5 border-t border-slate-100 text-[10.5px] leading-snug">
               <div>
@@ -342,21 +370,32 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             </div>
           </div>
 
-          {/* Payment Mode */}
-          <div className="pt-2 text-[10px] flex justify-between items-center text-slate-600">
-            <div>
-              <span className="font-bold text-slate-700">PAYMENT: </span>
-              <span>{order.payment || "Cash on Delivery"}</span>
-            </div>
-            <span className="font-bold text-slate-900">
-              {order.payment?.includes("UPI") || order.payment?.includes("Card") ? "PAID" : "COLLECT CASH"}
-            </span>
+          {/* Delivery Rider & Customer Cash Collection Highlight Box */}
+          <div className={`mt-2.5 p-2 rounded-lg border-2 text-center ${
+            isCod 
+              ? "border-amber-400 bg-amber-50 text-amber-950" 
+              : "border-emerald-400 bg-emerald-50 text-emerald-950"
+          }`}>
+            <p className="text-xs font-black tracking-wide">
+              {isCod ? `★ CASH TO COLLECT: ₹${grandTotal} ★` : "✓ PAID ONLINE — ₹0 TO COLLECT"}
+            </p>
+            <p className="text-[9.5px] font-semibold mt-0.5 text-slate-700">
+              {isCod 
+                ? "Rider Note: Collect exact cash from customer upon food handover" 
+                : "Rider Note: Order is prepaid online. Do NOT collect any cash"}
+            </p>
           </div>
 
-          {/* Kitchen Footer Note */}
-          <div className="mt-3 pt-2 border-t border-dashed border-slate-200 text-center text-[9px] text-slate-400">
-            <p className="font-bold text-slate-600">*** KOT READY FOR KITCHEN ***</p>
-            <p className="mt-0.5">Thank you for ordering with Food Ninja!</p>
+          {/* Delivery Rider & Customer Handover Signature Line */}
+          <div className="mt-2.5 pt-2 border-t border-dashed border-slate-200 flex justify-between text-[9px] text-slate-500 font-semibold">
+            <span>Rider: ________________</span>
+            <span>Customer Sign: ________________</span>
+          </div>
+
+          {/* Receipt Footer Note */}
+          <div className="mt-2.5 pt-2 border-t border-dashed border-slate-200 text-center text-[9px] text-slate-400">
+            <p className="font-bold text-slate-600">*** CUSTOMER TAX INVOICE & DELIVERY BILL ***</p>
+            <p className="mt-0.5">Thank you for ordering with {settings.restaurantName || "Food Ninja"}!</p>
           </div>
         </div>
 
