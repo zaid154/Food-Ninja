@@ -50,6 +50,26 @@ const Contact = () => {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
+  const [storeSettings, setStoreSettings] = useState({
+    restaurantName: "Food Ninja",
+    fssaiNumber: "10020011000123",
+    gstinNumber: "07AAAAF1234A1Z5",
+    storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
+    storePhone: "+91 98765 43210",
+    storeEmail: "support@foodninja.com",
+  });
+
+  useEffect(() => {
+    if (typeof fetch !== "undefined") {
+      fetch(`${API_BASE_URL}/settings`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d && d.settings) setStoreSettings(d.settings);
+        })
+        .catch(() => {});
+    }
+  }, []);
+
   useEffect(() => {
     if (typeof window !== "undefined" && window.scrollTo) {
       window.scrollTo(0, 0);
@@ -298,29 +318,35 @@ const Contact = () => {
 
               <div className="mt-5 space-y-3 text-xs text-slate-600 border-t border-slate-200/60 pt-4">
                 <div>
-                  <strong className="text-slate-900 block font-bold">Registered Office:</strong>
-                  <span className="text-slate-500">FoodNinja Corporate Tower, Connaught Place, New Delhi 110001, India</span>
+                  <strong className="text-slate-900 block font-bold">Kitchen & Outlet Address:</strong>
+                  <span className="text-slate-500">{storeSettings.storeAddress || "FoodNinja Kitchen, Connaught Place, New Delhi 110001, India"}</span>
                 </div>
 
                 <div>
                   <strong className="text-slate-900 block font-bold">Kitchen & Helpline Phone:</strong>
-                  <a href="tel:+919876543210" className="text-emerald-700 font-semibold hover:underline">+91 98765 43210</a>
+                  <a href={`tel:${(storeSettings.storePhone || "+919876543210").replace(/\s/g, "")}`} className="text-emerald-700 font-semibold hover:underline">
+                    {storeSettings.storePhone || "+91 98765 43210"}
+                  </a>
                   <span className="text-[10px] text-slate-400 block mt-0.5">Kitchen Operational Hours: Mon–Sun, 9:00 AM – 11:30 PM</span>
                 </div>
 
                 <div>
                   <strong className="text-slate-900 block font-bold">Priority Customer Support:</strong>
-                  <a href="mailto:foodninja@gmail.com" className="text-emerald-700 font-semibold hover:underline">foodninja@gmail.com</a>
+                  <a href={`mailto:${storeSettings.storeEmail || "support@foodninja.com"}`} className="text-emerald-700 font-semibold hover:underline">
+                    {storeSettings.storeEmail || "support@foodninja.com"}
+                  </a>
                 </div>
 
                 <div>
                   <strong className="text-slate-900 block font-bold">Food Safety & Compliance:</strong>
-                  <span className="text-slate-500">FSSAI Lic. No. 13324001000452 (Single Commercial Kitchen)</span>
+                  <span className="text-slate-500 font-mono">FSSAI Lic. No. {storeSettings.fssaiNumber || "10020011000123"} • GSTIN: {storeSettings.gstinNumber || "07AAAAF1234A1Z5"}</span>
                 </div>
 
                 <div>
                   <strong className="text-slate-900 block font-bold">Statutory Grievance Redressal Desk:</strong>
-                  <a href="mailto:foodninja@gmail.com" className="text-emerald-700 font-semibold hover:underline">foodninja@gmail.com</a>
+                  <a href={`mailto:${storeSettings.storeEmail || "support@foodninja.com"}`} className="text-emerald-700 font-semibold hover:underline">
+                    {storeSettings.storeEmail || "support@foodninja.com"}
+                  </a>
                   <span className="text-[10px] text-slate-400 block mt-0.5">Turnaround: 24–48 hours statutory acknowledgment</span>
                 </div>
               </div>

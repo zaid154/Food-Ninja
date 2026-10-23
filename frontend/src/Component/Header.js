@@ -5,6 +5,7 @@ import { clearCart } from "../utils/cartSlice";
 import { clearWishlist } from "../utils/wishlistSlice";
 import UserContext from "./Usercontext";
 import BrandLogo from "./BrandLogo";
+import { API_BASE_URL } from "../utils/Constants";
 
 const Header = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -31,6 +32,19 @@ const Header = () => {
       setSearchOpen(true);
     }
   }, [location.search]);
+
+  const [storeSettings, setStoreSettings] = useState(null);
+
+  useEffect(() => {
+    if (typeof fetch !== "undefined") {
+      fetch(`${API_BASE_URL}/settings`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d && d.settings) setStoreSettings(d.settings);
+        })
+        .catch(() => {});
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const adminSession = sessionStorage.getItem("adminAuth") === "true";
@@ -112,6 +126,12 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
+      {/* Dynamic Announcement Banner from Admin Settings */}
+      {storeSettings?.announcement && (
+        <div className="bg-emerald-700 text-white text-[11px] font-semibold py-1 px-4 text-center tracking-wide">
+          <span>{storeSettings.announcement}</span>
+        </div>
+      )}
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 sm:px-10 py-3.5">
         {/* Brand Logo (Leaf in dark bowl + FoodNinja) */}
         <BrandLogo to="/" size="md" hideSubtitle={true} />

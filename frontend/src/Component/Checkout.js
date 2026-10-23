@@ -57,18 +57,46 @@ const Checkout = () => {
     });
     const [showSaved, setShowSaved] = useState(false);
 
+    const [settings, setSettings] = useState({
+        deliveryFee: 30,
+        freeDeliveryThreshold: 499,
+        packagingFee: 15,
+        taxRate: 5,
+        restaurantOpen: true,
+        restaurantName: "Food Ninja",
+        fssaiNumber: "10020011000123",
+        gstinNumber: "07AAAAF1234A1Z5",
+    });
+
+    useEffect(() => {
+        if (typeof fetch !== "undefined") {
+            fetch(`${API_BASE_URL}/settings`)
+                .then((r) => r.json())
+                .then((d) => {
+                    if (d && d.settings) setSettings(d.settings);
+                })
+                .catch(() => {});
+        }
+    }, []);
+
     const totalItems = items.reduce((n, i) => n + (i.quantity || 1), 0);
     const subtotal = items.reduce(
         (sum, item) => sum + (item.price || item.caloriesPerServing || 0) * (item.quantity || 1),
         0
     );
-    const deliveryFee = totalItems > 0 ? 30 : 0;
-    const taxes = Math.round(subtotal * 0.05);
+    const isFreeDelivery = subtotal >= (settings.freeDeliveryThreshold || 499);
+    const deliveryFee = totalItems > 0 ? (isFreeDelivery ? 0 : (settings.deliveryFee ?? 30)) : 0;
+    const taxes = totalItems > 0 ? Math.round(subtotal * ((settings.taxRate ?? 5) / 100)) : 0;
     const grandTotal = subtotal + deliveryFee + taxes;
 
     const placeOrder = async (e) => {
         e.preventDefault();
         setError("");
+
+        if (!settings.restaurantOpen) {
+            setError("The restaurant is currently closed and not accepting new orders.");
+            return;
+        }
 
         // 1. Validate Name
         if (!name.trim() || name.trim().length < 3 || isGibberish(name)) {
@@ -244,7 +272,7 @@ const Checkout = () => {
                             <span className="font-bold text-slate-800">₹{confirmedOrder.deliveryFee || deliveryFee}</span>
                         </div>
                         <div className="flex justify-between text-slate-600">
-                            <span>Govt. Taxes (5% GST)</span>
+                            <span>Govt. Taxes ({settings.taxRate ?? 5}% GST)</span>
                             <span className="font-bold text-slate-800">₹{confirmedOrder.taxes || taxes}</span>
                         </div>
                         <div className="flex justify-between border-t border-dashed border-slate-300 pt-2 text-sm font-black text-slate-900">
@@ -518,7 +546,7 @@ const Checkout = () => {
                             <span className="font-bold text-slate-900">₹{deliveryFee}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span>Govt. Taxes (5% GST)</span>
+                            <span>Govt. Taxes ({settings.taxRate ?? 5}% GST)</span>
                             <span className="font-bold text-slate-900">₹{taxes}</span>
                         </div>
                     </div>

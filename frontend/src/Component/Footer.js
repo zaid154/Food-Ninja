@@ -1,8 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import BrandLogo from "./BrandLogo";
+import { API_BASE_URL } from "../utils/Constants";
 
 const Footer = () => {
+  const [settings, setSettings] = useState({
+    restaurantName: "Food Ninja",
+    fssaiNumber: "10020011000123",
+    gstinNumber: "07AAAAF1234A1Z5",
+    storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
+    storePhone: "+91 98765 43210",
+  });
+
+  useEffect(() => {
+    if (typeof fetch !== "undefined") {
+      fetch(`${API_BASE_URL}/settings`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d && d.settings) setSettings(d.settings);
+        })
+        .catch(() => {});
+    }
+  }, []);
+
   return (
     <footer className="bg-[#111928] text-slate-300 mt-10 sm:mt-12 pt-10 sm:pt-12 pb-8">
       <div className="mx-auto max-w-7xl px-6">
@@ -13,6 +33,11 @@ const Footer = () => {
             <p className="mt-4 text-xs text-slate-400 leading-relaxed max-w-xs">
               Delicious meals crafted with fresh ingredients, delivered hot and fresh directly to your doorstep.
             </p>
+            {settings.storePhone && (
+              <p className="mt-3 text-xs text-emerald-400 font-semibold">
+                Helpline: {settings.storePhone}
+              </p>
+            )}
           </div>
 
           {/* Col 2: Quick Links */}
@@ -86,8 +111,18 @@ const Footer = () => {
 
         {/* Bottom Legal / Copyright Row */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 text-[11px] text-slate-500">
-          <p>© 2025 FoodNinja. All rights reserved.</p>
-          <p className="font-medium text-slate-400">Good Food • Happy People</p>
+          <div>
+            <p>© {new Date().getFullYear()} {settings.restaurantName || "Food Ninja"}. All rights reserved.</p>
+            <p className="text-[10px] text-slate-400 mt-1 font-mono">
+              FSSAI Lic. No: {settings.fssaiNumber || "10020011000123"} • GSTIN: {settings.gstinNumber || "07AAAAF1234A1Z5"}
+            </p>
+          </div>
+          <div className="text-center sm:text-right">
+            <p className="font-medium text-slate-400">Good Food • Happy People</p>
+            {settings.storeAddress && (
+              <p className="text-[10px] text-slate-500 mt-0.5">{settings.storeAddress}</p>
+            )}
+          </div>
         </div>
       </div>
     </footer>

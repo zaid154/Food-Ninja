@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { API_BASE_URL } from "../../utils/Constants";
 
 /**
  * Kitchen Order Ticket (KOT) & Tax Invoice Slip Modal
@@ -7,6 +8,25 @@ import React from "react";
  */
 const OrderInvoiceModal = ({ order, onClose }) => {
   if (!order) return null;
+
+  const [settings, setSettings] = useState({
+    restaurantName: "Food Ninja",
+    fssaiNumber: "10020011000123",
+    gstinNumber: "07AAAAF1234A1Z5",
+    storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
+    storePhone: "+91 98765 43210",
+  });
+
+  useEffect(() => {
+    if (typeof fetch !== "undefined") {
+      fetch(`${API_BASE_URL}/settings`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d && d.settings) setSettings(d.settings);
+        })
+        .catch(() => {});
+    }
+  }, []);
 
   const items = order.items || [];
 
@@ -87,9 +107,10 @@ const OrderInvoiceModal = ({ order, onClose }) => {
         </head>
         <body>
           <div class="text-center">
-            <h2 style="margin: 0; font-size: 18px; font-weight: 900; letter-spacing: 1px;">FOOD NINJA</h2>
-            <div style="font-size: 9px; margin-top: 2px;">AUTHENTIC RESTAURANT & FAST KITCHEN</div>
-            <div style="font-size: 9px; color: #333; margin-top: 2px;">FSSAI: 10020042001234 • GST: 27AABCF1234P1Z5</div>
+            <h2 style="margin: 0; font-size: 18px; font-weight: 900; letter-spacing: 1px;">${(settings.restaurantName || "FOOD NINJA").toUpperCase()}</h2>
+            <div style="font-size: 9px; margin-top: 2px;">${(settings.storeAddress || "AUTHENTIC RESTAURANT & FAST KITCHEN").toUpperCase()}</div>
+            <div style="font-size: 9px; color: #333; margin-top: 2px;">FSSAI: ${settings.fssaiNumber || "10020011000123"} • GSTIN: ${settings.gstinNumber || "07AAAAF1234A1Z5"}</div>
+            ${settings.storePhone ? `<div style="font-size: 9px; color: #444; margin-top: 1px;">PHONE: ${settings.storePhone}</div>` : ""}
             <div class="double-divider"></div>
             <div style="font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">KITCHEN ORDER TICKET (KOT) / TAX INVOICE</div>
             <div class="divider"></div>
@@ -229,13 +250,20 @@ const OrderInvoiceModal = ({ order, onClose }) => {
           
           {/* Receipt Brand Header */}
           <div className="text-center pb-2 border-b border-dashed border-slate-300">
-            <h2 className="text-base font-black tracking-wider text-slate-900">FOOD NINJA</h2>
+            <h2 className="text-base font-black tracking-wider text-slate-900 uppercase">
+              {settings.restaurantName || "FOOD NINJA"}
+            </h2>
             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
               Kitchen Order Ticket & Tax Invoice
             </p>
-            <p className="text-[9px] text-slate-400 mt-0.5">
-              FSSAI: 10020042001234 • GST: 27AABCF1234P1Z5
+            <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
+              FSSAI: {settings.fssaiNumber || "10020011000123"} • GST: {settings.gstinNumber || "07AAAAF1234A1Z5"}
             </p>
+            {settings.storeAddress && (
+              <p className="text-[8.5px] text-slate-400 mt-0.5 truncate">
+                {settings.storeAddress}
+              </p>
+            )}
           </div>
 
           {/* Balanced Metadata (Zero empty void) */}
@@ -306,7 +334,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             </div>
             <div className="flex justify-between text-slate-600">
               <span>Restaurant Packaging & GST</span>
-              <span>₹${taxes}</span>
+              <span>₹{taxes}</span>
             </div>
             <div className="flex justify-between pt-1.5 border-t border-slate-200 text-sm font-black text-slate-900">
               <span>GRAND TOTAL</span>
