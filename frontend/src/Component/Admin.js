@@ -231,13 +231,41 @@ const Admin = () => {
     <div className="min-h-screen bg-slate-100/70 text-slate-900 flex flex-col">
       {/* Top Admin Header Bar */}
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-2xs">
-        {/* Top Branding Row */}
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3.5">
-          {/* Brand Logo - identical to main store header */}
-          <BrandLogo to="/admin" size="md" hideSubtitle={true} />
+        {/* Top Branding & Main Navigation Row (Unified, No Empty Void) */}
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3">
+          {/* Left: Brand Logo */}
+          <div className="shrink-0">
+            <BrandLogo to="/admin" size="md" hideSubtitle={true} />
+          </div>
 
-          {/* User Profile Avatar with dropdown (exact match to main store header) */}
-          <div className="relative" ref={dropdownRef}>
+          {/* Center: Desktop Navigation Tabs (Fills Header Space Cleanly) */}
+          <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                end={link.end}
+                className={({ isActive }) =>
+                  `flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition whitespace-nowrap ${
+                    isActive
+                      ? "bg-slate-900 text-white font-bold shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                  }`
+                }
+              >
+                {link.icon}
+                <span>{link.label}</span>
+                {link.badge !== null && (
+                  <span className="rounded-full bg-emerald-100 text-emerald-800 px-1.5 py-0.2 text-[9px] font-bold">
+                    {link.badge}
+                  </span>
+                )}
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* Right: User Profile Avatar with dropdown (exact match to main store header) */}
+          <div className="relative shrink-0" ref={dropdownRef}>
             <button
               type="button"
               onClick={() => setUserDropdown(!userDropdown)}
@@ -306,26 +334,26 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Clean Top Navigation Bar (Tabs) */}
-        <div className="border-t border-slate-100 bg-white">
-          <div className="mx-auto flex max-w-7xl items-center gap-1 px-4 sm:px-6 lg:px-8 overflow-x-auto scrollbar-none text-xs font-semibold">
+        {/* Mobile / Tablet Horizontal Navigation Tabs (Hidden on Desktop) */}
+        <div className="lg:hidden border-t border-slate-100 bg-white">
+          <div className="mx-auto flex max-w-7xl items-center gap-1 px-4 sm:px-6 overflow-x-auto scrollbar-none text-xs font-semibold py-2">
             {navLinks.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 end={link.end}
                 className={({ isActive }) =>
-                  `flex items-center gap-2 px-4 py-3 border-b-2 transition whitespace-nowrap ${
+                  `flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition whitespace-nowrap ${
                     isActive
-                      ? "border-emerald-600 text-slate-900 font-bold"
-                      : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300"
+                      ? "bg-slate-900 text-white font-bold"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`
                 }
               >
                 {link.icon}
                 <span>{link.label}</span>
                 {link.badge !== null && (
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                  <span className="rounded-full bg-emerald-100 text-emerald-800 px-1.5 py-0.2 text-[9px] font-bold">
                     {link.badge}
                   </span>
                 )}

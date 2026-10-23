@@ -68,7 +68,7 @@ const AdminSettings = (props) => {
       });
       const data = await res.json();
       if (res.ok) {
-        showToast("Settings and legal details saved successfully!");
+        showToast("All settings & legal details saved successfully!");
       } else {
         alert(data.message || "Failed to save settings.");
       }
@@ -79,16 +79,22 @@ const AdminSettings = (props) => {
     }
   };
 
+  // Live computed preview values
+  const previewSubtotal = 1490;
+  const previewTax = Math.round(previewSubtotal * ((settings.taxRate || 5) / 100));
+  const previewDelivery = previewSubtotal >= (settings.freeDeliveryThreshold || 499) ? 0 : (settings.deliveryFee || 30);
+  const previewGrandTotal = previewSubtotal + previewDelivery + previewTax;
+
   return (
-    <div className="space-y-6 max-w-5xl">
-      {/* Clean Integrated Page Header */}
+    <div className="space-y-6 w-full">
+      {/* Page Title & Status Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
         <div>
           <h1 className="text-xl font-black tracking-tight text-slate-900">
             Store & Legal Settings
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Manage FSSAI license, GSTIN, pricing, delivery thresholds, and live restaurant status
+            Configure dynamic statutory compliance, restaurant branding, taxes, fees, and operational status
           </p>
         </div>
 
@@ -124,237 +130,332 @@ const AdminSettings = (props) => {
         </div>
       </div>
 
-      {/* Single Scrollable Form containing all 3 sections */}
-      <form onSubmit={handleSave} className="space-y-6">
-        {/* Section 1: Business & Compliance */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
-          <div className="border-b border-slate-100 pb-3">
-            <h2 className="font-bold text-slate-900 text-sm">Restaurant Brand & Compliance</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Legal details printed on customer invoices, KOT slips, and website footer</p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 text-xs">
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Restaurant / Brand Name *</label>
-              <input
-                type="text"
-                required
-                value={settings.restaurantName}
-                onChange={(e) => setSettings({ ...settings, restaurantName: e.target.value })}
-                placeholder="e.g. Food Ninja"
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500 font-semibold"
-              />
+      {/* 2-Column Balanced Dashboard (Zero Empty Space) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column (7 cols): The 3 Scrollable Form Sections */}
+        <form onSubmit={handleSave} className="lg:col-span-7 space-y-5">
+          {/* Section 1: Business & Compliance */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
+            <div className="border-b border-slate-100 pb-3">
+              <h2 className="font-bold text-slate-900 text-sm">Restaurant Brand & Compliance</h2>
+              <p className="text-xs text-slate-400 mt-0.5">Printed live on customer invoices, KOT slips, and website footer</p>
             </div>
 
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">FSSAI License Number (14 digits) *</label>
-              <input
-                type="text"
-                maxLength={14}
-                value={settings.fssaiNumber}
-                onChange={(e) => setSettings({ ...settings, fssaiNumber: e.target.value })}
-                placeholder="e.g. 10020011000123"
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500 font-mono"
-              />
-              <span className="text-[10px] text-slate-400">Printed on bill slips and footer</span>
-            </div>
+            <div className="grid gap-3.5 sm:grid-cols-2 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Restaurant / Brand Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={settings.restaurantName}
+                  onChange={(e) => setSettings({ ...settings, restaurantName: e.target.value })}
+                  placeholder="e.g. Food Ninja"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-semibold"
+                />
+              </div>
 
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">GSTIN Number (15 characters) *</label>
-              <input
-                type="text"
-                maxLength={15}
-                value={settings.gstinNumber}
-                onChange={(e) => setSettings({ ...settings, gstinNumber: e.target.value.toUpperCase() })}
-                placeholder="e.g. 07AAAAF1234A1Z5"
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500 font-mono uppercase"
-              />
-              <span className="text-[10px] text-slate-400">Mandatory for GST compliant tax invoicing</span>
-            </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">FSSAI License Number (14 digits) *</label>
+                <input
+                  type="text"
+                  maxLength={14}
+                  value={settings.fssaiNumber}
+                  onChange={(e) => setSettings({ ...settings, fssaiNumber: e.target.value })}
+                  placeholder="e.g. 10020011000123"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono"
+                />
+                <span className="text-[10px] text-slate-400">Printed on bill slips and footer</span>
+              </div>
 
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Customer Support Phone</label>
-              <input
-                type="text"
-                value={settings.storePhone}
-                onChange={(e) => setSettings({ ...settings, storePhone: e.target.value })}
-                placeholder="e.g. +91 98765 43210"
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500"
-              />
-            </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">GSTIN Number (15 characters) *</label>
+                <input
+                  type="text"
+                  maxLength={15}
+                  value={settings.gstinNumber}
+                  onChange={(e) => setSettings({ ...settings, gstinNumber: e.target.value.toUpperCase() })}
+                  placeholder="e.g. 07AAAAF1234A1Z5"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono uppercase"
+                />
+                <span className="text-[10px] text-slate-400">Mandatory for GST compliant tax invoicing</span>
+              </div>
 
-            <div className="sm:col-span-2">
-              <label className="block font-bold text-slate-700 mb-1">Support Email Address</label>
-              <input
-                type="email"
-                value={settings.storeEmail}
-                onChange={(e) => setSettings({ ...settings, storeEmail: e.target.value })}
-                placeholder="e.g. support@foodninja.com"
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500"
-              />
-            </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Customer Support Phone</label>
+                <input
+                  type="text"
+                  value={settings.storePhone}
+                  onChange={(e) => setSettings({ ...settings, storePhone: e.target.value })}
+                  placeholder="e.g. +91 98765 43210"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500"
+                />
+              </div>
 
-            <div className="sm:col-span-2">
-              <label className="block font-bold text-slate-700 mb-1">Kitchen / Outlet Address</label>
-              <textarea
-                rows={2}
-                value={settings.storeAddress}
-                onChange={(e) => setSettings({ ...settings, storeAddress: e.target.value })}
-                placeholder="e.g. Shop 12, Food Street, Sector 62, Delhi NCR"
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500 resize-none"
-              />
-            </div>
-          </div>
-        </div>
+              <div className="sm:col-span-2">
+                <label className="block font-bold text-slate-700 mb-1">Support Email Address</label>
+                <input
+                  type="email"
+                  value={settings.storeEmail}
+                  onChange={(e) => setSettings({ ...settings, storeEmail: e.target.value })}
+                  placeholder="e.g. support@foodninja.com"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500"
+                />
+              </div>
 
-        {/* Section 2: Fees & Taxes */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
-          <div className="border-b border-slate-100 pb-3">
-            <h2 className="font-bold text-slate-900 text-sm">Fees, Thresholds & Taxes</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Applied automatically during cart checkout calculations</p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 text-xs">
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Standard Delivery Fee (₹) *</label>
-              <input
-                type="number"
-                required
-                min="0"
-                value={settings.deliveryFee}
-                onChange={(e) => setSettings({ ...settings, deliveryFee: Number(e.target.value) })}
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500 font-mono"
-              />
-              <span className="text-[10px] text-slate-400">Default delivery fee charged on orders</span>
-            </div>
-
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Free Delivery Threshold (₹) *</label>
-              <input
-                type="number"
-                required
-                min="0"
-                value={settings.freeDeliveryThreshold}
-                onChange={(e) => setSettings({ ...settings, freeDeliveryThreshold: Number(e.target.value) })}
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500 font-mono"
-              />
-              <span className="text-[10px] text-slate-400">Orders above this cart value get free delivery (₹0)</span>
-            </div>
-
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Packaging / Handling Fee (₹) *</label>
-              <input
-                type="number"
-                required
-                min="0"
-                value={settings.packagingFee}
-                onChange={(e) => setSettings({ ...settings, packagingFee: Number(e.target.value) })}
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500 font-mono"
-              />
-              <span className="text-[10px] text-slate-400">Container & spill-proof packaging charge</span>
-            </div>
-
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Govt. Tax / GST Rate (%) *</label>
-              <input
-                type="number"
-                required
-                min="0"
-                max="28"
-                value={settings.taxRate}
-                onChange={(e) => setSettings({ ...settings, taxRate: Number(e.target.value) })}
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500 font-mono"
-              />
-              <span className="text-[10px] text-slate-400">Standard restaurant service tax (typically 5%)</span>
+              <div className="sm:col-span-2">
+                <label className="block font-bold text-slate-700 mb-1">Kitchen / Outlet Address</label>
+                <textarea
+                  rows={2}
+                  value={settings.storeAddress}
+                  onChange={(e) => setSettings({ ...settings, storeAddress: e.target.value })}
+                  placeholder="e.g. Shop 12, Food Street, Sector 62, Delhi NCR"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 resize-none"
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Section 3: Operations & Announcements */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
-          <div className="border-b border-slate-100 pb-3">
-            <h2 className="font-bold text-slate-900 text-sm">Store Operations & Announcement Banner</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Control live order intake and customer announcements</p>
+          {/* Section 2: Fees & Taxes */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
+            <div className="border-b border-slate-100 pb-3">
+              <h2 className="font-bold text-slate-900 text-sm">Fees, Thresholds & Taxes</h2>
+              <p className="text-xs text-slate-400 mt-0.5">Applied automatically during cart checkout calculations</p>
+            </div>
+
+            <div className="grid gap-3.5 sm:grid-cols-2 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Standard Delivery Fee (₹) *</label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={settings.deliveryFee}
+                  onChange={(e) => setSettings({ ...settings, deliveryFee: Number(e.target.value) })}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono"
+                />
+                <span className="text-[10px] text-slate-400">Default delivery fee charged on orders</span>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Free Delivery Threshold (₹) *</label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={settings.freeDeliveryThreshold}
+                  onChange={(e) => setSettings({ ...settings, freeDeliveryThreshold: Number(e.target.value) })}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono"
+                />
+                <span className="text-[10px] text-slate-400">Orders above this cart value get free delivery (₹0)</span>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Packaging / Handling Fee (₹) *</label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={settings.packagingFee}
+                  onChange={(e) => setSettings({ ...settings, packagingFee: Number(e.target.value) })}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono"
+                />
+                <span className="text-[10px] text-slate-400">Container & spill-proof packaging charge</span>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Govt. Tax / GST Rate (%) *</label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  max="28"
+                  value={settings.taxRate}
+                  onChange={(e) => setSettings({ ...settings, taxRate: Number(e.target.value) })}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono"
+                />
+                <span className="text-[10px] text-slate-400">Standard restaurant service tax (typically 5%)</span>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-4 text-xs">
-            <div>
-              <label className="block font-bold text-slate-700 mb-1.5">Live Store Status</label>
-              <div className="grid grid-cols-2 gap-3 max-w-md">
-                <button
-                  type="button"
-                  onClick={() => setSettings({ ...settings, restaurantOpen: true })}
-                  className={`rounded-xl border py-3 px-4 font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                    settings.restaurantOpen
-                      ? "border-emerald-600 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-500/20"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-600" />
-                  <span>Open for Orders</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSettings({ ...settings, restaurantOpen: false })}
-                  className={`rounded-xl border py-3 px-4 font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                    !settings.restaurantOpen
-                      ? "border-rose-600 bg-rose-50 text-rose-800 ring-2 ring-rose-500/20"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  <span className="h-2.5 w-2.5 rounded-full bg-rose-600" />
-                  <span>Closed (Pause)</span>
-                </button>
+          {/* Section 3: Operations & Announcements */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
+            <div className="border-b border-slate-100 pb-3">
+              <h2 className="font-bold text-slate-900 text-sm">Store Operations & Announcement Banner</h2>
+              <p className="text-xs text-slate-400 mt-0.5">Control live order intake and customer announcements</p>
+            </div>
+
+            <div className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1.5">Live Store Status</label>
+                <div className="grid grid-cols-2 gap-3 max-w-md">
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, restaurantOpen: true })}
+                    className={`rounded-xl border py-2.5 px-3 font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                      settings.restaurantOpen
+                        ? "border-emerald-600 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-500/20"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span className="h-2 w-2 rounded-full bg-emerald-600" />
+                    <span>Open for Orders</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, restaurantOpen: false })}
+                    className={`rounded-xl border py-2.5 px-3 font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                      !settings.restaurantOpen
+                        ? "border-rose-600 bg-rose-50 text-rose-800 ring-2 ring-rose-500/20"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span className="h-2 w-2 rounded-full bg-rose-600" />
+                    <span>Closed (Pause)</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="max-w-md">
+                <label className="block font-bold text-slate-700 mb-1">Minimum Order Value (₹) *</label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={settings.minOrderValue}
+                  onChange={(e) => setSettings({ ...settings, minOrderValue: Number(e.target.value) })}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono"
+                />
+                <span className="text-[10px] text-slate-400">Checkout is blocked if total is below this amount</span>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Storefront Announcement Banner</label>
+                <textarea
+                  rows={2}
+                  value={settings.announcement}
+                  onChange={(e) => setSettings({ ...settings, announcement: e.target.value })}
+                  placeholder="e.g. Free delivery on orders above ₹499! Enjoy freshly cooked authentic meals."
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 resize-none"
+                />
+                <span className="text-[10px] text-slate-400">Broadcasted across customer store notice bar</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Save Action Button */}
+          <div className="flex items-center justify-end gap-3 pt-2 pb-6">
+            <button
+              type="submit"
+              disabled={saving || loading}
+              className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-6 py-3 text-xs font-bold text-white shadow-xs transition cursor-pointer disabled:opacity-50"
+            >
+              {saving ? (
+                <span>Saving Changes...</span>
+              ) : (
+                <>
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Save All Settings</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+
+        {/* Right Column (5 cols): Real-Time Live KOT Slip & Invoice Preview */}
+        <aside className="lg:col-span-5 sticky top-20 space-y-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
+                <span>Live POS KOT & Bill Preview</span>
+              </span>
+              <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">
+                80mm Thermal
+              </span>
+            </div>
+
+            {/* Simulated Live Receipt (Exact Real-Time Match with KOT Slip) */}
+            <div className="mt-3 p-3.5 bg-slate-50/70 rounded-xl border border-dashed border-slate-300 font-mono text-slate-800 text-[11px] leading-tight space-y-2">
+              <div className="text-center pb-2 border-b border-dashed border-slate-300">
+                <h3 className="text-sm font-black tracking-wider text-slate-900 uppercase">
+                  {settings.restaurantName || "FOOD NINJA"}
+                </h3>
+                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
+                  Kitchen Order Ticket & Tax Invoice
+                </p>
+                <p className="text-[9px] text-slate-600 mt-1 font-semibold">
+                  FSSAI: {settings.fssaiNumber || "10020011000123"}
+                </p>
+                <p className="text-[9px] text-slate-600 font-semibold">
+                  GSTIN: {settings.gstinNumber || "07AAAAF1234A1Z5"}
+                </p>
+                {settings.storeAddress && (
+                  <p className="text-[8.5px] text-slate-400 mt-1 truncate">
+                    {settings.storeAddress}
+                  </p>
+                )}
+                {settings.storePhone && (
+                  <p className="text-[8.5px] text-slate-400">
+                    Phone: {settings.storePhone}
+                  </p>
+                )}
+              </div>
+
+              {/* Sample Order Metadata */}
+              <div className="py-1 text-[10px] space-y-0.5 border-b border-dashed border-slate-300">
+                <div className="flex justify-between">
+                  <span className="font-bold">ORDER #LIVE-PREVIEW</span>
+                  <span className="text-slate-400">Today</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>CUSTOMER: Mohd Zaid</span>
+                  <span className="font-bold text-emerald-700">PLACED</span>
+                </div>
+              </div>
+
+              {/* Sample Bill Calculation */}
+              <div className="py-1 text-[10.5px] space-y-1">
+                <div className="flex justify-between text-slate-600">
+                  <span>Item Subtotal</span>
+                  <span>₹{previewSubtotal}</span>
+                </div>
+                <div className="flex justify-between text-slate-600">
+                  <span>Delivery Fee</span>
+                  <span>{previewDelivery === 0 ? "FREE" : `₹${previewDelivery}`}</span>
+                </div>
+                <div className="flex justify-between text-slate-600">
+                  <span>Packaging & GST ({settings.taxRate || 5}%)</span>
+                  <span>₹{previewTax}</span>
+                </div>
+                <div className="flex justify-between pt-1 border-t border-slate-300 text-xs font-black text-slate-900">
+                  <span>GRAND TOTAL</span>
+                  <span className="text-emerald-700">₹{previewGrandTotal}</span>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-dashed border-slate-300 text-center text-[9px] text-slate-400">
+                <p className="font-bold text-slate-600">*** LIVE DYNAMIC PREVIEW ***</p>
+                <p className="mt-0.5">Edits above update on printed slips immediately</p>
               </div>
             </div>
 
-            <div className="max-w-md">
-              <label className="block font-bold text-slate-700 mb-1">Minimum Order Value (₹) *</label>
-              <input
-                type="number"
-                required
-                min="0"
-                value={settings.minOrderValue}
-                onChange={(e) => setSettings({ ...settings, minOrderValue: Number(e.target.value) })}
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500 font-mono"
-              />
-              <span className="text-[10px] text-slate-400">Checkout is blocked if total is below this amount</span>
-            </div>
-
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Storefront Announcement Banner</label>
-              <textarea
-                rows={3}
-                value={settings.announcement}
-                onChange={(e) => setSettings({ ...settings, announcement: e.target.value })}
-                placeholder="e.g. Free delivery on orders above ₹499! Enjoy freshly cooked authentic meals."
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 outline-none focus:border-emerald-500 resize-none"
-              />
-              <span className="text-[10px] text-slate-400">Broadcasted across customer store notice bar</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Save Action Bar */}
-        <div className="flex items-center justify-end gap-3 pt-2 pb-8">
-          <button
-            type="submit"
-            disabled={saving || loading}
-            className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-6 py-3 text-xs font-bold text-white shadow-xs transition cursor-pointer disabled:opacity-50"
-          >
-            {saving ? (
-              <span>Saving Changes...</span>
-            ) : (
-              <>
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Save All Settings</span>
-              </>
+            {/* Announcement Banner Live Card */}
+            {settings.announcement && (
+              <div className="mt-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/80 text-xs text-emerald-900">
+                <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block mb-0.5">
+                  Live Storefront Banner Preview:
+                </span>
+                <p className="text-[11px] font-medium leading-snug">
+                  {settings.announcement}
+                </p>
+              </div>
             )}
-          </button>
-        </div>
-      </form>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 };
