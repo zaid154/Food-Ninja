@@ -241,16 +241,17 @@ const OrderInvoiceModal = ({ order, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-3 sm:p-4 backdrop-blur-xs overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-3 sm:p-4 backdrop-blur-xs overflow-hidden"
       onClick={onClose}
     >
-      {/* Thermal POS Receipt Modal Container (80mm standard width: max-w-[340px], fits on screen with NO scrollbar) */}
+      {/* Compact receipt preview; the paper itself scrolls inside this fixed-height dialog. */}
       <div
-        className="relative w-full max-w-[340px] rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200 text-slate-900"
+        className="relative flex w-full max-w-[340px] flex-col overflow-hidden rounded-xl border border-slate-300 bg-white text-slate-900 shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+        style={{ maxHeight: "min(72dvh, 620px)" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-4 py-2 text-xs">
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 py-2 text-xs">
           <span className="font-bold text-slate-700 flex items-center gap-1.5 text-[11px]">
             <svg className="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -268,7 +269,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
         </div>
 
         {/* Printable 80mm Receipt Content */}
-        <div id="printable-thermal-slip" className="p-4 bg-white font-mono text-slate-800 text-[11px] leading-tight">
+        <div id="printable-thermal-slip" className="min-h-0 flex-1 overflow-y-auto bg-white p-3 font-mono text-slate-800 text-[11px] leading-tight">
           
           {/* Receipt Brand Header */}
           <div className="text-center pb-2 border-b border-dashed border-slate-300">
@@ -297,11 +298,11 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             <div className="flex justify-between items-center text-[10px]">
               <span className="text-slate-500 font-bold">TYPE: HOME DELIVERY</span>
               {isCod ? (
-                <span className="rounded-md bg-amber-100 text-amber-950 font-black px-2 py-0.5 border border-amber-300 text-[10px] tracking-wide">
+                <span className="rounded-sm bg-white text-black font-black px-2 py-0.5 border border-slate-500 text-[10px] tracking-wide">
                   COD: COLLECT ₹{grandTotal}
                 </span>
               ) : (
-                <span className="rounded-md bg-emerald-100 text-emerald-950 font-black px-2 py-0.5 border border-emerald-300 text-[10px] tracking-wide">
+                <span className="rounded-sm bg-white text-black font-black px-2 py-0.5 border border-slate-500 text-[10px] tracking-wide">
                   PAID ONLINE (₹0 DUE)
                 </span>
               )}
@@ -366,15 +367,13 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             </div>
             <div className="flex justify-between pt-1.5 border-t border-slate-200 text-sm font-black text-slate-900">
               <span>GRAND TOTAL</span>
-              <span className="text-emerald-800">₹{grandTotal}</span>
+              <span className="text-black">₹{grandTotal}</span>
             </div>
           </div>
 
           {/* Delivery Rider & Customer Cash Collection Highlight Box */}
           <div className={`mt-2.5 p-2 rounded-lg border-2 text-center ${
-            isCod 
-              ? "border-amber-400 bg-amber-50 text-amber-950" 
-              : "border-emerald-400 bg-emerald-50 text-emerald-950"
+            "border-slate-800 bg-white text-black"
           }`}>
             <p className="text-xs font-black tracking-wide">
               {isCod ? `★ CASH TO COLLECT: ₹${grandTotal} ★` : "✓ PAID ONLINE — ₹0 TO COLLECT"}
@@ -400,7 +399,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
         </div>
 
         {/* Modal Action Buttons (Always immediately visible without scrolling) */}
-        <div className="flex items-center justify-between gap-2 border-t border-slate-100 bg-slate-50/80 p-3">
+        <div className="flex shrink-0 items-center justify-between gap-2 border-t border-slate-200 bg-white p-3">
           <button
             type="button"
             onClick={onClose}

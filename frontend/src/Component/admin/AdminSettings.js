@@ -23,6 +23,8 @@ const AdminSettings = (props) => {
     openingTime: "06:00",
     closingTime: "20:00",
     operatingHoursText: "6:00 AM – 8:00 PM",
+    closedNoticeMessage: "",
+    autoScheduleEnabled: true,
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -50,6 +52,8 @@ const AdminSettings = (props) => {
           openingTime: data.settings.openingTime || "06:00",
           closingTime: data.settings.closingTime || "20:00",
           operatingHoursText: data.settings.operatingHoursText || "6:00 AM – 8:00 PM",
+          closedNoticeMessage: data.settings.closedNoticeMessage || "",
+          autoScheduleEnabled: data.settings.autoScheduleEnabled !== false,
         });
       }
     } catch (err) {
@@ -111,6 +115,23 @@ const AdminSettings = (props) => {
   const previewSubtotal = 1490;
   const previewTax = Math.round(previewSubtotal * ((settings.taxRate || 5) / 100));
   const previewDelivery = previewSubtotal >= (settings.freeDeliveryThreshold || 499) ? 0 : (settings.deliveryFee || 30);
+
+  // Mirror the server's daytime and overnight schedule calculation for a live preview.
+  const openingMinutes = /^([01]\d|2[0-3]):[0-5]\d$/.test(settings.openingTime || "")
+    ? Number(settings.openingTime.slice(0, 2)) * 60 + Number(settings.openingTime.slice(3)) : null;
+  const closingMinutes = /^([01]\d|2[0-3]):[0-5]\d$/.test(settings.closingTime || "")
+    ? Number(settings.closingTime.slice(0, 2)) * 60 + Number(settings.closingTime.slice(3)) : null;
+  const currentMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+  const isWithinHours = openingMinutes === null || closingMinutes === null || openingMinutes === closingMinutes
+    ? true
+    : closingMinutes > openingMinutes
+      ? currentMinutes >= openingMinutes && currentMinutes < closingMinutes
+      : currentMinutes >= openingMinutes || currentMinutes < closingMinutes;
+  const isPreviewOpen = settings.restaurantOpen !== false && (settings.autoScheduleEnabled === false || isWithinHours);
+  const previewBannerText = settings.closedNoticeMessage?.trim()
+    || (!isWithinHours
+      ? `We are currently closed for orders. Kitchen hours: ${settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!`
+      : "Orders temporarily paused by kitchen. We'll be back shortly!");
   const previewGrandTotal = previewSubtotal + previewDelivery + previewTax;
 
   return (
@@ -129,13 +150,13 @@ const AdminSettings = (props) => {
         <div className="flex items-center gap-3 self-start sm:self-auto">
           <span
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold border ${
-              settings.restaurantOpen
+              isPreviewOpen
                 ? "bg-emerald-50 text-emerald-800 border-emerald-200"
                 : "bg-rose-50 text-rose-800 border-rose-200"
             }`}
           >
-            <span className={`h-2 w-2 rounded-full ${settings.restaurantOpen ? "bg-emerald-600 animate-pulse" : "bg-rose-600"}`} />
-            {settings.restaurantOpen ? "Open for Orders" : "Store Closed"}
+            <span className={`h-2 w-2 rounded-full ${isPreviewOpen ? "bg-emerald-600 animate-pulse" : "bg-rose-600"}`} />
+            {isPreviewOpen ? "Open for Orders" : "Store Closed"}
           </span>
 
           <button
@@ -344,6 +365,46 @@ const AdminSettings = (props) => {
                 </div>
               </div>
 
+              {/* Custom Pause / Closed Notice */}
+              {!settings.restaurantOpen && (
+                <div className="max-w-md space-y-2">
+                  <label className="block font-bold text-slate-700">Custom Pause / Closed Notice <span className="text-slate-400 font-normal">(Optional)</span></label>
+                  <textarea
+                    rows={2}
+                    value={settings.closedNoticeMessage || ""}
+                    onChange={(e) => setSettings({ ...settings, closedNoticeMessage: e.target.value })}
+                    placeholder="Leave empty for default notice, or type a custom reason..."
+                    className="w-full rounded-xl border border-rose-200 px-3 py-2 outline-none focus:border-rose-400 resize-none bg-rose-50/30 text-xs"
+                  />
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      "Heavy Kitchen Rush — Resuming soon",
+                      "Temporary Kitchen Maintenance",
+                      "Special Event / Private Catering",
+                    ].map((chip) => (
+                      <button
+                        key={chip}
+                        type="button"
+                        onClick={() => setSettings({ ...settings, closedNoticeMessage: chip })}
+                        className="text-[10px] font-semibold text-rose-700 bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded-full px-2.5 py-1 transition cursor-pointer"
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="text-[10px] text-slate-400 block">Shown on the storefront header, cart, and checkout when store is paused</span>
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={saving || loading}
+                    className="rounded-lg bg-emerald-600 hover:bg-emerald-700 px-3 py-2 text-[11px] font-bold text-white shadow-sm transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {saving ? "Saving..." : "Save Store Status & Notice"}
+                  </button>
+                  <span className="ml-2 text-[10px] text-slate-500">Save to apply this notice to the storefront.</span>
+                </div>
+              )}
+
               {/* Operating Hours (Opening & Closing) */}
               <div className="max-w-md">
                 <div className="flex items-center justify-between mb-1">
@@ -374,6 +435,22 @@ const AdminSettings = (props) => {
                 </div>
                 <span className="text-[10px] text-slate-400 mt-1 block">
                   Displayed to customers on the header and during closed hours
+                </span>
+
+                {/* Auto-enforce operating hours toggle */}
+                <label className="flex items-center gap-2.5 mt-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={settings.autoScheduleEnabled !== false}
+                    onChange={(e) => setSettings({ ...settings, autoScheduleEnabled: e.target.checked })}
+                    className="h-4 w-4 rounded border-slate-300 text-emerald-600 accent-emerald-600 cursor-pointer"
+                  />
+                  <span className="text-[11px] font-semibold text-slate-700">
+                    Auto-close outside kitchen hours
+                  </span>
+                </label>
+                <span className="text-[10px] text-slate-400 block mt-0.5">
+                  When enabled, orders are automatically blocked before opening time and after closing time
                 </span>
               </div>
 
@@ -512,13 +589,13 @@ const AdminSettings = (props) => {
             </div>
 
             {/* Announcement & Status Banner Live Card */}
-            {!settings.restaurantOpen ? (
+            {!isPreviewOpen ? (
               <div className="mt-3 p-3 rounded-xl bg-rose-50/90 border border-rose-300 text-xs text-rose-950">
                 <span className="text-[10px] font-black text-rose-700 uppercase tracking-wider block mb-1">
                   Live Closed Storefront Banner:
                 </span>
                 <p className="text-[11px] font-semibold leading-snug">
-                  🔴 We are currently closed for orders. Kitchen Hours: {settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!
+                  {previewBannerText}
                 </p>
               </div>
             ) : settings.announcement ? (

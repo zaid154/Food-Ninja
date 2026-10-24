@@ -35,14 +35,18 @@ const Header = () => {
   const [storeSettings, setStoreSettings] = useState(null);
 
   useEffect(() => {
-    if (typeof fetch !== "undefined") {
+    const refreshSettings = () => {
+      if (typeof fetch === "undefined") return;
       fetch(`${API_BASE_URL}/settings`)
         .then((r) => r.json())
         .then((d) => {
           if (d && d.settings) setStoreSettings(d.settings);
         })
         .catch(() => {});
-    }
+    };
+    refreshSettings();
+    const interval = setInterval(refreshSettings, 60_000);
+    return () => clearInterval(interval);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -126,10 +130,10 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
       {/* Store Closed Alert or Announcement Banner */}
-      {storeSettings && storeSettings.restaurantOpen === false ? (
+      {storeSettings && (storeSettings.isEffectiveOpen === false || storeSettings.restaurantOpen === false) ? (
         <div className="bg-rose-600 text-white text-[11px] font-bold py-1.5 px-4 text-center tracking-wide flex items-center justify-center gap-2 shadow-xs">
           <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-          <span>We are currently closed for orders. Kitchen hours: {storeSettings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!</span>
+          <span>{storeSettings.effectiveClosedReason || storeSettings.closedNoticeMessage || `We are currently closed for orders. Kitchen hours: ${storeSettings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!`}</span>
         </div>
       ) : storeSettings?.announcement ? (
         <div className="bg-emerald-700 text-white text-[11px] font-semibold py-1 px-4 text-center tracking-wide">

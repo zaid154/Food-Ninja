@@ -76,14 +76,18 @@ const Checkout = () => {
     });
 
     useEffect(() => {
-        if (typeof fetch !== "undefined") {
+        const refreshSettings = () => {
+            if (typeof fetch === "undefined") return;
             fetch(`${API_BASE_URL}/settings`)
                 .then((r) => r.json())
                 .then((d) => {
                     if (d && d.settings) setSettings(d.settings);
                 })
                 .catch(() => {});
-        }
+        };
+        refreshSettings();
+        const interval = setInterval(refreshSettings, 60_000);
+        return () => clearInterval(interval);
     }, []);
 
     const totalItems = items.reduce((n, i) => n + (i.quantity || 1), 0);
@@ -101,8 +105,8 @@ const Checkout = () => {
         e.preventDefault();
         setError("");
 
-        if (!settings.restaurantOpen) {
-            setError(`The restaurant is currently closed for orders. Kitchen hours: ${settings.operatingHoursText || "6:00 AM – 8:00 PM"}.`);
+        if (settings.restaurantOpen === false || settings.isEffectiveOpen === false) {
+            setError(settings.effectiveClosedReason || settings.closedNoticeMessage || `We are currently closed for orders. Kitchen hours: ${settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!`);
             return;
         }
 
@@ -185,11 +189,17 @@ const Checkout = () => {
         const finalizeOrder = async (orderToSave) => {
             try {
                 // Save to Backend MongoDB Atlas
-                await fetch(`${API_BASE_URL}/orders`, {
+                const response = await fetch(`${API_BASE_URL}/orders`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(orderToSave),
                 });
+                if (!response.ok) {
+                    const result = await response.json().catch(() => ({}));
+                    const error = new Error(result.message || "Unable to place your order.");
+                    error.status = response.status;
+                    throw error;
+                }
 
                 // Save to Redux Store
                 dispatch(addOrder(orderToSave));
@@ -208,6 +218,10 @@ const Checkout = () => {
                 setConfirmedOrder(orderToSave);
             } catch (err) {
                 console.error("Order error:", err);
+                if (err.status === 403) {
+                    setError(err.message || settings.effectiveClosedReason || "The restaurant is currently closed for orders.");
+                    return;
+                }
                 dispatch(addOrder(orderToSave));
                 if (!isBuyNow) dispatch(clearCart());
                 try {
@@ -581,12 +595,12 @@ const Checkout = () => {
                         </div>
 
                         {/* Store Closed Banner */}
-                        {settings.restaurantOpen === false && (
+                        {(settings.restaurantOpen === false || settings.isEffectiveOpen === false) && (
                             <div className="mb-3 p-3 rounded-xl bg-rose-50 border border-rose-300 text-xs text-rose-950 flex items-start gap-2">
                                 <span className="h-2 w-2 rounded-full bg-rose-600 shrink-0 mt-1 animate-pulse" />
                                 <div>
                                     <span className="font-bold block text-rose-900">Restaurant Currently Closed for Orders</span>
-                                    <span className="text-[11px] text-rose-800">Kitchen operating hours: {settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders placed while closed cannot be accepted.</span>
+                                    <span className="text-[11px] text-rose-800">{settings.effectiveClosedReason || settings.closedNoticeMessage || `We are currently closed for orders. Kitchen hours: ${settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!`}</span>
                                 </div>
                             </div>
                         )}
@@ -913,12 +927,12 @@ const Checkout = () => {
                         {/* Place Order CTA Button */}
                         <button
                             type="submit"
-                            disabled={submitting || settings.restaurantOpen === false || subtotal < (settings.minOrderValue || 0)}
+                            disabled={submitting || settings.restaurantOpen === false || settings.isEffectiveOpen === false || subtotal < (settings.minOrderValue || 0)}
                             className="w-full mt-4 rounded-xl bg-[#0c5936] hover:bg-[#084227] text-white py-3.5 px-4 font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.99] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {submitting ? (
                                 <span>Placing Order...</span>
-                            ) : settings.restaurantOpen === false ? (
+                            ) : (settings.restaurantOpen === false || settings.isEffectiveOpen === false) ? (
                                 <span>Restaurant Closed — Orders Paused</span>
                             ) : subtotal < (settings.minOrderValue || 0) ? (
                                 <span>Min. Order ₹{settings.minOrderValue} Required</span>

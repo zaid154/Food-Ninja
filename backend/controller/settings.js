@@ -1,5 +1,60 @@
 const Settings = require("../models/settings");
 
+const DEFAULT_PAUSE_NOTICE = "Orders temporarily paused by kitchen. We'll be back shortly!";
+
+const parseTime = (value) => {
+  if (typeof value !== "string" || !/^([01]\d|2[0-3]):[0-5]\d$/.test(value)) return null;
+  const [hours, minutes] = value.split(":").map(Number);
+  return hours * 60 + minutes;
+};
+
+// Check if current server time falls within opening–closing window
+// Supports both normal (06:00–20:00) and overnight (18:00–02:00) ranges
+const isWithinHours = (openingTime, closingTime, now = new Date()) => {
+  if (!openingTime || !closingTime) return true;
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const openMin = parseTime(openingTime);
+  const closeMin = parseTime(closingTime);
+  if (openMin === null || closeMin === null) return true;
+
+  // Equal times represent a full-day schedule.
+  if (openMin === closeMin) return true;
+
+  if (closeMin > openMin) {
+    // Normal daytime range (e.g. 06:00–20:00)
+    return currentMinutes >= openMin && currentMinutes < closeMin;
+  } else {
+    // Overnight range (e.g. 18:00–02:00)
+    return currentMinutes >= openMin || currentMinutes < closeMin;
+  }
+};
+
+// Build the effective closed reason string
+const buildClosedReason = (settings, withinHours) => {
+  // Admin typed a custom message — highest priority
+  if (settings.closedNoticeMessage && settings.closedNoticeMessage.trim()) {
+    return settings.closedNoticeMessage.trim();
+  }
+  // Outside operating hours
+  if (!withinHours) {
+    const hours = settings.operatingHoursText || "6:00 AM – 8:00 PM";
+    return `We are currently closed for orders. Kitchen hours: ${hours}. Orders will resume during operating hours!`;
+  }
+  // Manually paused during open hours with no custom message
+  return DEFAULT_PAUSE_NOTICE;
+};
+
+const getStoreStatus = (settings, now = new Date()) => {
+  const withinHours = isWithinHours(settings.openingTime, settings.closingTime, now);
+  const autoSchedule = settings.autoScheduleEnabled !== false;
+  const isEffectiveOpen = settings.restaurantOpen !== false && (!autoSchedule || withinHours);
+  return {
+    isWithinHours: withinHours,
+    isEffectiveOpen,
+    effectiveClosedReason: isEffectiveOpen ? "" : buildClosedReason(settings, withinHours),
+  };
+};
+
 // GET /api/settings
 const getSettings = async (req, res) => {
   try {
@@ -23,6 +78,8 @@ const getSettings = async (req, res) => {
         openingTime: "06:00",
         closingTime: "20:00",
         operatingHoursText: "6:00 AM – 8:00 PM",
+        closedNoticeMessage: "",
+        autoScheduleEnabled: true,
       });
     } else if (!settings.openingTime || !settings.closingTime || !settings.operatingHoursText) {
       settings.openingTime = settings.openingTime || "06:00";
@@ -30,7 +87,12 @@ const getSettings = async (req, res) => {
       settings.operatingHoursText = settings.operatingHoursText || "6:00 AM – 8:00 PM";
       await settings.save();
     }
-    return res.status(200).json({ success: true, settings });
+
+    // Compute effective open/closed status
+    const settingsObj = settings.toObject ? settings.toObject() : { ...settings };
+    Object.assign(settingsObj, getStoreStatus(settings));
+
+    return res.status(200).json({ success: true, settings: settingsObj });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Failed to fetch settings", error: error.message });
   }
@@ -56,6 +118,8 @@ const updateSettings = async (req, res) => {
       openingTime,
       closingTime,
       operatingHoursText,
+      closedNoticeMessage,
+      autoScheduleEnabled,
     } = req.body;
 
     const updateData = {};
@@ -75,6 +139,8 @@ const updateSettings = async (req, res) => {
     if (openingTime !== undefined) updateData.openingTime = openingTime.trim();
     if (closingTime !== undefined) updateData.closingTime = closingTime.trim();
     if (operatingHoursText !== undefined) updateData.operatingHoursText = operatingHoursText.trim();
+    if (closedNoticeMessage !== undefined) updateData.closedNoticeMessage = closedNoticeMessage.trim();
+    if (autoScheduleEnabled !== undefined) updateData.autoScheduleEnabled = Boolean(autoScheduleEnabled);
 
     const settings = await Settings.findOneAndUpdate(
       { key: "store_settings" },
@@ -82,14 +148,18 @@ const updateSettings = async (req, res) => {
       { new: true, upsert: true }
     );
 
+    // Compute effective status for the response
+    const settingsObj = settings.toObject ? settings.toObject() : { ...settings };
+    Object.assign(settingsObj, getStoreStatus(settings));
+
     return res.status(200).json({
       success: true,
       message: "Store charges and operational settings updated successfully!",
-      settings,
+      settings: settingsObj,
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Failed to update settings", error: error.message });
   }
 };
 
-module.exports = { getSettings, updateSettings };
+module.exports = { getSettings, updateSettings, isWithinHours, buildClosedReason, getStoreStatus };

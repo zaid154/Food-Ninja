@@ -19,6 +19,8 @@ const settingsSchema = new mongoose.Schema(
     openingTime: { type: String, default: "06:00" },
     closingTime: { type: String, default: "20:00" },
     operatingHoursText: { type: String, default: "6:00 AM – 8:00 PM" },
+    closedNoticeMessage: { type: String, default: "" },
+    autoScheduleEnabled: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

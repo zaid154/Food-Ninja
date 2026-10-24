@@ -19,14 +19,18 @@ const Cart = () => {
   });
 
   useEffect(() => {
-    if (typeof fetch !== "undefined") {
+    const refreshSettings = () => {
+      if (typeof fetch === "undefined") return;
       fetch(`${API_BASE_URL}/settings`)
         .then((r) => r.json())
         .then((d) => {
           if (d && d.settings) setSettings(d.settings);
         })
         .catch(() => {});
-    }
+    };
+    refreshSettings();
+    const interval = setInterval(refreshSettings, 60_000);
+    return () => clearInterval(interval);
   }, []);
 
   const totalItems = cartItems.reduce((n, i) => n + (i.quantity || 1), 0);
@@ -41,7 +45,7 @@ const Cart = () => {
   const taxes = totalItems > 0 ? Math.round(totalAmount * ((settings.taxRate ?? 5) / 100)) : 0;
   const grandTotal = totalAmount + deliveryFee + packagingFee + taxes;
 
-  const isStoreClosed = settings.restaurantOpen === false;
+  const isStoreClosed = settings.isEffectiveOpen === false || settings.restaurantOpen === false;
   const isBelowMinOrder = totalAmount < (settings.minOrderValue || 0);
   const canCheckout = !isStoreClosed && !isBelowMinOrder;
 
@@ -315,7 +319,7 @@ const Cart = () => {
                   </svg>
                   <div>
                     <span className="font-bold block text-rose-800">Restaurant Currently Closed</span>
-                    <span className="text-[11px] text-rose-700">Kitchen operating hours: {settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!</span>
+                    <span className="text-[11px] text-rose-700">{settings.effectiveClosedReason || settings.closedNoticeMessage || `We are currently closed for orders. Kitchen hours: ${settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!`}</span>
                   </div>
                 </div>
               ) : isBelowMinOrder ? (
