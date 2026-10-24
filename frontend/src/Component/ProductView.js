@@ -84,6 +84,7 @@ const ProductView = () => {
     let isMounted = true;
     const fetchDish = async () => {
       try {
+        setDirectProduct(null);
         setLoadingDish(true);
         const res = await fetch(`${API_BASE_URL}/recipes/${id}`);
         if (res.ok) {
@@ -113,33 +114,10 @@ const ProductView = () => {
     ? apiData.recipes
     : FALLBACK_RECIPES;
 
-  // Find dish by direct fetch, then by ID in list, or fallback
-  const product = directProduct
-    || allDishes.find((item) => String(item.id) === String(id) || String(item._id) === String(id))
-    || allDishes.find((item) => item.name && item.name.toLowerCase().includes("borscht"))
-    || {
-        id: 35,
-        name: "Russian Borscht",
-        cuisine: "Russian",
-        category: "Soups & Salads",
-        price: 150,
-        caloriesPerServing: 150,
-        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80",
-        rating: 4.3,
-        reviewCount: 86,
-        description: "Delicious Russian style Russian Borscht, prepared fresh with aromatic herbs and premium quality ingredients."
-      };
-
-  const isBorscht = product.name?.toLowerCase().includes("borscht") ?? false;
-  const mainDishImg = product.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80";
-
-  const inCart = cartItems.find((i) => String(i.id) === String(product.id));
-  const cartQty = inCart ? inCart.quantity : 0;
-  const isLiked = wishlistItems.some((i) => String(i.id) === String(product.id));
-
-  const price = product.price || 150;
-  const rating = product.rating ? Number(product.rating).toFixed(1) : "4.3";
-  const reviewCount = product.reviewCount || 86;
+  // Only render a dish that matches the selected URL ID.
+  const productFromList = allDishes.find((item) => String(item.id) === String(id) || String(item._id) === String(id));
+  const fetchedProductMatchesId = directProduct && String(directProduct.id || directProduct._id) === String(id);
+  const product = fetchedProductMatchesId ? directProduct : productFromList;
 
   // Fetch real reviews from MongoDB
   const fetchReviews = async () => {
@@ -230,6 +208,48 @@ const ProductView = () => {
     fetchReviews();
     checkEligibility();
   }, [product?.id, userEmail]);
+
+  if (!product) {
+    if (loadingDish || apiData === null) {
+      return (
+        <div aria-busy="true" aria-label="Loading dish" className="min-h-screen bg-white px-4 py-8 sm:px-6">
+          <div className="mx-auto grid max-w-6xl animate-pulse grid-cols-1 gap-8 lg:grid-cols-2">
+            <div className="h-[380px] rounded-3xl bg-slate-100 sm:h-[420px]" />
+            <div className="space-y-5 py-2">
+              <div className="h-5 w-40 rounded bg-slate-100" />
+              <div className="h-10 w-3/4 rounded bg-slate-100" />
+              <div className="h-5 w-1/2 rounded bg-slate-100" />
+              <div className="h-28 rounded-2xl bg-slate-100" />
+              <div className="h-16 rounded-2xl bg-slate-100" />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <section className="flex min-h-[75vh] items-center justify-center px-4 text-center">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Dish unavailable</h1>
+          <p className="mt-2 text-sm text-slate-500">This dish could not be found. Please choose another item from the menu.</p>
+          <Link to="/" className="mt-5 inline-flex rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700">
+            Back to Food Menu
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  const isBorscht = product.name?.toLowerCase().includes("borscht") ?? false;
+  const mainDishImg = product.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80";
+
+  const inCart = cartItems.find((i) => String(i.id) === String(product.id));
+  const cartQty = inCart ? inCart.quantity : 0;
+  const isLiked = wishlistItems.some((i) => String(i.id) === String(product.id));
+
+  const price = product.price || 150;
+  const rating = product.rating ? Number(product.rating).toFixed(1) : "4.3";
+  const reviewCount = product.reviewCount || 86;
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();

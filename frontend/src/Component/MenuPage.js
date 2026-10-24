@@ -529,7 +529,7 @@ const MenuPage = () => {
           {/* Horizontal Scroll Track */}
           <div
             ref={categoryCarouselRef}
-            className="flex gap-2.5 sm:gap-3.5 overflow-x-auto pb-2 scrollbar-none scroll-smooth px-1"
+            className="flex gap-2.5 sm:gap-3.5 overflow-x-auto px-1 pt-2 pb-3 scrollbar-none scroll-smooth"
           >
             {menuCategories.map((cat) => {
               const isActive = currentCategory.toLowerCase() === cat.name.toLowerCase();
