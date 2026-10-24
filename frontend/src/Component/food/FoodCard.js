@@ -40,7 +40,7 @@ const FoodCard = ({ data }) => {
   return (
     <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
       {/* Dish Image */}
-      <Link to={`/restaurant/${id}`} className="block relative h-44 w-full overflow-hidden bg-slate-100 flex items-center justify-center">
+      <Link to={`/restaurant/${id}`} state={{ product: data }} className="block relative h-44 w-full overflow-hidden bg-slate-100 flex items-center justify-center">
         <img
           src={image}
           alt={name}
@@ -94,7 +94,7 @@ const FoodCard = ({ data }) => {
       {/* Dish Content */}
       <div className="flex flex-1 flex-col justify-between p-4">
         <div>
-          <Link to={`/restaurant/${id}`} className="block">
+          <Link to={`/restaurant/${id}`} state={{ product: data }} className="block">
             <h3 className="text-base font-bold text-slate-900 line-clamp-1 hover:text-emerald-700 transition">
               {name}
             </h3>

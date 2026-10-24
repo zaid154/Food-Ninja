@@ -1,16 +1,14 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useLocation, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import useResipe from "./useRecipes";
 import { addCart, removeCart } from "../utils/cartSlice";
 import { addWishlist, removeWishlist } from "../utils/wishlistSlice";
-import { FALLBACK_RECIPES } from "../utils/fallbackDishes";
 import { API_BASE_URL } from "../utils/Constants";
 import UserContext from "./Usercontext";
 
 const ProductView = () => {
   const { id } = useParams();
-  const apiData = useResipe();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { user } = useContext(UserContext);
 
@@ -76,48 +74,54 @@ const ProductView = () => {
   const [reviewSuccess, setReviewSuccess] = useState("");
   const [reviewError, setReviewError] = useState("");
 
-  const [directProduct, setDirectProduct] = useState(null);
-  const [loadingDish, setLoadingDish] = useState(true);
+  const [dishRequest, setDishRequest] = useState({ id: null, product: null, loading: true });
 
-  // Directly fetch single dish by ID to ensure all 158 dishes load with zero delay
+  // Fetch the canonical dish in the background; card navigation state renders instantly.
   useEffect(() => {
-    let isMounted = true;
+    const requestId = String(id ?? "");
+    const controller = new AbortController();
+    setDishRequest({ id: requestId, product: null, loading: true });
+
     const fetchDish = async () => {
       try {
-        setDirectProduct(null);
-        setLoadingDish(true);
-        const res = await fetch(`${API_BASE_URL}/recipes/${id}`);
+        const res = await fetch(`${API_BASE_URL}/recipes/${encodeURIComponent(id)}`, {
+          signal: controller.signal,
+        });
         if (res.ok) {
           const json = await res.json();
-          if (isMounted && json && (json.id || json._id)) {
-            setDirectProduct(json);
+          const responseId = String(json?.id ?? json?._id ?? "");
+          if (responseId === requestId) {
+            setDishRequest({ id: requestId, product: json, loading: false });
             return;
           }
         }
+        setDishRequest({ id: requestId, product: null, loading: false });
       } catch (err) {
-        // Fallback gracefully to apiData or local list
-      } finally {
-        if (isMounted) setLoadingDish(false);
+        if (err.name !== "AbortError") {
+          setDishRequest({ id: requestId, product: null, loading: false });
+        }
       }
     };
 
     if (id) {
       fetchDish();
+    } else {
+      setDishRequest({ id: requestId, product: null, loading: false });
     }
+
+    return () => controller.abort();
   }, [id]);
 
   const cartItems = useSelector((store) => store.cart.item);
   const wishlistItems = useSelector((store) => store.wishlist.item);
 
-  // Available dishes with reliable instant fallback
-  const allDishes = (apiData && Array.isArray(apiData.recipes) && apiData.recipes.length > 0)
-    ? apiData.recipes
-    : FALLBACK_RECIPES;
-
-  // Only render a dish that matches the selected URL ID.
-  const productFromList = allDishes.find((item) => String(item.id) === String(id) || String(item._id) === String(id));
-  const fetchedProductMatchesId = directProduct && String(directProduct.id || directProduct._id) === String(id);
-  const product = fetchedProductMatchesId ? directProduct : productFromList;
+  const navigationProduct = location.state?.product;
+  const navigationProductMatchesId = navigationProduct &&
+    [navigationProduct.id, navigationProduct._id].some((productId) => String(productId) === String(id));
+  const requestMatchesId = dishRequest.id === String(id ?? "");
+  const directProduct = requestMatchesId ? dishRequest.product : null;
+  const product = navigationProductMatchesId ? navigationProduct : directProduct;
+  const loadingDish = !navigationProductMatchesId && (!requestMatchesId || dishRequest.loading);
 
   // Fetch real reviews from MongoDB
   const fetchReviews = async () => {
@@ -210,7 +214,7 @@ const ProductView = () => {
   }, [product?.id, userEmail]);
 
   if (!product) {
-    if (loadingDish || apiData === null) {
+    if (loadingDish) {
       return (
         <div aria-busy="true" aria-label="Loading dish" className="min-h-screen bg-white px-4 py-8 sm:px-6">
           <div className="mx-auto grid max-w-6xl animate-pulse grid-cols-1 gap-8 lg:grid-cols-2">
