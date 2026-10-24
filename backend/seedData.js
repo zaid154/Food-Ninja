@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+  const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const fs = require("fs");
 const path = require("path");
@@ -7,9 +7,84 @@ const Recipe = require("./models/recipe");
 const User = require("./models/user");
 const Review = require("./models/review");
 const Order = require("./models/order");
+const Category = require("./models/category");
 const seedDishes = require("./data/seedDishes");
 
 dotenv.config({ path: path.resolve(__dirname, ".env") });
+
+// 7 Core Food Categories
+const defaultCategories = [
+  {
+    name: "Biryani",
+    slug: "biryani",
+    bg: "bg-[#f4faee]",
+    img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=300&auto=format&fit=crop&q=80",
+    description: "Aromatic dum biryanis layered with fragrant basmati rice and rich spices.",
+    displayOrder: 1,
+    isActive: true,
+    isFeatured: true,
+  },
+  {
+    name: "Pizza",
+    slug: "pizza",
+    bg: "bg-[#fff3eb]",
+    img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&auto=format&fit=crop&q=80",
+    description: "Wood-fired and pan-crust artisanal pizzas with gourmet cheese.",
+    displayOrder: 2,
+    isActive: true,
+    isFeatured: true,
+  },
+  {
+    name: "Burgers",
+    slug: "burgers",
+    bg: "bg-[#fff8e7]",
+    img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&auto=format&fit=crop&q=80",
+    description: "Juicy grilled patties in toasted brioche buns with signature dressings.",
+    displayOrder: 3,
+    isActive: true,
+    isFeatured: true,
+  },
+  {
+    name: "Chinese",
+    slug: "chinese",
+    bg: "bg-[#fef2f2]",
+    img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=300&auto=format&fit=crop&q=80",
+    description: "Sizzling wok tossed noodles, Manchurian, fried rice, and dimsums.",
+    displayOrder: 4,
+    isActive: true,
+    isFeatured: true,
+  },
+  {
+    name: "Indian",
+    slug: "indian",
+    bg: "bg-[#fef9c3]",
+    img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300&auto=format&fit=crop&q=80",
+    description: "Authentic regional specialties from across 24 Indian states.",
+    displayOrder: 5,
+    isActive: true,
+    isFeatured: true,
+  },
+  {
+    name: "Italian",
+    slug: "italian",
+    bg: "bg-[#fdf2f8]",
+    img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=300&auto=format&fit=crop&q=80",
+    description: "Classic risottos, creamy fettuccine, lasagna, and authentic tiramisu.",
+    displayOrder: 6,
+    isActive: true,
+    isFeatured: true,
+  },
+  {
+    name: "Beverages",
+    slug: "beverages",
+    bg: "bg-[#f0f9ff]",
+    img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300&auto=format&fit=crop&q=80",
+    description: "Cold-pressed juices, thick milkshakes, mojitos, and specialty teas.",
+    displayOrder: 7,
+    isActive: true,
+    isFeatured: true,
+  },
+];
 
 // 1 Admin + 2 Verified Customer Accounts as requested
 const realisticUsers = [
@@ -461,6 +536,11 @@ const seed = async () => {
     await User.deleteMany({});
     await User.insertMany(realisticUsers);
     console.log(`Inserted ${realisticUsers.length} Users successfully! (1 Admin + 2 Customers)`);
+
+    // Reset and seed Categories
+    await Category.deleteMany({});
+    await Category.insertMany(defaultCategories);
+    console.log(`Inserted ${defaultCategories.length} Categories into MongoDB Atlas!`);
 
     // Reset and seed Recipes
     await Recipe.deleteMany({});
