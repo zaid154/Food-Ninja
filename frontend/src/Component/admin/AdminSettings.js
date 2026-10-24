@@ -20,6 +20,9 @@ const AdminSettings = (props) => {
     minOrderValue: 99,
     restaurantOpen: true,
     announcement: "Free delivery on orders above ₹499! Enjoy freshly cooked authentic meals.",
+    openingTime: "06:00",
+    closingTime: "20:00",
+    operatingHoursText: "6:00 AM – 8:00 PM",
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -44,6 +47,9 @@ const AdminSettings = (props) => {
           minOrderValue: data.settings.minOrderValue ?? 99,
           restaurantOpen: data.settings.restaurantOpen ?? true,
           announcement: data.settings.announcement ?? "",
+          openingTime: data.settings.openingTime || "06:00",
+          closingTime: data.settings.closingTime || "20:00",
+          operatingHoursText: data.settings.operatingHoursText || "6:00 AM – 8:00 PM",
         });
       }
     } catch (err) {
@@ -77,6 +83,28 @@ const AdminSettings = (props) => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const formatTime12h = (t24) => {
+    if (!t24) return "";
+    const parts = t24.split(":");
+    const h = parseInt(parts[0], 10);
+    const m = parts[1] || "00";
+    const ampm = h >= 12 ? "PM" : "AM";
+    const h12 = h % 12 || 12;
+    return `${h12}:${m} ${ampm}`;
+  };
+
+  const updateHours = (newOpen, newClose) => {
+    const o = newOpen !== undefined ? newOpen : (settings.openingTime || "06:00");
+    const c = newClose !== undefined ? newClose : (settings.closingTime || "20:00");
+    const text = `${formatTime12h(o)} – ${formatTime12h(c)}`;
+    setSettings((prev) => ({
+      ...prev,
+      openingTime: o,
+      closingTime: c,
+      operatingHoursText: text,
+    }));
   };
 
   // Live computed preview values
@@ -316,6 +344,39 @@ const AdminSettings = (props) => {
                 </div>
               </div>
 
+              {/* Operating Hours (Opening & Closing) */}
+              <div className="max-w-md">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block font-bold text-slate-700">Kitchen Operating Hours</label>
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                    {settings.operatingHoursText || "6:00 AM – 8:00 PM"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <span className="block text-[10px] text-slate-500 font-semibold mb-1">Opening Time</span>
+                    <input
+                      type="time"
+                      value={settings.openingTime || "06:00"}
+                      onChange={(e) => updateHours(e.target.value, undefined)}
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono text-xs bg-slate-50/50"
+                    />
+                  </div>
+                  <div>
+                    <span className="block text-[10px] text-slate-500 font-semibold mb-1">Closing Time</span>
+                    <input
+                      type="time"
+                      value={settings.closingTime || "20:00"}
+                      onChange={(e) => updateHours(undefined, e.target.value)}
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono text-xs bg-slate-50/50"
+                    />
+                  </div>
+                </div>
+                <span className="text-[10px] text-slate-400 mt-1 block">
+                  Displayed to customers on the header and during closed hours
+                </span>
+              </div>
+
               <div className="max-w-md">
                 <label className="block font-bold text-slate-700 mb-1">Minimum Order Value (₹) *</label>
                 <input
@@ -450,8 +511,17 @@ const AdminSettings = (props) => {
               </div>
             </div>
 
-            {/* Announcement Banner Live Card */}
-            {settings.announcement && (
+            {/* Announcement & Status Banner Live Card */}
+            {!settings.restaurantOpen ? (
+              <div className="mt-3 p-3 rounded-xl bg-rose-50/90 border border-rose-300 text-xs text-rose-950">
+                <span className="text-[10px] font-black text-rose-700 uppercase tracking-wider block mb-1">
+                  Live Closed Storefront Banner:
+                </span>
+                <p className="text-[11px] font-semibold leading-snug">
+                  🔴 We are currently closed for orders. Kitchen Hours: {settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!
+                </p>
+              </div>
+            ) : settings.announcement ? (
               <div className="mt-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/80 text-xs text-emerald-900">
                 <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block mb-0.5">
                   Live Storefront Banner Preview:
@@ -460,7 +530,7 @@ const AdminSettings = (props) => {
                   {settings.announcement}
                 </p>
               </div>
-            )}
+            ) : null}
           </div>
         </aside>
       </div>

@@ -68,6 +68,8 @@ const Checkout = () => {
         packagingFee: 15,
         taxRate: 5,
         restaurantOpen: true,
+        minOrderValue: 99,
+        operatingHoursText: "6:00 AM – 8:00 PM",
         restaurantName: "Food Ninja",
         fssaiNumber: "10020011000123",
         gstinNumber: "07AAAAF1234A1Z5",
@@ -100,7 +102,12 @@ const Checkout = () => {
         setError("");
 
         if (!settings.restaurantOpen) {
-            setError("The restaurant is currently closed and not accepting new orders.");
+            setError(`The restaurant is currently closed for orders. Kitchen hours: ${settings.operatingHoursText || "6:00 AM – 8:00 PM"}.`);
+            return;
+        }
+
+        if (subtotal < (settings.minOrderValue || 0)) {
+            setError(`Minimum order value is ₹${settings.minOrderValue}. Please add more dishes to proceed.`);
             return;
         }
 
@@ -573,6 +580,17 @@ const Checkout = () => {
                             </div>
                         </div>
 
+                        {/* Store Closed Banner */}
+                        {settings.restaurantOpen === false && (
+                            <div className="mb-3 p-3 rounded-xl bg-rose-50 border border-rose-300 text-xs text-rose-950 flex items-start gap-2">
+                                <span className="h-2 w-2 rounded-full bg-rose-600 shrink-0 mt-1 animate-pulse" />
+                                <div>
+                                    <span className="font-bold block text-rose-900">Restaurant Currently Closed for Orders</span>
+                                    <span className="text-[11px] text-rose-800">Kitchen operating hours: {settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders placed while closed cannot be accepted.</span>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Section 1: Delivery Address (Compact) */}
                         <div className="rounded-xl border border-slate-200/80 bg-white p-3 mb-3">
                             <div className="flex items-center justify-between pb-2">
@@ -895,11 +913,15 @@ const Checkout = () => {
                         {/* Place Order CTA Button */}
                         <button
                             type="submit"
-                            disabled={submitting}
-                            className="w-full mt-4 rounded-xl bg-[#0c5936] hover:bg-[#084227] text-white py-3.5 px-4 font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.99] cursor-pointer disabled:opacity-50"
+                            disabled={submitting || settings.restaurantOpen === false || subtotal < (settings.minOrderValue || 0)}
+                            className="w-full mt-4 rounded-xl bg-[#0c5936] hover:bg-[#084227] text-white py-3.5 px-4 font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.99] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {submitting ? (
                                 <span>Placing Order...</span>
+                            ) : settings.restaurantOpen === false ? (
+                                <span>Restaurant Closed — Orders Paused</span>
+                            ) : subtotal < (settings.minOrderValue || 0) ? (
+                                <span>Min. Order ₹{settings.minOrderValue} Required</span>
                             ) : (
                                 <>
                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">

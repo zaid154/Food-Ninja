@@ -1,4 +1,5 @@
 const Order = require("../models/order");
+const Settings = require("../models/settings");
 
 // Get all orders (for Admin or user)
 const getOrders = async (req, res) => {
@@ -56,6 +57,11 @@ const createOrder = async (req, res) => {
 
     if (!customerName || !phone || !address || !items || !total) {
       return res.status(400).json({ message: "Missing required order details." });
+    }
+
+    const settings = await Settings.findOne({ key: "store_settings" });
+    if (settings && settings.restaurantOpen === false) {
+      return res.status(403).json({ message: "Store is currently closed for orders." });
     }
 
     const orderId = id || Date.now();

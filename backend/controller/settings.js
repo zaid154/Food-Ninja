@@ -20,7 +20,15 @@ const getSettings = async (req, res) => {
         restaurantOpen: true,
         minOrderValue: 99,
         announcement: "Free delivery on orders above ₹499! Enjoy freshly cooked authentic meals.",
+        openingTime: "06:00",
+        closingTime: "20:00",
+        operatingHoursText: "6:00 AM – 8:00 PM",
       });
+    } else if (!settings.openingTime || !settings.closingTime || !settings.operatingHoursText) {
+      settings.openingTime = settings.openingTime || "06:00";
+      settings.closingTime = settings.closingTime || "20:00";
+      settings.operatingHoursText = settings.operatingHoursText || "6:00 AM – 8:00 PM";
+      await settings.save();
     }
     return res.status(200).json({ success: true, settings });
   } catch (error) {
@@ -45,6 +53,9 @@ const updateSettings = async (req, res) => {
       restaurantOpen,
       minOrderValue,
       announcement,
+      openingTime,
+      closingTime,
+      operatingHoursText,
     } = req.body;
 
     const updateData = {};
@@ -61,6 +72,9 @@ const updateSettings = async (req, res) => {
     if (restaurantOpen !== undefined) updateData.restaurantOpen = Boolean(restaurantOpen);
     if (minOrderValue !== undefined) updateData.minOrderValue = Number(minOrderValue);
     if (announcement !== undefined) updateData.announcement = announcement.trim();
+    if (openingTime !== undefined) updateData.openingTime = openingTime.trim();
+    if (closingTime !== undefined) updateData.closingTime = closingTime.trim();
+    if (operatingHoursText !== undefined) updateData.operatingHoursText = operatingHoursText.trim();
 
     const settings = await Settings.findOneAndUpdate(
       { key: "store_settings" },

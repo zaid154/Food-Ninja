@@ -13,6 +13,9 @@ const Cart = () => {
     freeDeliveryThreshold: 499,
     packagingFee: 15,
     taxRate: 5,
+    restaurantOpen: true,
+    minOrderValue: 99,
+    operatingHoursText: "6:00 AM – 8:00 PM",
   });
 
   useEffect(() => {
@@ -37,6 +40,10 @@ const Cart = () => {
   const packagingFee = totalItems > 0 ? (settings.packagingFee ?? 15) : 0;
   const taxes = totalItems > 0 ? Math.round(totalAmount * ((settings.taxRate ?? 5) / 100)) : 0;
   const grandTotal = totalAmount + deliveryFee + packagingFee + taxes;
+
+  const isStoreClosed = settings.restaurantOpen === false;
+  const isBelowMinOrder = totalAmount < (settings.minOrderValue || 0);
+  const canCheckout = !isStoreClosed && !isBelowMinOrder;
 
   if (totalItems === 0) {
     return (
@@ -298,17 +305,51 @@ const Cart = () => {
                 </div>
               </div>
 
+              {/* Store Status / Min Order Warning */}
+              {isStoreClosed ? (
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 flex items-start gap-2">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <div>
+                    <span className="font-bold block text-rose-800">Restaurant Currently Closed</span>
+                    <span className="text-[11px] text-rose-700">Kitchen operating hours: {settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!</span>
+                  </div>
+                </div>
+              ) : isBelowMinOrder ? (
+                <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center justify-between">
+                  <span>Minimum order value is <strong>₹{settings.minOrderValue}</strong></span>
+                  <span className="font-bold text-amber-800">Add ₹{settings.minOrderValue - totalAmount} more</span>
+                </div>
+              ) : null}
+
               {/* Checkout Action Button */}
-              <Link
-                to="/checkout"
-                className="w-full flex items-center justify-between rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] px-4 py-3 text-white text-xs font-bold shadow-xs transition cursor-pointer"
-              >
-                <span>PROCEED TO CHECKOUT</span>
-                <span className="flex items-center gap-1 font-black">
-                  <span>₹{grandTotal}</span>
-                  <span>→</span>
-                </span>
-              </Link>
+              {canCheckout ? (
+                <Link
+                  to="/checkout"
+                  className="w-full flex items-center justify-between rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] px-4 py-3 text-white text-xs font-bold shadow-xs transition cursor-pointer"
+                >
+                  <span>PROCEED TO CHECKOUT</span>
+                  <span className="flex items-center gap-1 font-black">
+                    <span>₹{grandTotal}</span>
+                    <span>→</span>
+                  </span>
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-200 text-slate-500 px-4 py-3 text-xs font-bold cursor-not-allowed select-none"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  <span>{isStoreClosed ? "STORE CLOSED — ORDERS PAUSED" : `MINIMUM ORDER ₹${settings.minOrderValue || 99}`}</span>
+                </button>
+              )}
 
               {/* Safe & Secure Footnote */}
               <div className="pt-1 flex items-center justify-center gap-3 text-[10px] text-slate-400 border-t border-slate-100">

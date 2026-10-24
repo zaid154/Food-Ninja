@@ -16,6 +16,9 @@ const settingsSchema = new mongoose.Schema(
     restaurantOpen: { type: Boolean, default: true },
     minOrderValue: { type: Number, default: 99 },
     announcement: { type: String, default: "" },
+    openingTime: { type: String, default: "06:00" },
+    closingTime: { type: String, default: "20:00" },
+    operatingHoursText: { type: String, default: "6:00 AM – 8:00 PM" },
   },
   { timestamps: true }
 );
