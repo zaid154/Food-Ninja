@@ -9,13 +9,11 @@ global.dbStatus = {
 
 const connectDb = async () => {
   try {
-    let uri = process.env.CONNECTION_STRING || process.env.MONGO_URI || "";
-    // Strip accidental quotes or whitespace that users often paste into Render dashboard
-    uri = uri.replace(/^["']|["']$/g, "").trim();
+    const uri = (process.env.MONGO_URI || "").trim();
 
     if (!uri) {
       global.dbStatus.error = "MONGO_URI is missing in environment variables";
-      console.log("Database connection failed ❌: MONGO_URI is missing");
+      console.log("Database connection failed: MONGO_URI is missing");
       return;
     }
 
@@ -30,12 +28,12 @@ const connectDb = async () => {
     global.dbStatus.connected = true;
     global.dbStatus.connecting = false;
     global.dbStatus.error = null;
-    console.log("MongoDB Database connected successfully ✅");
+    console.log("MongoDB Database connected successfully");
   } catch (error) {
     global.dbStatus.connected = false;
     global.dbStatus.connecting = false;
     global.dbStatus.error = error.message;
-    console.log("Database connection failed ❌:", error.message);
+    console.log("Database connection failed:", error.message);
   }
 };
 
