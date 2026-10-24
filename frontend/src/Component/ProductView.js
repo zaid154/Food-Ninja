@@ -130,6 +130,7 @@ const ProductView = () => {
         description: "Delicious Russian style Russian Borscht, prepared fresh with aromatic herbs and premium quality ingredients."
       };
 
+  const isBorscht = product.name?.toLowerCase().includes("borscht") ?? false;
   const mainDishImg = product.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80";
 
   const inCart = cartItems.find((i) => String(i.id) === String(product.id));
