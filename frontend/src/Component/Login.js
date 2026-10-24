@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import UserContext from "./Usercontext";
 import { API_BASE_URL } from "../utils/Constants";
-import BrandLogo from "./BrandLogo";
+import logo from "../assets/logo.png";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -69,9 +69,9 @@ const Login = () => {
             <div className="w-full max-w-md rounded-2xl bg-white p-7 sm:p-8 shadow-sm border border-slate-200">
                 {/* Brand Header */}
                 <div className="text-center mb-6">
-                    <div className="inline-flex justify-center mb-3">
-                        <BrandLogo to="/" size="lg" badge hideText />
-                    </div>
+                    <Link to="/" className="inline-flex justify-center mb-3">
+                        <img src={logo} alt="Food Ninja" className="h-14 w-14 rounded-full object-cover shadow-xs border border-slate-200" />
+                    </Link>
                     <h1 className="text-2xl font-black text-slate-900">
                         Welcome to Food<span className="text-emerald-600">Ninja</span>
                     </h1>

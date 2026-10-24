@@ -3,7 +3,7 @@ import { NavLink, Link, Outlet, useLocation, useNavigate } from "react-router-do
 import AdminLogin from "./admin/AdminLogin";
 import Header from "./Header";
 import Footer from "./Footer";
-import BrandLogo from "./BrandLogo";
+import logo from "../assets/logo.png";
 import { API_BASE_URL } from "../utils/Constants";
 
 const Admin = () => {
@@ -235,7 +235,11 @@ const Admin = () => {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3">
           {/* Left: Brand Logo */}
           <div className="shrink-0">
-            <BrandLogo to="/admin" size="md" hideSubtitle={true} />
+            <Link to="/admin" className="flex items-center gap-2.5">
+              <img src={logo} alt="Food Ninja Admin" className="h-8 w-8 rounded-full object-cover" />
+              <span className="font-black text-lg tracking-tight text-slate-900">Food<span className="text-emerald-600">Ninja</span></span>
+              <span className="text-[10px] font-black uppercase tracking-wider bg-slate-900 text-white px-1.5 py-0.5 rounded">Admin</span>
+            </Link>
           </div>
 
           {/* Center: Desktop Navigation Tabs (Fills Header Space Cleanly) */}

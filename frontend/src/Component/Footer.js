@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import BrandLogo from "./BrandLogo";
+import logo from "../assets/logo.png";
 import { API_BASE_URL } from "../utils/Constants";
 
 const Footer = () => {
@@ -29,7 +29,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
           {/* Col 1: Brand Info */}
           <div>
-            <BrandLogo variant="dark" badge size="md" />
+            <Link to="/" className="inline-flex items-center gap-2.5 group">
+              <img src={logo} alt="Food Ninja" className="h-10 w-10 rounded-full object-cover p-0.5 bg-white shadow-xs" />
+              <span className="font-black text-xl tracking-tight text-white">Food<span className="text-emerald-400">Ninja</span></span>
+            </Link>
             <p className="mt-4 text-xs text-slate-400 leading-relaxed max-w-xs">
               Delicious meals crafted with fresh ingredients, delivered hot and fresh directly to your doorstep.
             </p>
