@@ -21,12 +21,17 @@ Food Ninja is a full-stack food ordering platform built using the MERN stack (Mo
 - **Customer Reviews & Badges:** Real-time customer feedback on dishes, featuring dynamic "Verified Customer - Delivered Order" badges.
 - **Cart & Wishlist:** Redux Toolkit-backed cart with quantity controls, subtotal calculations, and `localStorage` persistence so cart items remain saved on page refresh.
 - **Order Placement & Tracking:** Seamless checkout with address and payment details. Dedicated order history and tracking page with live status updates (`Placed` -> `Preparing` -> `Out for Delivery` -> `Delivered`).
+- **Store Hours & Closed Notices:** Customers see the store's closed notice in the header, cart, and checkout. The server blocks new orders when the store is paused or outside its scheduled hours.
 - **User Authentication:** Simple signup and login with role management (`user` / `admin`).
 
 ### Admin Dashboard (`/admin`)
 - **Menu Management:** Add new dishes, edit pricing and descriptions, or remove items.
-- **Order Management:** View all incoming orders, customer details, and update live delivery status.
+- **Order Management:** Search orders, filter by date and status, distinguish today's and older orders, and update delivery status.
+- **Categories & Customers:** Manage menu categories and view customer records from the admin dashboard.
+- **Store Settings:** Pause or reopen orders, enter a custom closed notice, set opening/closing times, and enable automatic closure outside those hours. The admin preview uses the backend schedule.
 - **Inquiry Management:** Review customer contact messages with direct one-click email and phone call actions.
+
+Scheduled hours support daytime ranges (for example, 06:00–20:00) and overnight ranges (for example, 18:00–02:00). They use India Standard Time (IST). A custom closed notice is shown to customers while the store is closed.
 
 ---
 
@@ -35,7 +40,7 @@ Food Ninja is a full-stack food ordering platform built using the MERN stack (Mo
 - **Frontend:** React 18, React Router v6, Redux Toolkit, Tailwind CSS v4, Parcel
 - **Backend:** Node.js, Express.js 5, Mongoose ODM
 - **Database:** MongoDB Atlas Cloud
-- **Testing:** Jest, React Testing Library (100% pass)
+- **Testing:** Jest and React Testing Library
 
 ---
 
@@ -46,23 +51,20 @@ Food Ninja/
 ├── backend/
 │   ├── config/
 │   │   └── connectionDb.js     # MongoDB connection setup
-│   ├── controller/             # Business logic
-│   │   ├── inquiry.js          # Contact messages controller
-│   │   ├── order.js            # Orders & status progression
-│   │   ├── recipe.js           # Menu dishes CRUD
-│   │   └── user.js             # Registration & login
-│   ├── models/                 # Mongoose schemas (User, Recipe, Order, Inquiry)
-│   ├── routes/                 # Express route definitions
+│   ├── controller/             # Business logic for catalog, orders, reviews, settings, etc.
+│   ├── models/                 # Mongoose schemas for users, dishes, orders, reviews, settings, etc.
+│   ├── routes/                 # Express route definitions, including payment
+│   ├── data/                   # Seed dish data
 │   ├── seedData.js             # Initial database seeder script
 │   └── server.js               # Express application entry point
 ├── frontend/
 │   ├── src/
 │   │   ├── Component/          # UI views, pages, and components
-│   │   │   ├── admin/          # Admin dashboard pages
+│   │   │   ├── admin/          # Admin pages and shared dropdowns
 │   │   │   ├── food/           # Food cards and list items
 │   │   │   └── __tests__/      # Jest & React Testing Library test suite
-│   │   ├── mockData/           # Test fixtures
 │   │   ├── utils/              # Redux store, slices, and constants
+│   │   │   └── storeNotices.js # Shared closed-store notice and IST clock helpers
 │   │   ├── App.css             # Tailwind imports & custom utilities
 │   │   └── App.js              # Root router & layout
 │   ├── index.html              # Parcel HTML entry point
@@ -139,17 +141,30 @@ npm test
 | `POST` | `/api/recipes` | Add new dish (Admin) |
 | `PUT` | `/api/recipes/:id` | Update dish details (Admin) |
 | `DELETE`| `/api/recipes/:id` | Delete dish (Admin) |
-| `GET` | `/api/reviews/:recipeId` | Get all reviews for a specific dish |
-| `POST` | `/api/reviews` | Submit new customer review (auto-checks delivered order status) |
+| `PUT`, `PATCH` | `/api/recipes/:id/stock` | Update dish availability |
+| `GET` | `/api/recipes/:id/reviews` | Get reviews for a dish |
+| `POST` | `/api/recipes/:id/reviews` | Submit a review after delivered-order verification |
+| `GET` | `/api/recipes/:id/review-eligibility` | Check whether the customer can review the dish |
 | `GET` | `/api/orders` | Get orders (filtered by user or all for admin) |
-| `POST` | `/api/orders` | Place a new order |
+| `GET` | `/api/orders/:id` | Get one order |
+| `POST` | `/api/orders` | Place an order; closed stores reject the request with a notice |
 | `PUT` | `/api/orders/:id/status` | Update order delivery status |
 | `POST` | `/api/users/register` | Register new user account |
 | `POST` | `/api/users/login` | Login user |
+| `GET` | `/api/users` | List users |
 | `GET` | `/api/contact` | Get all customer inquiries (Admin) |
 | `POST` | `/api/contact` | Submit contact form inquiry |
 | `PUT` | `/api/contact/:id/reply` | Record reply to customer inquiry |
 | `DELETE`| `/api/contact/:id` | Delete inquiry (Admin) |
+| `PATCH`, `PUT` | `/api/contact/:id/resolve` | Resolve an inquiry |
+| `GET`, `PUT` | `/api/settings` | Read or update store hours, pause state, fees, and closed notice |
+| `GET` | `/api/payment/key` | Get payment configuration status and public key |
+| `POST` | `/api/payment/create-order` | Create a payment order |
+| `POST` | `/api/payment/verify` | Verify a payment signature |
+| `GET`, `POST` | `/api/categories` | List or create categories |
+| `PUT`, `DELETE` | `/api/categories/:id` | Update or delete a category |
+
+The recipe router is also mounted at `/api/foods` for compatibility. Review endpoints are also available under `/api/reviews/:id` and `/api/reviews/:id/eligibility`.
 
 ---
 
