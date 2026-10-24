@@ -1,4 +1,4 @@
-import logo from "../assets/logo.png";
+import logo from "url:../assets/logo.png";
 export const LOGO = logo;
 
 const defaultUrl =

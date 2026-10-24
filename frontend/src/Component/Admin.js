@@ -3,8 +3,7 @@ import { NavLink, Link, Outlet, useLocation, useNavigate } from "react-router-do
 import AdminLogin from "./admin/AdminLogin";
 import Header from "./Header";
 import Footer from "./Footer";
-import logo from "../assets/logo.png";
-import { API_BASE_URL } from "../utils/Constants";
+import { API_BASE_URL, LOGO } from "../utils/Constants";
 
 const Admin = () => {
   const [isAdminAuth, setIsAdminAuth] = useState(() => {
@@ -236,7 +235,7 @@ const Admin = () => {
           {/* Left: Brand Logo */}
           <div className="shrink-0">
             <Link to="/admin" className="flex items-center gap-2.5">
-              <img src={logo} alt="Food Ninja Admin" className="h-8 w-8 rounded-full object-cover" />
+              <img src={LOGO} alt="Food Ninja Admin" className="h-8 w-8 rounded-full object-cover" />
               <span className="font-black text-lg tracking-tight text-slate-900">Food<span className="text-emerald-600">Ninja</span></span>
               <span className="text-[10px] font-black uppercase tracking-wider bg-slate-900 text-white px-1.5 py-0.5 rounded">Admin</span>
             </Link>

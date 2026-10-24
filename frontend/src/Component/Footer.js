@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/logo.png";
-import { API_BASE_URL } from "../utils/Constants";
+import { API_BASE_URL, LOGO } from "../utils/Constants";
 
 const Footer = () => {
   const [settings, setSettings] = useState({
@@ -30,7 +29,7 @@ const Footer = () => {
           {/* Col 1: Brand Info */}
           <div>
             <Link to="/" className="inline-flex items-center gap-2.5 group">
-              <img src={logo} alt="Food Ninja" className="h-10 w-10 rounded-full object-cover p-0.5 bg-white shadow-xs" />
+              <img src={LOGO} alt="Food Ninja" className="h-10 w-10 rounded-full object-cover p-0.5 bg-white shadow-xs" />
               <span className="font-black text-xl tracking-tight text-white">Food<span className="text-emerald-400">Ninja</span></span>
             </Link>
             <p className="mt-4 text-xs text-slate-400 leading-relaxed max-w-xs">

@@ -5,7 +5,6 @@ import useResipe from "./useRecipes";
 import { addCart, removeCart } from "../utils/cartSlice";
 import { addWishlist, removeWishlist } from "../utils/wishlistSlice";
 import { FALLBACK_RECIPES } from "../utils/fallbackDishes";
-import { DISH_BORSCHT } from "../assets/mockupImages";
 import { API_BASE_URL } from "../utils/Constants";
 import UserContext from "./Usercontext";
 
@@ -125,14 +124,13 @@ const ProductView = () => {
         category: "Soups & Salads",
         price: 150,
         caloriesPerServing: 150,
-        image: DISH_BORSCHT,
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80",
         rating: 4.3,
         reviewCount: 86,
         description: "Delicious Russian style Russian Borscht, prepared fresh with aromatic herbs and premium quality ingredients."
       };
 
-  const isBorscht = product.name && product.name.toLowerCase().includes("borscht");
-  const mainDishImg = isBorscht ? DISH_BORSCHT : (product.image || DISH_BORSCHT);
+  const mainDishImg = product.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80";
 
   const inCart = cartItems.find((i) => String(i.id) === String(product.id));
   const cartQty = inCart ? inCart.quantity : 0;

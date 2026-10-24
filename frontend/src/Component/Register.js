@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../utils/Constants";
-import logo from "../assets/logo.png";
+import { API_BASE_URL, LOGO } from "../utils/Constants";
 
 const Register = () => {
     const [name, setName] = useState("");
@@ -64,7 +63,7 @@ const Register = () => {
                 {/* Brand Header */}
                 <div className="text-center mb-6">
                     <Link to="/" className="inline-flex justify-center mb-3">
-                        <img src={logo} alt="Food Ninja" className="h-14 w-14 rounded-full object-cover shadow-xs border border-slate-200" />
+                        <img src={LOGO} alt="Food Ninja" className="h-14 w-14 rounded-full object-cover shadow-xs border border-slate-200" />
                     </Link>
                     <h1 className="text-2xl font-black text-slate-900">
                         Join Food<span className="text-emerald-600">Ninja</span>

@@ -4,8 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../utils/cartSlice";
 import { clearWishlist } from "../utils/wishlistSlice";
 import UserContext from "./Usercontext";
-import logo from "../assets/logo.png";
-import { API_BASE_URL } from "../utils/Constants";
+import { API_BASE_URL, LOGO } from "../utils/Constants";
 
 const Header = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -135,7 +134,7 @@ const Header = () => {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 sm:px-10 py-3.5">
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-2.5 group">
-          <img src={logo} alt="Food Ninja" className="h-9 w-9 rounded-full object-cover shadow-2xs group-hover:scale-105 transition-transform" />
+          <img src={LOGO} alt="Food Ninja" className="h-9 w-9 rounded-full object-cover shadow-2xs group-hover:scale-105 transition-transform" />
           <span className="font-black text-xl tracking-tight text-slate-900">Food<span className="text-emerald-600">Ninja</span></span>
         </Link>
 
