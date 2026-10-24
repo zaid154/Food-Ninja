@@ -1,115 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import OrderInvoiceModal from "./OrderInvoiceModal";
+import AdminDropdown from "./AdminDropdown";
 
 const STATUSES = ["All", "Placed", "Preparing", "Out for Delivery", "Delivered", "Cancelled"];
 const ORDER_STATUS_OPTIONS = STATUSES.filter((status) => status !== "All").map((status) => ({ value: status, label: status }));
 const DATE_FILTERS = ["Today", "Yesterday", "Older", "All Dates"];
-
-const FilterDropdown = ({ label, value, options, onChange, compact = false, portal = false, triggerClassName = "" }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [panelStyle, setPanelStyle] = useState({});
-  const dropdownRef = useRef(null);
-  const panelRef = useRef(null);
-  const selectedOption = options.find((option) => option.value === value);
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const closeOnOutsideClick = (event) => {
-      const clickedTrigger = dropdownRef.current?.contains(event.target);
-      const clickedPanel = panelRef.current?.contains(event.target);
-      if (!clickedTrigger && !clickedPanel) setIsOpen(false);
-    };
-    const closeOnEscape = (event) => {
-      if (event.key === "Escape") setIsOpen(false);
-    };
-    const updatePanelPosition = () => {
-      if (!portal || !dropdownRef.current) return;
-      const trigger = dropdownRef.current.querySelector("button");
-      if (!trigger) return;
-      const rect = trigger.getBoundingClientRect();
-      const panelHeight = Math.min(options.length * 38 + 8, 248);
-      const opensDown = rect.bottom + panelHeight + 8 < window.innerHeight;
-      setPanelStyle({
-        position: "fixed",
-        left: rect.left,
-        width: rect.width,
-        top: opensDown ? rect.bottom + 4 : Math.max(8, rect.top - panelHeight - 4),
-        zIndex: 1000,
-      });
-    };
-    updatePanelPosition();
-    document.addEventListener("mousedown", closeOnOutsideClick);
-    document.addEventListener("keydown", closeOnEscape);
-    window.addEventListener("resize", updatePanelPosition);
-    window.addEventListener("scroll", updatePanelPosition, true);
-    return () => {
-      document.removeEventListener("mousedown", closeOnOutsideClick);
-      document.removeEventListener("keydown", closeOnEscape);
-      window.removeEventListener("resize", updatePanelPosition);
-      window.removeEventListener("scroll", updatePanelPosition, true);
-    };
-  }, [isOpen, options.length, portal]);
-
-  const menu = isOpen && (
-    <div
-      ref={panelRef}
-      role="listbox"
-      style={portal ? panelStyle : undefined}
-      className={`${portal ? "" : "absolute left-0 right-0 top-full mt-1 z-[80]"} overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-xl animate-in fade-in zoom-in-95 duration-150`}
-    >
-      <div className="max-h-60 overflow-y-auto [scrollbar-width:thin]">
-        {options.map((option) => {
-          const isSelected = option.value === value;
-          return (
-            <button
-              key={option.value}
-              type="button"
-              role="option"
-              aria-selected={isSelected}
-              onClick={() => { onChange(option.value); setIsOpen(false); }}
-              className={`flex w-full items-center justify-between gap-3 rounded-lg px-2.5 py-2 text-left text-xs transition ${
-                isSelected ? "bg-emerald-50 font-bold text-emerald-900" : "text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              <span className="truncate">{option.label}</span>
-              <span className="flex shrink-0 items-center gap-2">
-                {option.count !== undefined && <span className="text-[10px] font-semibold text-slate-400">{option.count}</span>}
-                {isSelected && (
-                  <svg className="h-3.5 w-3.5 text-emerald-700" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <path d="m4 10 4 4 8-8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="relative min-w-0" ref={dropdownRef}>
-      {label && <span className="mb-1 block text-[10px] font-bold tracking-wide text-slate-500">{label}</span>}
-      <button
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((open) => !open)}
-        className={`flex w-full items-center justify-between gap-2 rounded-lg border bg-white px-3 text-left text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-emerald-600/10 ${compact ? "py-1.5" : "py-2.5"} ${
-          isOpen ? "border-emerald-600 ring-2 ring-emerald-600/10" : "border-slate-200 hover:border-slate-300"
-        } ${triggerClassName}`}
-      >
-        <span className="truncate text-slate-800">{selectedOption?.label || value}</span>
-        <svg className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${isOpen ? "rotate-180 text-emerald-700" : ""}`} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-          <path d="m5 7.5 5 5 5-5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
-      {portal ? menu && createPortal(menu, document.body) : menu}
-    </div>
-  );
-};
 
 const getOrderDate = (order) => {
   const createdAt = order.createdAt ? new Date(order.createdAt) : null;
@@ -208,14 +104,14 @@ const AdminOrders = (props) => {
         </div>
 
         <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-3 xl:w-[700px]">
-          <FilterDropdown
+          <AdminDropdown
             label="DATE"
             value={selectedDate}
             options={dateOptions}
             onChange={(value) => { setSelectedDate(value); setPage(1); }}
           />
 
-          <FilterDropdown
+          <AdminDropdown
             label="STATUS"
             value={selectedStatus}
             options={statusOptions}
@@ -341,7 +237,7 @@ const AdminOrders = (props) => {
                     <p className="text-[10px] text-slate-400">{o.payment}</p>
                   </td>
                   <td className="py-3.5 align-top text-right space-y-1.5">
-                    <FilterDropdown
+                    <AdminDropdown
                       label={null}
                       value={o.status}
                       options={ORDER_STATUS_OPTIONS}

@@ -1,10 +1,11 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../utils/cartSlice";
 import { addOrder } from "../utils/ordersSlice";
 import UserContext from "./Usercontext";
 import { API_BASE_URL } from "../utils/Constants";
+import { getClosedStoreNotice } from "../utils/storeNotices";
 
 // Validation helper to detect fake keyboard spam / gibberish
 const isGibberish = (str) => {
@@ -106,7 +107,7 @@ const Checkout = () => {
         setError("");
 
         if (settings.restaurantOpen === false || settings.isEffectiveOpen === false) {
-            setError(settings.effectiveClosedReason || settings.closedNoticeMessage || `We are currently closed for orders. Kitchen hours: ${settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!`);
+            setError(getClosedStoreNotice(settings));
             return;
         }
 
@@ -600,7 +601,7 @@ const Checkout = () => {
                                 <span className="h-2 w-2 rounded-full bg-rose-600 shrink-0 mt-1 animate-pulse" />
                                 <div>
                                     <span className="font-bold block text-rose-900">Restaurant Currently Closed for Orders</span>
-                                    <span className="text-[11px] text-rose-800">{settings.effectiveClosedReason || settings.closedNoticeMessage || `We are currently closed for orders. Kitchen hours: ${settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!`}</span>
+                                    <span className="text-[11px] text-rose-800">{getClosedStoreNotice(settings)}</span>
                                 </div>
                             </div>
                         )}

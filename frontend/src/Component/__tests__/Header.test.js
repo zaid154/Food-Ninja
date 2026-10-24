@@ -2,7 +2,6 @@ import { render, screen } from "@testing-library/react";
 import Header from "../Header";
 import store from "../../utils/Store";
 import { Provider } from "react-redux";
-import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import "@testing-library/jest-dom";
 

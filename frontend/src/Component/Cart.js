@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addCart, clearCart, removeCart } from "../utils/cartSlice";
 import { API_BASE_URL } from "../utils/Constants";
+import { getClosedStoreNotice } from "../utils/storeNotices";
 
 const Cart = () => {
   const cartItems = useSelector((store) => store.cart.item);
@@ -319,7 +320,7 @@ const Cart = () => {
                   </svg>
                   <div>
                     <span className="font-bold block text-rose-800">Restaurant Currently Closed</span>
-                    <span className="text-[11px] text-rose-700">{settings.effectiveClosedReason || settings.closedNoticeMessage || `We are currently closed for orders. Kitchen hours: ${settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!`}</span>
+                    <span className="text-[11px] text-rose-700">{getClosedStoreNotice(settings)}</span>
                   </div>
                 </div>
               ) : isBelowMinOrder ? (

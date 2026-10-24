@@ -15,7 +15,7 @@ const settingsSchema = new mongoose.Schema(
     taxRate: { type: Number, default: 5 },
     restaurantOpen: { type: Boolean, default: true },
     minOrderValue: { type: Number, default: 99 },
-    announcement: { type: String, default: "" },
+    announcement: { type: String, default: "Free delivery on orders above ₹499! Enjoy freshly cooked authentic meals." },
     openingTime: { type: String, default: "06:00" },
     closingTime: { type: String, default: "20:00" },
     operatingHoursText: { type: String, default: "6:00 AM – 8:00 PM" },

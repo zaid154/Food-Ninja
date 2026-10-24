@@ -1,6 +1,18 @@
 const Settings = require("../models/settings");
 
 const DEFAULT_PAUSE_NOTICE = "Orders temporarily paused by kitchen. We'll be back shortly!";
+const STORE_TIME_ZONE = "Asia/Kolkata";
+
+const getStoreCurrentMinutes = (now) => {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: STORE_TIME_ZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(now);
+  const timeParts = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return Number(timeParts.hour) * 60 + Number(timeParts.minute);
+};
 
 const parseTime = (value) => {
   if (typeof value !== "string" || !/^([01]\d|2[0-3]):[0-5]\d$/.test(value)) return null;
@@ -8,11 +20,11 @@ const parseTime = (value) => {
   return hours * 60 + minutes;
 };
 
-// Check if current server time falls within opening–closing window
+// Check the restaurant's local time against daytime or overnight hours.
 // Supports both normal (06:00–20:00) and overnight (18:00–02:00) ranges
 const isWithinHours = (openingTime, closingTime, now = new Date()) => {
   if (!openingTime || !closingTime) return true;
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const currentMinutes = getStoreCurrentMinutes(now);
   const openMin = parseTime(openingTime);
   const closeMin = parseTime(closingTime);
   if (openMin === null || closeMin === null) return true;
@@ -60,27 +72,7 @@ const getSettings = async (req, res) => {
   try {
     let settings = await Settings.findOne({ key: "store_settings" });
     if (!settings) {
-      settings = await Settings.create({
-        key: "store_settings",
-        restaurantName: "Food Ninja",
-        fssaiNumber: "10020011000123",
-        gstinNumber: "07AAAAF1234A1Z5",
-        storePhone: "+91 98765 43210",
-        storeEmail: "support@foodninja.com",
-        storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
-        deliveryFee: 30,
-        freeDeliveryThreshold: 499,
-        packagingFee: 15,
-        taxRate: 5,
-        restaurantOpen: true,
-        minOrderValue: 99,
-        announcement: "Free delivery on orders above ₹499! Enjoy freshly cooked authentic meals.",
-        openingTime: "06:00",
-        closingTime: "20:00",
-        operatingHoursText: "6:00 AM – 8:00 PM",
-        closedNoticeMessage: "",
-        autoScheduleEnabled: true,
-      });
+      settings = await Settings.create({ key: "store_settings" });
     } else if (!settings.openingTime || !settings.closingTime || !settings.operatingHoursText) {
       settings.openingTime = settings.openingTime || "06:00";
       settings.closingTime = settings.closingTime || "20:00";

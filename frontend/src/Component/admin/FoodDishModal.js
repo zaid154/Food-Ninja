@@ -1,176 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-
-/**
- * Modern Custom Dropdown Component
- * Replaces ugly native OS <select> popups with modern Tailwind emerald styling.
- * Floats cleanly on z-50 without triggering modal scrollbars or layout shifts.
- * Supports inline dynamic addition of custom cuisines (+ Add New Cuisine).
- */
-const CustomDropdown = ({
-  label,
-  sublabel,
-  value,
-  options = [],
-  onChange,
-  allowAdd = false,
-  onAddOption,
-  placeholder = "Select..."
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [newOptionText, setNewOptionText] = useState("");
-  const [isAdding, setIsAdding] = useState(false);
-  const dropdownRef = useRef(null);
-
-  // Close when clicking outside
-  useEffect(() => {
-    const handleOutsideClick = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setIsOpen(false);
-        setIsAdding(false);
-      }
-    };
-    if (isOpen) {
-      document.addEventListener("mousedown", handleOutsideClick);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, [isOpen]);
-
-  const handleCreateNew = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const trimmed = newOptionText.trim();
-    if (!trimmed) return;
-    if (onAddOption) {
-      onAddOption(trimmed);
-    }
-    onChange(trimmed);
-    setNewOptionText("");
-    setIsAdding(false);
-    setIsOpen(false);
-  };
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <label className="block font-bold text-slate-700 mb-1 flex items-center justify-between text-[11px]">
-        <span>{label}</span>
-        {sublabel && <span className="text-[10px] text-slate-400 font-normal">{sublabel}</span>}
-      </label>
-
-      {/* Styled Trigger Button */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-full rounded-xl border px-3 py-1.5 text-xs flex items-center justify-between bg-white transition cursor-pointer text-left ${
-          isOpen
-            ? "border-emerald-600 ring-2 ring-emerald-500/20"
-            : "border-slate-300 hover:border-slate-400"
-        }`}
-      >
-        <span className={`truncate font-medium ${value ? "text-slate-800" : "text-slate-400"}`}>
-          {value || placeholder}
-        </span>
-        <svg
-          className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 shrink-0 ml-1 ${
-            isOpen ? "rotate-180 text-emerald-600" : ""
-          }`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </button>
-
-      {/* Floating Dropdown Panel (Clean shadow-2xl, sleek 6px custom scrollbar, NO arrows) */}
-      {isOpen && (
-        <div className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl bg-white border border-slate-200 shadow-2xl overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150">
-          <div className="max-h-36 overflow-y-auto divide-y divide-slate-50 [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-200 hover:[&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-transparent">
-            {options.map((opt) => {
-              const isSelected = opt === value;
-              return (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => {
-                    onChange(opt);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full px-3 py-1.5 text-xs flex items-center justify-between text-left transition cursor-pointer ${
-                    isSelected
-                      ? "bg-emerald-50 text-emerald-900 font-bold"
-                      : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
-                  }`}
-                >
-                  <span className="truncate">{opt}</span>
-                  {isSelected && (
-                    <svg className="h-3.5 w-3.5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Add Custom Option Footer (e.g. for Cuisines) */}
-          {allowAdd && (
-            <div className="border-t border-slate-100 p-1.5 bg-slate-50/80">
-              {isAdding ? (
-                <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                  <input
-                    type="text"
-                    autoFocus
-                    value={newOptionText}
-                    onChange={(e) => setNewOptionText(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleCreateNew(e);
-                      if (e.key === "Escape") setIsAdding(false);
-                    }}
-                    placeholder="Type cuisine (e.g. Awadhi, Japanese)"
-                    className="w-full rounded-lg border border-emerald-500 bg-white px-2 py-1 text-[11px] outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleCreateNew}
-                    className="rounded-lg bg-emerald-700 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-emerald-800 transition shrink-0 cursor-pointer"
-                  >
-                    Add
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsAdding(false)}
-                    className="text-slate-400 hover:text-slate-600 px-1 text-xs font-bold shrink-0 cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsAdding(true);
-                  }}
-                  className="w-full flex items-center gap-1.5 text-left text-xs font-bold text-emerald-700 hover:text-emerald-800 px-2 py-1 rounded-lg hover:bg-emerald-50 transition cursor-pointer"
-                >
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                  </svg>
-                  <span>Add New Cuisine</span>
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
+import { useState, useEffect, useRef } from "react";
+import AdminDropdown from "./AdminDropdown";
 const FoodDishModal = ({
   isOpen,
   onClose,
@@ -315,7 +144,7 @@ const FoodDishModal = ({
 
               {/* Category & Cuisine Dropdowns (Clean floating dropdowns with zero scrollbar trigger) */}
               <div className="grid grid-cols-2 gap-2.5">
-                <CustomDropdown
+                <AdminDropdown variant="dish"
                   label="Category *"
                   sublabel="Menu section"
                   value={foodForm.category}
@@ -324,7 +153,7 @@ const FoodDishModal = ({
                   placeholder="Select Category"
                 />
 
-                <CustomDropdown
+                <AdminDropdown variant="dish"
                   label="Cuisine / Origin *"
                   sublabel="Regional style"
                   value={foodForm.cuisine}
@@ -332,6 +161,8 @@ const FoodDishModal = ({
                   onChange={(c) => setFoodForm({ ...foodForm, cuisine: c })}
                   allowAdd={true}
                   onAddOption={handleAddCustomCuisine}
+                  addLabel="Add New Cuisine"
+                  addPlaceholder="Type cuisine (e.g. Awadhi, Japanese)"
                   placeholder="Select Cuisine"
                 />
               </div>

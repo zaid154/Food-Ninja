@@ -1,9 +1,9 @@
-import React from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { LOGO } from "../../utils/Constants";
 
 const AdminLogin = ({ adminEmail, setAdminEmail, adminPassword, setAdminPassword, authError, onLogin }) => {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <section className="flex min-h-[75vh] items-center justify-center bg-slate-50 px-4 py-12">

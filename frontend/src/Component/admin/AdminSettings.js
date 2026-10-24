@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
+import { getKitchenHoursClosedNotice, getStoreCurrentMinutes } from "../../utils/storeNotices";
 
 const AdminSettings = (props) => {
   const context = useOutletContext() || {};
@@ -121,7 +122,7 @@ const AdminSettings = (props) => {
     ? Number(settings.openingTime.slice(0, 2)) * 60 + Number(settings.openingTime.slice(3)) : null;
   const closingMinutes = /^([01]\d|2[0-3]):[0-5]\d$/.test(settings.closingTime || "")
     ? Number(settings.closingTime.slice(0, 2)) * 60 + Number(settings.closingTime.slice(3)) : null;
-  const currentMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+  const currentMinutes = getStoreCurrentMinutes();
   const isWithinHours = openingMinutes === null || closingMinutes === null || openingMinutes === closingMinutes
     ? true
     : closingMinutes > openingMinutes
@@ -130,7 +131,7 @@ const AdminSettings = (props) => {
   const isPreviewOpen = settings.restaurantOpen !== false && (settings.autoScheduleEnabled === false || isWithinHours);
   const previewBannerText = settings.closedNoticeMessage?.trim()
     || (!isWithinHours
-      ? `We are currently closed for orders. Kitchen hours: ${settings.operatingHoursText || "6:00 AM – 8:00 PM"}. Orders will resume during operating hours!`
+      ? getKitchenHoursClosedNotice(settings.operatingHoursText)
       : "Orders temporarily paused by kitchen. We'll be back shortly!");
   const previewGrandTotal = previewSubtotal + previewDelivery + previewTax;
 
@@ -434,7 +435,7 @@ const AdminSettings = (props) => {
                   </div>
                 </div>
                 <span className="text-[10px] text-slate-400 mt-1 block">
-                  Displayed to customers on the header and during closed hours
+                  Displayed to customers on the header and during closed hours. Schedule uses India Standard Time (IST).
                 </span>
 
                 {/* Auto-enforce operating hours toggle */}
