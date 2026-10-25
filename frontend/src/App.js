@@ -21,6 +21,7 @@ import CheckoutPage from "./Component/CheckoutPage";
 import OrderConfirmationPage from "./Component/OrderConfirmationPage";
 import OrdersPage from "./Component/OrdersPage";
 import OrderDetailsPage from "./Component/OrderDetailsPage";
+import OrderResolutionPage from "./Component/OrderResolutionPage";
 import ProtectedRoute from "./Component/ProtectedRoute";
 import AdminLayout from "./Component/AdminLayout";
 import AdminOverviewPage from "./Component/admin/AdminOverviewPage";
@@ -95,7 +96,10 @@ const appRouter = createBrowserRouter([
       { path: "/orders", element: <OrdersPage /> },
       { path: "/order-confirmation/:id", element: <OrderConfirmationPage /> },
       { path: "/orders/:id", element: <OrderDetailsPage /> },
+      { path: "/orders/:id/resolution", element: <OrderResolutionPage /> },
       { path: "/order/:id", element: <OrderDetailsPage /> },
+      { path: "/order/:id/resolution", element: <OrderResolutionPage /> },
+      { path: "/order-resolution/:id", element: <OrderResolutionPage /> },
       {
         path: "/admin",
         element: <AdminLayout />,

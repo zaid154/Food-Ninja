@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import { Link } from "react-router-dom";
+import UserContext from "./Usercontext";
 import { API_BASE_URL } from "../utils/Constants";
 
 const ISSUE_OPTIONS = [
@@ -68,15 +70,22 @@ const ISSUE_OPTIONS = [
 ];
 
 const OrderHelpModal = ({ order, isOpen, onClose }) => {
+  const { user } = useContext(UserContext);
   const [issueCategory, setIssueCategory] = useState("Delivery Delayed");
-  const [name, setName] = useState(order?.customerName || "");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState(order?.phone || "");
+  const [name, setName] = useState(order?.customerName || user?.name || "");
+  const [email, setEmail] = useState(order?.userEmail || user?.email || "");
+  const [phone, setPhone] = useState(order?.phone || user?.phone || "");
   const [message, setMessage] = useState("");
   const [priority, setPriority] = useState("urgent");
   const [submitting, setSubmitting] = useState(false);
   const [submittedTicket, setSubmittedTicket] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    if (order?.customerName || user?.name) setName(order?.customerName || user?.name || "");
+    if (order?.userEmail || user?.email) setEmail(order?.userEmail || user?.email || "");
+    if (order?.phone || user?.phone) setPhone(order?.phone || user?.phone || "");
+  }, [order, user]);
 
   if (!isOpen || !order) return null;
 
@@ -156,17 +165,31 @@ const OrderHelpModal = ({ order, isOpen, onClose }) => {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={resetAndClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 transition cursor-pointer"
-            aria-label="Close modal"
-          >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="6" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-1">
+            <Link
+              to={`/orders/${order.id}/resolution`}
+              onClick={resetAndClose}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 transition cursor-pointer"
+              title="Open full resolution page"
+              aria-label="Open full resolution page"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </Link>
+
+            <button
+              type="button"
+              onClick={resetAndClose}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 transition cursor-pointer"
+              aria-label="Close modal"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="6" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 bg-emerald-50/60 border-b border-emerald-100/70 px-6 py-2.5 text-xs">
