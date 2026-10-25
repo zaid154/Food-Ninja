@@ -6,7 +6,23 @@ import { addWishlist, removeWishlist } from "../utils/wishlistSlice";
 import { API_BASE_URL } from "../utils/Constants";
 import UserContext from "./Usercontext";
 
-const ProductPage = () => {
+const getLoggedUser = () => {
+  try { return JSON.parse(localStorage.getItem("loggedUser") || "{}"); } catch { return {}; }
+};
+
+const formatTimeAgo = (dateStr) => {
+  if (!dateStr) return "Recently";
+  const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
+  if (diff < 60) return "Just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+  return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+};
+
+const RATING_LABELS = { 5: "5 - Excellent", 4: "4 - Very Good", 3: "3 - Average", 2: "2 - Fair", 1: "1 - Poor" };
+
+const DishPage = () => {
   const { id } = useParams();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -14,17 +30,19 @@ const ProductPage = () => {
 
   const [activeTab, setActiveTab] = useState("description");
   const [selectedPortion, setSelectedPortion] = useState("Full");
+  const [reviews, setReviews] = useState([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState("");
+  const [reviewError, setReviewError] = useState("");
+  const [dishRequest, setDishRequest] = useState({ id: null, product: null, loading: true });
+  const [eligibility, setEligibility] = useState({ checking: true, eligible: false, reason: "not_logged_in", message: "", orderId: null });
 
-  const rawName = user?.name || (() => {
-    try {
-      const logged = JSON.parse(localStorage.getItem("loggedUser") || "{}");
-      return logged.name || "";
-    } catch {
-      return "";
-    }
-  })() || "Mohd Zaid";
-
+  const rawName = user?.name || getLoggedUser().name || "Mohd Zaid";
   const displayName = rawName.includes(" ") ? rawName.trim() : rawName.replace(/([a-z])([A-Z])/g, "$1 $2").trim();
+  const userEmail = (getLoggedUser().email || user?.email || "").trim().toLowerCase();
 
   useEffect(() => {
     try {
@@ -39,63 +57,39 @@ const ProductPage = () => {
     } catch {}
   }, []);
 
-  const [reviews, setReviews] = useState([]);
-  const [showReviewForm, setShowReviewForm] = useState(false);
-  const [reviewRating, setReviewRating] = useState(5);
-  const [userEmail] = useState(() => {
-    try {
-      const logged = JSON.parse(localStorage.getItem("loggedUser") || "{}");
-      return (logged.email || "").trim().toLowerCase();
-    } catch {
-      return "";
-    }
-  });
-
-  const [eligibility, setEligibility] = useState({ checking: true, eligible: false, reason: "not_logged_in", message: "", orderId: null });
-  const [reviewComment, setReviewComment] = useState("");
-  const [submittingReview, setSubmittingReview] = useState(false);
-  const [reviewSuccess, setReviewSuccess] = useState("");
-  const [reviewError, setReviewError] = useState("");
-  const [dishRequest, setDishRequest] = useState({ id: null, product: null, loading: true });
-
   useEffect(() => {
     const requestId = String(id ?? "");
     setSelectedPortion("Full");
     const controller = new AbortController();
     setDishRequest({ id: requestId, product: null, loading: true });
 
-    const fetchDish = async () => {
+    (async () => {
       try {
+        if (!id) return setDishRequest({ id: requestId, product: null, loading: false });
         const res = await fetch(`${API_BASE_URL}/recipes/${encodeURIComponent(id)}`, { signal: controller.signal });
         if (res.ok) {
           const json = await res.json();
-          const responseId = String(json?.id ?? json?._id ?? "");
-          if (responseId === requestId) {
-            setDishRequest({ id: requestId, product: json, loading: false });
-            return;
+          if (String(json?.id ?? json?._id ?? "") === requestId) {
+            return setDishRequest({ id: requestId, product: json, loading: false });
           }
         }
         setDishRequest({ id: requestId, product: null, loading: false });
       } catch (err) {
         if (err.name !== "AbortError") setDishRequest({ id: requestId, product: null, loading: false });
       }
-    };
-
-    if (id) fetchDish();
-    else setDishRequest({ id: requestId, product: null, loading: false });
-
+    })();
     return () => controller.abort();
   }, [id]);
 
   const cartItems = useSelector((store) => store.cart.item);
   const wishlistItems = useSelector((store) => store.wishlist.item);
 
-  const navigationProduct = location.state?.product;
-  const navigationProductMatchesId = navigationProduct && [navigationProduct.id, navigationProduct._id].some((pid) => String(pid) === String(id));
-  const requestMatchesId = dishRequest.id === String(id ?? "");
-  const directProduct = requestMatchesId ? dishRequest.product : null;
-  const product = navigationProductMatchesId ? { ...navigationProduct, ...(directProduct || {}) } : directProduct;
-  const loadingDish = !navigationProductMatchesId && (!requestMatchesId || dishRequest.loading);
+  const navProduct = location.state?.product;
+  const navMatches = navProduct && [navProduct.id, navProduct._id].some((pid) => String(pid) === String(id));
+  const reqMatches = dishRequest.id === String(id ?? "");
+  const directProduct = reqMatches ? dishRequest.product : null;
+  const product = navMatches ? { ...navProduct, ...(directProduct || {}) } : directProduct;
+  const loadingDish = !navMatches && (!reqMatches || dishRequest.loading);
 
   const fetchReviews = async () => {
     if (!product?.id) return;
@@ -105,9 +99,7 @@ const ProductPage = () => {
         const json = await res.json();
         if (json.success && Array.isArray(json.reviews)) setReviews(json.reviews);
       }
-    } catch (err) {
-      console.error("Failed to load reviews:", err);
-    }
+    } catch {}
   };
 
   const checkEligibility = async () => {
@@ -115,21 +107,15 @@ const ProductPage = () => {
     try {
       try {
         const savedOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-        const localDelivered = savedOrders.find((o) => o.status === "Delivered" && Array.isArray(o.items) && o.items.some((it) => String(it.id) === String(product.id)));
-        if (localDelivered) {
-          setEligibility({ checking: false, eligible: true, orderId: localDelivered.id, message: "Verified Buyer: Order delivered! You can write a review." });
-          return;
-        }
+        const delivered = savedOrders.find((o) => o.status === "Delivered" && Array.isArray(o.items) && o.items.some((it) => String(it.id) === String(product.id)));
+        if (delivered) return setEligibility({ checking: false, eligible: true, orderId: delivered.id, message: "Verified Buyer: Order delivered! You can write a review." });
       } catch {}
 
       if (userEmail) {
         const res = await fetch(`${API_BASE_URL}/recipes/${product.id}/review-eligibility?email=${encodeURIComponent(userEmail)}`);
         if (res.ok) {
           const json = await res.json();
-          if (json.success) {
-            setEligibility({ checking: false, eligible: json.eligible, reason: json.reason || (json.eligible ? "" : "not_ordered"), message: json.message, orderId: json.orderId || null });
-            return;
-          }
+          if (json.success) return setEligibility({ checking: false, eligible: json.eligible, reason: json.reason || (json.eligible ? "" : "not_ordered"), message: json.message, orderId: json.orderId || null });
         }
       }
 
@@ -165,15 +151,12 @@ const ProductPage = () => {
         </div>
       );
     }
-
     return (
       <section className="flex min-h-[75vh] items-center justify-center px-4 text-center">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Dish unavailable</h1>
           <p className="mt-2 text-sm text-slate-500">This dish could not be found. Please choose another item from the menu.</p>
-          <Link to="/" className="mt-5 inline-flex rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700">
-            Back to Food Menu
-          </Link>
+          <Link to="/" className="mt-5 inline-flex rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700">Back to Food Menu</Link>
         </div>
       </section>
     );
@@ -187,33 +170,52 @@ const ProductPage = () => {
         ...(Number(product.quarterPrice) > 0 ? [{ value: "Quarter", label: "Quarter Plate", price: Number(product.quarterPrice) }] : []),
       ]
     : [];
-  const selectedPortionOption = portionOptions.find((option) => option.value === selectedPortion) || portionOptions[0];
+  const selectedPortionOption = portionOptions.find((o) => o.value === selectedPortion) || portionOptions[0];
   const portionKey = product.hasPortions ? selectedPortionOption?.value || "Full" : "";
   const inCart = cartItems.find((i) => String(i.id) === String(product.id) && (i.portionSize || (i.hasPortions ? "Full" : "")) === portionKey);
   const cartQty = inCart ? inCart.quantity : 0;
   const isLiked = wishlistItems.some((i) => String(i.id) === String(product.id));
   const price = selectedPortionOption?.price || product.price || 150;
+  const isVegDish = product.dietary !== "Non-Veg" && product.isVeg !== false;
+
+  const displayRating = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : (product.rating ? Number(product.rating).toFixed(1) : "4.3");
+  const displayReviewCount = reviews.length > 0 ? reviews.length : (product.reviewCount || 0);
+
+  const ingredientsList = product.ingredients
+    ? (Array.isArray(product.ingredients) ? product.ingredients : product.ingredients.split(/(?=[A-Z])|,\s*|\s{2,}/).map((s) => s.trim()).filter(Boolean))
+    : ["Fresh Farm Ingredients", "Spices", "Cold-pressed Oil", "Chef Special Blend"];
+  const keyFeatures = Array.isArray(product.keyFeatures) ? product.keyFeatures.filter(Boolean) : String(product.keyFeatures || "").split(/[\n,]/).map((f) => f.trim()).filter(Boolean);
+
+  const nutritionRows = [
+    { label: "Energy", value: product.caloriesPerServing, unit: "kcal" },
+    { label: "Protein", value: product.proteinGrams, unit: "g" },
+    { label: "Carbs", value: product.carbsGrams, unit: "g" },
+    { label: "Fat", value: product.fatGrams, unit: "g" },
+  ].filter(({ value }) => value !== null && value !== undefined && value !== "" && Number.isFinite(Number(value)));
+
+  const handleAddToCart = () => {
+    dispatch(addCart({ ...product, price, portionSize: product.hasPortions ? portionKey : "", caloriesPerServing: product.caloriesPerServing }));
+  };
+  const handleRemoveFromCart = () => {
+    dispatch(removeCart({ id: product.id, portionSize: portionKey, hasPortions: Boolean(product.hasPortions) }));
+  };
+  const handleLike = () => {
+    if (isLiked) dispatch(removeWishlist(product.id));
+    else dispatch(addWishlist(product));
+  };
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     setReviewError("");
     setReviewSuccess("");
     if (!reviewComment.trim()) return setReviewError("Please enter your review comment.");
-
     try {
       setSubmittingReview(true);
       const res = await fetch(`${API_BASE_URL}/recipes/${product.id}/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userName: displayName,
-          userEmail: userEmail || user?.email || "",
-          orderId: eligibility.orderId || null,
-          rating: reviewRating,
-          comment: reviewComment.trim(),
-        }),
+        body: JSON.stringify({ userName: displayName, userEmail: userEmail || user?.email || "", orderId: eligibility.orderId || null, rating: reviewRating, comment: reviewComment.trim() }),
       });
-
       const data = await res.json();
       if (res.ok && data.success) {
         setReviewSuccess("Thank you! Your verified review has been submitted.");
@@ -231,44 +233,23 @@ const ProductPage = () => {
     }
   };
 
-  const formatTimeAgo = (dateStr) => {
-    if (!dateStr) return "Recently";
-    const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
-    if (diff < 60) return "Just now";
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
-    return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const eligibilityCards = {
+    not_logged_in: {
+      title: "Have you received this dish?",
+      desc: "Log in with your registered email to write a verified review.",
+      action: <Link to="/login" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-xs shrink-0 self-start sm:self-auto">Log In to Review →</Link>
+    },
+    order_pending: {
+      title: "Your order is on the way!",
+      desc: eligibility.message,
+      action: eligibility.orderId && <Link to={`/order/${eligibility.orderId}`} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition shadow-xs shrink-0 self-start sm:self-auto">Track Order →</Link>
+    },
+    not_ordered: {
+      title: "Taste it before reviewing!",
+      desc: "To keep reviews 100% authentic, reviews unlock once your order for this dish is Delivered.",
+      action: <button type="button" onClick={handleAddToCart} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-xs shrink-0 self-start sm:self-auto cursor-pointer">Order Now (₹{price})</button>
+    }
   };
-
-  const displayRating = reviews.length > 0 ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : (product.rating ? Number(product.rating).toFixed(1) : "4.3");
-  const displayReviewCount = reviews.length > 0 ? reviews.length : (product.reviewCount || 0);
-
-  const ingredientsList = product.ingredients
-    ? (Array.isArray(product.ingredients) ? product.ingredients : product.ingredients.split(/(?=[A-Z])|,\s*|\s{2,}/).map((s) => s.trim()).filter(Boolean))
-    : ["Fresh Farm Ingredients", "Spices", "Cold-pressed Oil", "Chef Special Blend"];
-  const keyFeatures = Array.isArray(product.keyFeatures) ? product.keyFeatures.filter(Boolean) : String(product.keyFeatures || "").split(/[\n,]/).map((f) => f.trim()).filter(Boolean);
-  const nutritionRows = [
-    { label: "Energy", value: product.caloriesPerServing, unit: "kcal" },
-    { label: "Protein", value: product.proteinGrams, unit: "g" },
-    { label: "Carbs", value: product.carbsGrams, unit: "g" },
-    { label: "Fat", value: product.fatGrams, unit: "g" },
-  ].filter(({ value }) => value !== null && value !== undefined && value !== "" && Number.isFinite(Number(value)));
-
-  const handleAddToCart = () => {
-    dispatch(addCart({ ...product, price, portionSize: product.hasPortions ? portionKey : "", caloriesPerServing: product.caloriesPerServing }));
-  };
-
-  const handleRemoveFromCart = () => {
-    dispatch(removeCart({ id: product.id, portionSize: portionKey, hasPortions: Boolean(product.hasPortions) }));
-  };
-
-  const handleLike = () => {
-    if (isLiked) dispatch(removeWishlist(product.id));
-    else dispatch(addWishlist(product));
-  };
-
-  const isVegDish = product.dietary === "Non-Veg" || product.isVeg === false ? false : true;
 
   return (
     <div className="bg-white min-h-screen pt-3 sm:pt-4 pb-12 text-slate-800">
@@ -276,23 +257,9 @@ const ProductPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start mb-7">
           <div className="lg:col-span-6 w-full">
             <div className="relative w-full h-[340px] sm:h-[380px] rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-xs group">
-              <img
-                src={mainDishImg}
-                alt={product.name}
-                className={`h-full w-full ${product.imageFit === "contain" ? "object-contain p-4 bg-slate-50" : "object-cover"} transition-transform duration-500 group-hover:scale-105`}
-              />
-              <button
-                type="button"
-                onClick={handleLike}
-                className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 backdrop-blur-xs shadow-md transition-transform hover:scale-110 cursor-pointer ${
-                  isLiked ? "text-rose-500" : "text-slate-400 hover:text-rose-500"
-                }`}
-                title="Save to favorites"
-                aria-label="Wishlist"
-              >
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill={isLiked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-                  <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z" />
-                </svg>
+              <img src={mainDishImg} alt={product.name} className={`h-full w-full ${product.imageFit === "contain" ? "object-contain p-4 bg-slate-50" : "object-cover"} transition-transform duration-500 group-hover:scale-105`} />
+              <button type="button" onClick={handleLike} className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 backdrop-blur-xs shadow-md transition-transform hover:scale-110 cursor-pointer ${isLiked ? "text-rose-500" : "text-slate-400 hover:text-rose-500"}`} title="Save to favorites" aria-label="Wishlist">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill={isLiked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z" /></svg>
               </button>
             </div>
           </div>
@@ -300,9 +267,7 @@ const ProductPage = () => {
           <div className="lg:col-span-6 flex flex-col space-y-2.5">
             <div className="flex items-center gap-2.5">
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border ${isVegDish ? "bg-emerald-50 text-emerald-800 border-emerald-300" : "bg-red-50 text-red-800 border-red-300"}`}>
-                <span className={`h-2.5 w-2.5 rounded-sm border-2 flex items-center justify-center ${isVegDish ? "border-emerald-600" : "border-red-600"}`}>
-                  <span className={`h-1 w-1 rounded-full ${isVegDish ? "bg-emerald-600" : "bg-red-600"}`} />
-                </span>
+                <span className={`h-2.5 w-2.5 rounded-sm border-2 flex items-center justify-center ${isVegDish ? "border-emerald-600" : "border-red-600"}`}><span className={`h-1 w-1 rounded-full ${isVegDish ? "bg-emerald-600" : "bg-red-600"}`} /></span>
                 {isVegDish ? "Veg" : "Non-Veg"}
               </span>
               {product.category && <span className="text-xs font-medium text-slate-500">{product.cuisine ? `${product.cuisine} · ` : ""}{product.category}</span>}
@@ -311,10 +276,7 @@ const ProductPage = () => {
             <div>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">{product.name}</h1>
               <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[11px]">
-                <div className="flex items-center gap-1 font-bold text-slate-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded-md">
-                  <span className="text-amber-500 text-sm leading-none">★</span>
-                  <span>{displayRating}</span>
-                </div>
+                <div className="flex items-center gap-1 font-bold text-slate-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded-md"><span className="text-amber-500 text-sm leading-none">★</span><span>{displayRating}</span></div>
                 <span className="text-slate-500 font-medium">({displayReviewCount} customer {displayReviewCount === 1 ? "review" : "reviews"})</span>
                 <span className="text-slate-300">•</span>
                 <span className="text-emerald-700 font-medium">25-35 mins prep & delivery</span>
@@ -340,15 +302,7 @@ const ProductPage = () => {
                 <legend className="px-1 text-[11px] font-bold text-slate-800">Choose portion</legend>
                 <div className="grid grid-cols-3 gap-1.5">
                   {portionOptions.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setSelectedPortion(opt.value)}
-                      aria-pressed={portionKey === opt.value}
-                      className={`rounded-md border px-1.5 py-1.5 text-center transition cursor-pointer ${
-                        portionKey === opt.value ? "border-emerald-600 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600/20" : "border-slate-200 bg-white text-slate-600 hover:border-emerald-300"
-                      }`}
-                    >
+                    <button key={opt.value} type="button" onClick={() => setSelectedPortion(opt.value)} aria-pressed={portionKey === opt.value} className={`rounded-md border px-1.5 py-1.5 text-center transition cursor-pointer ${portionKey === opt.value ? "border-emerald-600 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-600/20" : "border-slate-200 bg-white text-slate-600 hover:border-emerald-300"}`}>
                       <span className="block text-[10px] font-bold">{opt.label}</span>
                       <span className="mt-0.5 block text-[11px] font-black">₹{opt.price}</span>
                     </button>
@@ -361,15 +315,11 @@ const ProductPage = () => {
               <div className="flex items-baseline justify-between">
                 <div className="flex items-baseline gap-2.5">
                   <span className="text-2xl font-black text-slate-900 tracking-tight">₹{price}</span>
-                  {product.hasPortions && selectedPortionOption && (
-                    <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800">{selectedPortionOption.label}</span>
-                  )}
+                  {product.hasPortions && selectedPortionOption && <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-800">{selectedPortionOption.label}</span>}
                   {(!product.hasPortions || portionKey === "Full") && Number(product.originalPrice) > price && (
                     <>
                       <span className="text-sm font-semibold text-slate-400 line-through">₹{product.originalPrice}</span>
-                      <span className="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
-                        {Math.round(((product.originalPrice - price) / product.originalPrice) * 100)}% OFF
-                      </span>
+                      <span className="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">{Math.round(((product.originalPrice - price) / product.originalPrice) * 100)}% OFF</span>
                     </>
                   )}
                 </div>
@@ -390,11 +340,7 @@ const ProductPage = () => {
                   </span>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={handleAddToCart}
-                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#137947] hover:bg-[#0e5c36] text-white px-4 py-2.5 text-xs font-bold shadow-xs transition-all active:scale-[0.98] cursor-pointer"
-                >
+                <button type="button" onClick={handleAddToCart} className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#137947] hover:bg-[#0e5c36] text-white px-4 py-2.5 text-xs font-bold shadow-xs transition-all active:scale-[0.98] cursor-pointer">
                   <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" /></svg>
                   <span>{selectedPortionOption ? `Add ${selectedPortionOption.label} to Cart` : "Add to Cart"}</span>
                 </button>
@@ -406,15 +352,10 @@ const ProductPage = () => {
                 { title: "Fresh Ingredients", sub: "100% natural" },
                 { title: "Fast Delivery", sub: "Within 30 mins" },
                 { title: "Hygienic & Safe", sub: "Well packed" },
-              ].map((badge, idx) => (
+              ].map((b, idx) => (
                 <div key={idx} className="flex items-center gap-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 shrink-0">
-                    <span className="text-xs font-bold">✓</span>
-                  </div>
-                  <div className="leading-tight">
-                    <div className="text-[10px] font-bold text-slate-900">{badge.title}</div>
-                    <div className="text-[9px] text-slate-400">{badge.sub}</div>
-                  </div>
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 shrink-0 text-xs font-bold">✓</div>
+                  <div className="leading-tight"><div className="text-[10px] font-bold text-slate-900">{b.title}</div><div className="text-[9px] text-slate-400">{b.sub}</div></div>
                 </div>
               ))}
             </div>
@@ -428,14 +369,7 @@ const ProductPage = () => {
               { id: "ingredients", label: "Ingredients" },
               { id: "reviews", label: `Reviews (${displayReviewCount})` },
             ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`rounded-sm text-sm font-semibold transition pb-3 relative cursor-pointer ${
-                  activeTab === tab.id ? "text-emerald-800 after:absolute after:bottom-[-3px] after:left-0 after:right-0 after:h-[2.5px] after:bg-emerald-600 after:rounded-full" : "text-slate-400 hover:text-slate-700"
-                }`}
-              >
+              <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`rounded-sm text-sm font-semibold transition pb-3 relative cursor-pointer ${activeTab === tab.id ? "text-emerald-800 after:absolute after:bottom-[-3px] after:left-0 after:right-0 after:h-[2.5px] after:bg-emerald-600 after:rounded-full" : "text-slate-400 hover:text-slate-700"}`}>
                 {tab.label}
               </button>
             ))}
@@ -450,9 +384,7 @@ const ProductPage = () => {
                     <div className="rounded-xl border border-slate-100 bg-[#fbfbfb] p-3">
                       <h3 className="text-sm font-black text-slate-900 mb-2">Key Features</h3>
                       <ul className="space-y-1.5 text-xs text-slate-600">
-                        {keyFeatures.map((f, i) => (
-                          <li key={i} className="flex items-center gap-2"><span className="text-emerald-600 font-bold">✓</span><span>{f}</span></li>
-                        ))}
+                        {keyFeatures.map((f, i) => (<li key={i} className="flex items-center gap-2"><span className="text-emerald-600 font-bold">✓</span><span>{f}</span></li>))}
                       </ul>
                     </div>
                   )}
@@ -477,17 +409,13 @@ const ProductPage = () => {
           {activeTab === "ingredients" && (
             <div className="max-w-3xl rounded-xl border border-slate-100 bg-slate-50/60 p-3 text-xs text-slate-600">
               <div className="mb-2.5 flex items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900">Fresh Ingredients</h3>
-                  <p className="mt-0.5 text-[11px] text-slate-500">Used in this preparation</p>
-                </div>
+                <div><h3 className="text-sm font-bold text-slate-900">Fresh Ingredients</h3><p className="mt-0.5 text-[11px] text-slate-500">Used in this preparation</p></div>
                 <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">{ingredientsList.length} items</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {ingredientsList.map((ing, i) => (
                   <span key={i} className="inline-flex items-center gap-1.5 rounded-full border border-emerald-100 bg-white px-2.5 py-1 font-medium text-slate-700">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    {ing}
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />{ing}
                   </span>
                 ))}
               </div>
@@ -499,9 +427,7 @@ const ProductPage = () => {
               <div className="flex items-center justify-between">
                 <p className="font-semibold text-slate-800">Customer Feedback ({displayReviewCount} {displayReviewCount === 1 ? "review" : "reviews"}):</p>
                 {eligibility.eligible ? (
-                  <button type="button" onClick={() => { document.getElementById("customer-reviews")?.scrollIntoView({ behavior: "smooth" }); setShowReviewForm(true); }} className="text-emerald-700 hover:underline font-bold text-xs cursor-pointer">
-                    + Write Verified Review
-                  </button>
+                  <button type="button" onClick={() => { document.getElementById("customer-reviews")?.scrollIntoView({ behavior: "smooth" }); setShowReviewForm(true); }} className="text-emerald-700 hover:underline font-bold text-xs cursor-pointer">+ Write Verified Review</button>
                 ) : (
                   <span className="text-[11px] text-slate-400 italic">(Reviews unlocked after delivery)</span>
                 )}
@@ -532,61 +458,24 @@ const ProductPage = () => {
                 <span className="text-xs text-slate-400">({displayReviewCount} {displayReviewCount === 1 ? "review" : "reviews"})</span>
               </div>
             </div>
-
             {eligibility.eligible ? (
-              <button
-                type="button"
-                onClick={() => { setShowReviewForm(!showReviewForm); setReviewError(""); setReviewSuccess(""); }}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs cursor-pointer self-start sm:self-auto"
-              >
+              <button type="button" onClick={() => { setShowReviewForm(!showReviewForm); setReviewError(""); setReviewSuccess(""); }} className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs cursor-pointer self-start sm:self-auto">
                 <span>{showReviewForm ? "Close Form" : "Rate & Review (Verified Buyer)"}</span>
               </button>
             ) : (
               <div className="flex items-center gap-2 self-start sm:self-auto">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-semibold">
-                  <span>Review unlocked on Delivery</span>
-                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-semibold">Review unlocked on Delivery</span>
               </div>
             )}
           </div>
 
-          {!eligibility.eligible && !eligibility.checking && (
-            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-linear-to-r from-slate-50 to-emerald-50/20 p-4 sm:p-5 text-xs">
-              {eligibility.reason === "not_logged_in" && (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <p className="font-bold text-slate-900">Have you received this dish?</p>
-                    <p className="text-slate-500 text-[11px]">Log in with your registered email to write a verified review.</p>
-                  </div>
-                  <Link to="/login" className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-xs shrink-0 self-start sm:self-auto">
-                    Log In to Review →
-                  </Link>
-                </div>
-              )}
-              {eligibility.reason === "order_pending" && (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <p className="font-bold text-slate-900">Your order is on the way!</p>
-                    <p className="text-slate-500 text-[11px]">{eligibility.message}</p>
-                  </div>
-                  {eligibility.orderId && (
-                    <Link to={`/order/${eligibility.orderId}`} className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition shadow-xs shrink-0 self-start sm:self-auto">
-                      Track Order →
-                    </Link>
-                  )}
-                </div>
-              )}
-              {eligibility.reason === "not_ordered" && (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <p className="font-bold text-slate-900">Taste it before reviewing!</p>
-                    <p className="text-slate-500 text-[11px]">To keep reviews 100% authentic, reviews unlock once your order for this dish is <strong>Delivered</strong>.</p>
-                  </div>
-                  <button type="button" onClick={handleAddToCart} className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-xs shrink-0 self-start sm:self-auto cursor-pointer">
-                    Order Now (₹{price})
-                  </button>
-                </div>
-              )}
+          {!eligibility.eligible && !eligibility.checking && eligibilityCards[eligibility.reason] && (
+            <div className="mb-6 rounded-2xl border border-slate-200/80 bg-linear-to-r from-slate-50 to-emerald-50/20 p-4 sm:p-5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <p className="font-bold text-slate-900">{eligibilityCards[eligibility.reason].title}</p>
+                <p className="text-slate-500 text-[11px]">{eligibilityCards[eligibility.reason].desc}</p>
+              </div>
+              {eligibilityCards[eligibility.reason].action}
             </div>
           )}
 
@@ -600,19 +489,9 @@ const ProductPage = () => {
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">Your Rating</label>
                 <div className="flex items-center gap-1.5">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setReviewRating(star)}
-                      className={`text-2xl transition cursor-pointer ${star <= reviewRating ? "text-amber-400 hover:text-amber-500 scale-105" : "text-slate-300 hover:text-amber-300"}`}
-                      title={`${star} stars`}
-                    >
-                      ★
-                    </button>
+                    <button key={star} type="button" onClick={() => setReviewRating(star)} className={`text-2xl transition cursor-pointer ${star <= reviewRating ? "text-amber-400 hover:text-amber-500 scale-105" : "text-slate-300 hover:text-amber-300"}`} title={`${star} stars`}>★</button>
                   ))}
-                  <span className="text-xs font-medium text-slate-600 ml-2">
-                    {reviewRating === 5 ? "5 - Excellent" : reviewRating === 4 ? "4 - Very Good" : reviewRating === 3 ? "3 - Average" : reviewRating === 2 ? "2 - Fair" : "1 - Poor"}
-                  </span>
+                  <span className="text-xs font-medium text-slate-600 ml-2">{RATING_LABELS[reviewRating]}</span>
                 </div>
               </div>
 
@@ -621,10 +500,7 @@ const ProductPage = () => {
                 <div className="flex items-center gap-3 rounded-xl border border-emerald-100 bg-white px-3.5 py-2.5 shadow-2xs">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white uppercase shrink-0">{(displayName || "U").charAt(0)}</div>
                   <div className="leading-tight">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-900">{displayName}</span>
-                      <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[9px] font-semibold text-emerald-800">Verified Buyer</span>
-                    </div>
+                    <div className="flex items-center gap-2"><span className="text-xs font-bold text-slate-900">{displayName}</span><span className="rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[9px] font-semibold text-emerald-800">Verified Buyer</span></div>
                     <p className="text-[10px] text-slate-400 mt-0.5">Posting review with verified purchase badge</p>
                   </div>
                 </div>
@@ -632,23 +508,12 @@ const ProductPage = () => {
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Your Review</label>
-                <textarea
-                  rows={3}
-                  value={reviewComment}
-                  onChange={(e) => setReviewComment(e.target.value)}
-                  placeholder="Tell us what you loved about the flavor, portion size, and presentation..."
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none"
-                  required
-                />
+                <textarea rows={3} value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} placeholder="Tell us what you loved about the flavor, portion size, and presentation..." className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-800 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none" required />
               </div>
 
               <div className="flex items-center gap-2 pt-1">
-                <button type="submit" disabled={submittingReview} className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold transition cursor-pointer">
-                  {submittingReview ? "Submitting..." : "Submit Review"}
-                </button>
-                <button type="button" onClick={() => setShowReviewForm(false)} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 text-xs font-semibold transition cursor-pointer">
-                  Cancel
-                </button>
+                <button type="submit" disabled={submittingReview} className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold transition cursor-pointer">{submittingReview ? "Submitting..." : "Submit Review"}</button>
+                <button type="button" onClick={() => setShowReviewForm(false)} className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 text-xs font-semibold transition cursor-pointer">Cancel</button>
               </div>
             </form>
           )}
@@ -661,19 +526,14 @@ const ProductPage = () => {
                     <div className="flex items-center gap-2.5">
                       <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white uppercase">{(rev.userName || "U").charAt(0)}</div>
                       <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-xs font-bold text-slate-900 leading-none">{rev.userName}</h4>
-                          <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-semibold text-emerald-700 border border-emerald-100">Verified Customer</span>
-                        </div>
+                        <div className="flex items-center gap-2"><h4 className="text-xs font-bold text-slate-900 leading-none">{rev.userName}</h4><span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-semibold text-emerald-700 border border-emerald-100">Verified Customer</span></div>
                         <p className="text-[10px] text-slate-400 mt-0.5">{formatTimeAgo(rev.createdAt)}</p>
                       </div>
                     </div>
                     <div className="text-amber-500 text-xs tracking-wider">{"★".repeat(rev.rating || 5)}{"☆".repeat(5 - (rev.rating || 5))}</div>
                     <p className="text-xs text-slate-600 leading-relaxed">{rev.comment}</p>
                   </div>
-                  <div className="h-14 w-14 rounded-xl overflow-hidden shrink-0 border border-slate-200">
-                    <img src={mainDishImg} alt="" className="h-full w-full object-cover" />
-                  </div>
+                  <div className="h-14 w-14 rounded-xl overflow-hidden shrink-0 border border-slate-200"><img src={mainDishImg} alt="" className="h-full w-full object-cover" /></div>
                 </div>
               ))}
             </div>
@@ -682,9 +542,7 @@ const ProductPage = () => {
               <h4 className="text-xs font-bold text-slate-800">No reviews yet for {product.name}</h4>
               <p className="text-[11px] text-slate-400 max-w-sm mx-auto mt-1 mb-3">Have you tasted this delicious dish? Be the first to share your experience with other foodies!</p>
               {!showReviewForm && (
-                <button type="button" onClick={() => setShowReviewForm(true)} className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition cursor-pointer">
-                  Write the First Review
-                </button>
+                <button type="button" onClick={() => setShowReviewForm(true)} className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition cursor-pointer">Write the First Review</button>
               )}
             </div>
           )}
@@ -695,13 +553,11 @@ const ProductPage = () => {
             <h4 className="text-xs sm:text-sm font-bold text-slate-900">Craving something healthy?</h4>
             <p className="text-[11px] text-slate-600">Explore our range of fresh and nutritious meals, made with love.</p>
           </div>
-          <Link to="/menu" className="rounded-xl border border-emerald-600/80 bg-white px-4 py-2 text-xs font-bold text-emerald-800 shadow-2xs hover:bg-emerald-50 transition shrink-0 self-start sm:self-auto">
-            Browse More →
-          </Link>
+          <Link to="/menu" className="rounded-xl border border-emerald-600/80 bg-white px-4 py-2 text-xs font-bold text-emerald-800 shadow-2xs hover:bg-emerald-50 transition shrink-0 self-start sm:self-auto">Browse More →</Link>
         </div>
       </div>
     </div>
   );
 };
 
-export default ProductPage;
+export default DishPage;

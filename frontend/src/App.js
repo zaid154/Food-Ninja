@@ -12,7 +12,7 @@ import ContactPage from "./Component/ContactPage";
 import TermsPage from "./Component/TermsPage";
 import PrivacyPage from "./Component/PrivacyPage";
 import RouteErrorPage from "./Component/RouteErrorPage";
-import ProductPage from "./Component/ProductPage";
+import DishPage from "./Component/DishPage";
 import UseContext from "./Component/Usercontext";
 import LoginPage from "./Component/LoginPage";
 import RegisterPage from "./Component/RegisterPage";
@@ -116,9 +116,9 @@ const appRouter = createBrowserRouter([
           { path: "inquiries", element: <AdminInquiriesPage /> }
         ]
       },
-      { path: "/restaurant/:id", element: <ProductPage /> },
-      { path: "/food/:id", element: <ProductPage /> },
-      { path: "/dish/:id", element: <ProductPage /> }
+      { path: "/restaurant/:id", element: <DishPage /> },
+      { path: "/food/:id", element: <DishPage /> },
+      { path: "/dish/:id", element: <DishPage /> }
     ]
   }
 ]);

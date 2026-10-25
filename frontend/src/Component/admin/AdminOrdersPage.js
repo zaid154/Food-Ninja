@@ -220,10 +220,15 @@ const AdminOrdersPage = (props) => {
                     </p>
                   </td>
                   <td className="py-3.5 align-top">
-                    <ul className="space-y-0.5 text-[11px]">
+                    <ul className="space-y-1 text-[11px]">
                       {o.items?.map((it, idx) => (
-                        <li key={idx} className="flex items-center gap-1.5">
+                        <li key={idx} className="flex flex-wrap items-center gap-1.5">
                           <span className="font-semibold text-slate-800">{it.name || it.title}</span>
+                          {it.portionSize && (
+                            <span className="inline-flex items-center rounded border border-amber-200 bg-amber-50 px-1.5 py-0.2 text-[9px] font-bold text-amber-800">
+                              {it.portionSize.includes("Plate") ? it.portionSize : `${it.portionSize} Plate`}
+                            </span>
+                          )}
                           <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-1 rounded">
                             x{it.quantity || 1}
                           </span>
