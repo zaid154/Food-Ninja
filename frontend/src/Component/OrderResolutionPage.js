@@ -115,163 +115,186 @@ const OrderResolutionPage = () => {
           <span className="font-mono text-[11px] text-slate-400">Order Resolution Desk</span>
         </div>
 
-        {ticket ? (
-          /* Confirmation State */
-          <div className="rounded-2xl border border-emerald-200 bg-white p-8 text-center space-y-4 shadow-xs max-w-xl mx-auto">
-            <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 text-xl font-bold">✓</span>
+        {/* 2-Column Responsive Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left Column (7 cols): Resolution Form */}
+          <div className="lg:col-span-7 rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-7 shadow-xs space-y-5">
             <div>
-              <h2 className="text-xl font-black text-slate-900">Priority Ticket Submitted</h2>
-              <p className="text-xs text-slate-500 mt-1">Directly escalated to kitchen & fleet desk for Order #{id}.</p>
+              <h1 className="text-xl font-black text-slate-900">Order Resolution Desk</h1>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Direct escalation channel for Order #{id} (₹{order?.total || 0} • {order?.status || "Placed"}).
+              </p>
             </div>
-            <div className="rounded-xl bg-slate-50 border border-slate-100 p-3.5 text-xs space-y-1.5 text-left">
-              <div className="flex justify-between"><span className="text-slate-400">Category:</span><strong className="text-slate-800">{ticket.issueCategory}</strong></div>
-              <div className="flex justify-between"><span className="text-slate-400">Email:</span><span className="text-slate-700">{ticket.email}</span></div>
-              <div className="flex justify-between"><span className="text-slate-400">Priority:</span><span className="font-bold text-rose-700 uppercase">{ticket.priority}</span></div>
-            </div>
-            <div className="flex justify-center gap-2.5 pt-1">
-              <Link to={`/orders/${id}`} className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 transition shadow-xs">Back to Order</Link>
-              <Link to="/orders" className="rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs px-4 py-2 transition">All Orders</Link>
-            </div>
-          </div>
-        ) : (
-          /* 2-Column Responsive Layout Utilizing Full Width */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Left Column (7 cols): Resolution Form */}
-            <div className="lg:col-span-7 rounded-2xl border border-slate-200/90 bg-white p-6 sm:p-7 shadow-xs space-y-5">
+
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+              {/* Category selector */}
               <div>
-                <h1 className="text-xl font-black text-slate-900">Order Resolution Desk</h1>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Direct escalation channel for Order #{id} (₹{order?.total || 0} • {order?.status || "Placed"}).
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-                {/* Category selector */}
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1.5">Select Issue Type *</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {ISSUES.map((opt) => (
-                      <button
-                        key={opt.id} type="button" onClick={() => setIssue(opt.id)}
-                        className={`p-2.5 rounded-xl border text-left transition cursor-pointer text-xs truncate ${issue === opt.id ? "bg-emerald-50 border-emerald-500 text-emerald-900 font-bold shadow-2xs" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"}`}
-                      >
-                        {opt.id}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Contact Inputs */}
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Your Name *</label>
-                    <input type="text" required value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500 transition" />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Email * (from account)</label>
-                    <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500 transition" />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Phone</label>
-                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500 transition font-mono" />
-                  </div>
-                </div>
-
-                {/* Priority */}
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Priority</label>
-                  <div className="flex gap-2">
-                    {[{ val: "urgent", label: "Urgent (Delay / Missing)" }, { val: "normal", label: "Normal (Feedback / Inquiry)" }].map((p) => (
-                      <button
-                        key={p.val} type="button" onClick={() => setPriority(p.val)}
-                        className={`px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition ${priority === p.val ? (p.val === "urgent" ? "bg-rose-50 border-rose-300 text-rose-900" : "bg-slate-100 border-slate-300 text-slate-900") : "bg-white border-slate-200 text-slate-500"}`}
-                      >
-                        {p.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Describe Issue *</label>
-                  <textarea required rows={4} value={message} onChange={(e) => setMessage(e.target.value)} placeholder={activeHint} className="w-full rounded-xl border border-slate-300 p-3 text-xs outline-none focus:border-emerald-500 transition" />
-                </div>
-
-                {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-2.5 text-xs text-rose-700 font-semibold">{error}</div>}
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                  <Link to="/contact" className="text-slate-400 hover:text-emerald-700 text-xs">Full Contact Page →</Link>
-                  <div className="flex items-center gap-2">
-                    <Link to={`/orders/${id}`} className="rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 transition">Cancel</Link>
-                    <button type="submit" disabled={submitting} className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 transition shadow-xs disabled:opacity-50">
-                      {submitting ? "Submitting..." : "Submit Ticket"}
+                <label className="block font-bold text-slate-700 mb-1.5">Select Issue Type *</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {ISSUES.map((opt) => (
+                    <button
+                      key={opt.id} type="button" onClick={() => setIssue(opt.id)}
+                      className={`p-2.5 rounded-xl border text-left transition cursor-pointer text-xs truncate ${issue === opt.id ? "bg-emerald-50 border-emerald-500 text-emerald-900 font-bold shadow-2xs" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"}`}
+                    >
+                      {opt.id}
                     </button>
-                  </div>
-                </div>
-              </form>
-            </div>
-
-            {/* Right Column (5 cols): Order Items & Live Summary Card */}
-            <div className="lg:col-span-5 space-y-4">
-              {/* Order Info Card */}
-              <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div>
-                    <h2 className="text-sm font-bold text-slate-900">Order Summary</h2>
-                    <p className="text-[11px] font-mono text-slate-400">#{order?.id || id}</p>
-                  </div>
-                  <span className="rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-bold">
-                    {order?.status || "Placed"}
-                  </span>
-                </div>
-
-                {/* Items List */}
-                <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-                  {(order?.items || []).map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between gap-3 text-xs">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        {item.image && (
-                          <img src={item.image} alt={item.name} className="h-10 w-10 rounded-lg object-cover border border-slate-100 shrink-0" />
-                        )}
-                        <div className="min-w-0">
-                          <p className="font-semibold text-slate-800 truncate">{item.name}</p>
-                          <p className="text-[10px] text-slate-400">
-                            Qty: {item.quantity || 1} {item.portionSize && `• ${item.portionSize}`}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="font-bold text-slate-900 shrink-0">₹{(item.price || 0) * (item.quantity || 1)}</span>
-                    </div>
                   ))}
                 </div>
+              </div>
 
-                {/* Price Breakdown */}
-                <div className="border-t border-slate-100 pt-3 text-xs space-y-1.5 text-slate-600">
-                  <div className="flex justify-between"><span>Subtotal</span><span>₹{order?.subtotal || order?.total || 0}</span></div>
-                  {order?.deliveryFee !== undefined && (
-                    <div className="flex justify-between"><span>Delivery Fee</span><span>{order.deliveryFee === 0 ? "FREE" : `₹${order.deliveryFee}`}</span></div>
-                  )}
-                  <div className="flex justify-between font-bold text-slate-900 text-sm pt-1 border-t border-dashed border-slate-200">
-                    <span>Grand Total</span>
-                    <span className="text-emerald-700">₹{order?.total || 0}</span>
-                  </div>
+              {/* Contact Inputs */}
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Your Name *</label>
+                  <input type="text" required value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500 transition" />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Email * (from account)</label>
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500 transition" />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Phone</label>
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500 transition font-mono" />
                 </div>
               </div>
 
-              {/* Priority Resolution Guarantee */}
-              <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 text-xs text-emerald-900 space-y-2">
-                <div className="flex items-center gap-2 font-bold text-emerald-800">
-                  <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
-                  <span>Direct Escalation Guarantee</span>
+              {/* Priority */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Priority</label>
+                <div className="flex gap-2">
+                  {[{ val: "urgent", label: "Urgent (Delay / Missing)" }, { val: "normal", label: "Normal (Feedback / Inquiry)" }].map((p) => (
+                    <button
+                      key={p.val} type="button" onClick={() => setPriority(p.val)}
+                      className={`px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition ${priority === p.val ? (p.val === "urgent" ? "bg-rose-50 border-rose-300 text-rose-900" : "bg-slate-100 border-slate-300 text-slate-900") : "bg-white border-slate-200 text-slate-500"}`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
                 </div>
-                <p className="text-[11px] text-emerald-700 leading-relaxed">
-                  Tickets logged on this desk notify the restaurant kitchen manager and delivery fleet supervisor within <strong>15 minutes</strong>.
-                </p>
-                <div className="pt-1 text-[11px] text-slate-500 font-mono">
-                  Support Helpline: <strong className="text-slate-700">+91 98765 43210</strong>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Describe Issue *</label>
+                <textarea required rows={4} value={message} onChange={(e) => setMessage(e.target.value)} placeholder={activeHint} className="w-full rounded-xl border border-slate-300 p-3 text-xs outline-none focus:border-emerald-500 transition" />
+              </div>
+
+              {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-2.5 text-xs text-rose-700 font-semibold">{error}</div>}
+
+              {/* Actions */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                <Link to="/contact" className="text-slate-400 hover:text-emerald-700 text-xs">Full Contact Page →</Link>
+                <div className="flex items-center gap-2">
+                  <Link to={`/orders/${id}`} className="rounded-xl border border-slate-200 px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 transition">Cancel</Link>
+                  <button type="submit" disabled={submitting} className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 transition shadow-xs disabled:opacity-50">
+                    {submitting ? "Submitting..." : "Submit Ticket"}
+                  </button>
                 </div>
+              </div>
+            </form>
+          </div>
+
+          {/* Right Column (5 cols): Order Items & Live Summary Card */}
+          <div className="lg:col-span-5 space-y-4">
+            <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                  <h2 className="text-sm font-bold text-slate-900">Order Summary</h2>
+                  <p className="text-[11px] font-mono text-slate-400">#{order?.id || id}</p>
+                </div>
+                <span className="rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-bold">
+                  {order?.status || "Placed"}
+                </span>
+              </div>
+
+              {/* Items List */}
+              <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                {(order?.items || []).map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      {item.image && (
+                        <img src={item.image} alt={item.name} className="h-10 w-10 rounded-lg object-cover border border-slate-100 shrink-0" />
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-800 truncate">{item.name}</p>
+                        <p className="text-[10px] text-slate-400">
+                          Qty: {item.quantity || 1} {item.portionSize && `• ${item.portionSize}`}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="font-bold text-slate-900 shrink-0">₹{(item.price || 0) * (item.quantity || 1)}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Price Breakdown */}
+              <div className="border-t border-slate-100 pt-3 text-xs space-y-1.5 text-slate-600">
+                <div className="flex justify-between"><span>Subtotal</span><span>₹{order?.subtotal || order?.total || 0}</span></div>
+                {order?.deliveryFee !== undefined && (
+                  <div className="flex justify-between"><span>Delivery Fee</span><span>{order.deliveryFee === 0 ? "FREE" : `₹${order.deliveryFee}`}</span></div>
+                )}
+                <div className="flex justify-between font-bold text-slate-900 text-sm pt-1 border-t border-dashed border-slate-200">
+                  <span>Grand Total</span>
+                  <span className="text-emerald-700">₹{order?.total || 0}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Guarantee Card */}
+            <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 text-xs text-emerald-900 space-y-2">
+              <div className="flex items-center gap-2 font-bold text-emerald-800">
+                <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
+                <span>Direct Escalation Guarantee</span>
+              </div>
+              <p className="text-[11px] text-emerald-700 leading-relaxed">
+                Tickets logged on this desk notify the restaurant kitchen manager and delivery fleet supervisor within <strong>15 minutes</strong>.
+              </p>
+              <div className="pt-1 text-[11px] text-slate-500 font-mono">
+                Support Helpline: <strong className="text-slate-700">+91 98765 43210</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Priority Ticket Submitted Modal Popup */}
+        {ticket && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+            <div className="relative w-full max-w-md rounded-2xl border border-emerald-200 bg-white p-6 sm:p-7 text-center shadow-2xl space-y-4">
+              <button
+                type="button"
+                onClick={() => { setTicket(null); setMessage(""); }}
+                className="absolute top-3.5 right-3.5 text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition"
+                aria-label="Close modal"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <div className="mx-auto flex h-13 w-13 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 shadow-xs">
+                <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-black text-slate-900">Priority Ticket Submitted!</h2>
+                <p className="text-xs text-slate-500 mt-1">Directly escalated to kitchen & fleet desk for Order #{id}.</p>
+              </div>
+
+              <div className="rounded-xl bg-slate-50 border border-slate-100 p-3.5 text-xs space-y-1.5 text-left">
+                <div className="flex justify-between"><span className="text-slate-400">Category:</span><strong className="text-slate-800">{ticket.issueCategory}</strong></div>
+                <div className="flex justify-between"><span className="text-slate-400">Email:</span><span className="text-slate-700">{ticket.email}</span></div>
+                <div className="flex justify-between"><span className="text-slate-400">Priority:</span><span className="font-bold text-rose-700 uppercase">{ticket.priority}</span></div>
+              </div>
+
+              <div className="flex justify-center gap-2.5 pt-1">
+                <Link to={`/orders/${id}`} className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 transition shadow-xs text-center">
+                  Back to Order #{id}
+                </Link>
+                <Link to="/orders" className="flex-1 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs py-2.5 transition text-center">
+                  All Orders
+                </Link>
               </div>
             </div>
           </div>
