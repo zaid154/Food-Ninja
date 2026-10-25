@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import UserContext from "./Usercontext";
 import { API_BASE_URL, LOGO } from "../utils/Constants";
@@ -15,6 +15,15 @@ const LoginPage = () => {
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
     const isFromCheckout = from === "/checkout";
+    const [showCheckoutNotice, setShowCheckoutNotice] = useState(isFromCheckout);
+
+    useEffect(() => {
+        if (!isFromCheckout) return;
+        const timer = setTimeout(() => {
+            setShowCheckoutNotice(false);
+        }, 30000);
+        return () => clearTimeout(timer);
+    }, [isFromCheckout]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -82,10 +91,21 @@ const LoginPage = () => {
                     </p>
                 </div>
 
-                {isFromCheckout && (
-                    <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs font-semibold text-emerald-800 mb-4 flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse shrink-0" />
-                        <span>Please sign in to complete your checkout and place your order.</span>
+                {/* 3-5 Word Single-Line Notice (Auto-dismisses in 30s) */}
+                {showCheckoutNotice && (
+                    <div className="rounded-xl bg-emerald-50 border border-emerald-200/90 px-3.5 py-2 text-xs font-semibold text-emerald-800 mb-4 flex items-center justify-between gap-2 shadow-2xs">
+                        <div className="flex items-center gap-2 min-w-0">
+                            <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+                            <span className="whitespace-nowrap">Sign in to checkout</span>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setShowCheckoutNotice(false)}
+                            className="text-emerald-700 hover:text-emerald-900 text-xs font-bold shrink-0 cursor-pointer px-1"
+                            aria-label="Dismiss notice"
+                        >
+                            ✕
+                        </button>
                     </div>
                 )}
 
@@ -141,6 +161,7 @@ const LoginPage = () => {
                             onClick={() => {
                                 setEmail("zaid@foodninja.com");
                                 setPassword("user123");
+                                setError("");
                             }}
                             className="text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg px-2.5 py-1 text-[11px] font-bold transition cursor-pointer"
                         >
