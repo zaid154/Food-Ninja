@@ -25,8 +25,8 @@ import ProtectedRoute from "./Component/ProtectedRoute";
 import AdminLayout from "./Component/AdminLayout";
 import AdminOverviewPage from "./Component/admin/AdminOverviewPage";
 import AdminOrdersPage from "./Component/admin/AdminOrdersPage";
-import AdminFoodsPage from "./Component/admin/AdminFoodsPage";
-import AdminFoodEditPage from "./Component/admin/AdminFoodEditPage";
+import AdminDishesPage from "./Component/admin/AdminDishesPage";
+import AdminDishFormPage from "./Component/admin/AdminDishFormPage";
 import AdminInquiriesPage from "./Component/admin/AdminInquiriesPage";
 import AdminCategoriesPage from "./Component/admin/AdminCategoriesPage";
 import AdminCustomersPage from "./Component/admin/AdminCustomersPage";
@@ -103,10 +103,13 @@ const appRouter = createBrowserRouter([
           { index: true, element: <AdminOverviewPage /> },
           { path: "overview", element: <AdminOverviewPage /> },
           { path: "orders", element: <AdminOrdersPage /> },
-          { path: "foods", element: <AdminFoodsPage /> },
-          { path: "foods/new", element: <AdminFoodEditPage /> },
-          { path: "foods/add", element: <AdminFoodEditPage /> },
-          { path: "foods/edit/:id", element: <AdminFoodEditPage /> },
+          { path: "foods", element: <AdminDishesPage /> },
+          { path: "foods/new", element: <AdminDishFormPage /> },
+          { path: "foods/add", element: <AdminDishFormPage /> },
+          { path: "foods/edit/:id", element: <AdminDishFormPage /> },
+          { path: "dishes", element: <AdminDishesPage /> },
+          { path: "dishes/new", element: <AdminDishFormPage /> },
+          { path: "dishes/edit/:id", element: <AdminDishFormPage /> },
           { path: "categories", element: <AdminCategoriesPage /> },
           { path: "customers", element: <AdminCustomersPage /> },
           { path: "settings", element: <AdminSettingsPage /> },

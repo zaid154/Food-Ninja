@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams, useOutletContext } from "react-router-dom
 import AdminDropdown from "./AdminDropdown";
 import { API_BASE_URL } from "../../utils/Constants";
 import { useAppDialog } from "../AppDialog";
-import { FOOD_CUISINES } from "./AdminFoodsPage";
+import { FOOD_CUISINES } from "./AdminDishesPage";
 
 const optionalNumber = (value) => (value === "" || value == null ? null : Number(value));
 const parseList = (value) =>
@@ -35,7 +35,7 @@ const initialFood = {
   keyFeatures: "",
 };
 
-const AdminFoodEditPage = () => {
+const AdminDishFormPage = () => {
   const { id } = useParams();
   const isEditing = Boolean(id);
   const navigate = useNavigate();
@@ -756,4 +756,4 @@ const AdminFoodEditPage = () => {
   );
 };
 
-export default AdminFoodEditPage;
+export default AdminDishFormPage;

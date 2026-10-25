@@ -20,7 +20,7 @@ export const FOOD_CUISINES = [
   "Thai"
 ];
 
-const AdminFoodsPage = (props) => {
+const AdminDishesPage = (props) => {
   const context = useOutletContext() || {};
   const { confirm, alert: showDialog } = useAppDialog();
   const foods = props.foods || context.foods || [];
@@ -316,4 +316,4 @@ const AdminFoodsPage = (props) => {
   );
 };
 
-export default AdminFoodsPage;
+export default AdminDishesPage;
