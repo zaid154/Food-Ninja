@@ -62,6 +62,7 @@ const AdminOverviewPage = (props) => {
   );
   const pendingCount = orders.filter((o) => ["Placed", "Preparing", "Out for Delivery"].includes(o.status)).length;
   const deliveredCount = orders.filter((o) => o.status === "Delivered").length;
+  const unresolvedInquiries = inquiries.filter((i) => !i.isResolved).length;
 
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
@@ -80,7 +81,7 @@ const AdminOverviewPage = (props) => {
     { label: "Live Orders", val: orders.length, sub: `${pendingCount} active in progress`, to: "/admin/orders", icon: <OrdersIcon />, color: "text-sky-700 bg-sky-50 border-sky-200" },
     { label: "Food Dishes", val: foods.length, sub: "Active catalog dishes", to: "/admin/foods", icon: <DishesIcon />, color: "text-amber-700 bg-amber-50 border-amber-200" },
     { label: "Categories", val: categories.length, sub: "Menu themes & presets", to: "/admin/categories", icon: <CategoriesIcon />, color: "text-purple-700 bg-purple-50 border-purple-200" },
-    { label: "Customer Inquiries", val: inquiries.length, sub: "Feedback & support", to: "/admin/inquiries", icon: <InquiriesIcon />, color: "text-rose-700 bg-rose-50 border-rose-200" },
+    { label: "Customer Inquiries", val: inquiries.length, sub: unresolvedInquiries > 0 ? `${unresolvedInquiries} pending attention` : "All issues resolved", to: "/admin/inquiries", icon: <InquiriesIcon />, color: "text-rose-700 bg-rose-50 border-rose-200" },
     { label: "Store Settings", val: "Charges & Hours", sub: "Delivery fee & timings", to: "/admin/settings", icon: <SettingsIcon />, color: "text-slate-700 bg-slate-50 border-slate-200" },
   ];
 

@@ -1,7 +1,78 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
 import { useAppDialog } from "../AppDialog";
+
+const CustomerInfo = ({ name, email, phone, orderId }) => (
+  <div className="space-y-1">
+    {orderId && (
+      <Link
+        to={`/orders/${orderId}`}
+        target="_blank"
+        className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
+        title="Open Order in new tab"
+      >
+        <span>Order #{orderId}</span>
+        <span className="text-[9px]">↗</span>
+      </Link>
+    )}
+    <div>
+      <p className="font-bold text-slate-900 text-xs leading-tight tracking-tight">{name || "Customer"}</p>
+      {email && (
+        <p className="text-[11px] text-slate-500 font-mono truncate select-all mt-0.5" title={email}>
+          {email}
+        </p>
+      )}
+      {phone && (
+        <p className="text-[11px] text-slate-600 font-mono mt-0.5 flex items-center gap-1">
+          <svg className="h-2.5 w-2.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+          </svg>
+          <span>{phone}</span>
+        </p>
+      )}
+    </div>
+  </div>
+);
+
+const ExpandableMessage = ({ text, time, limit = 110 }) => {
+  const [expanded, setExpanded] = useState(false);
+  const isLong = Boolean(text && text.length > limit);
+
+  return (
+    <div className="space-y-1">
+      <p className="text-slate-800 text-xs leading-relaxed break-words font-medium">
+        {isLong && !expanded ? `${text.slice(0, limit).trim()}...` : text}
+        {isLong && (
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            className="ml-1.5 text-[11px] font-bold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer inline-flex items-center"
+          >
+            {expanded ? "Show less" : "Read more"}
+          </button>
+        )}
+      </p>
+      {time && <p className="text-[10px] text-slate-400">Received: {time}</p>}
+    </div>
+  );
+};
+
+const ResolutionToggle = ({ isResolved, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer border ${
+      isResolved
+        ? "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
+        : "bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100"
+    }`}
+    title={`Mark as ${isResolved ? "Open" : "Resolved"}`}
+  >
+    <span className={`h-1.5 w-1.5 rounded-full ${isResolved ? "bg-emerald-600" : "bg-amber-600"}`} />
+    <span>{isResolved ? "Resolved" : "Open / Active"}</span>
+  </button>
+);
 
 const InquiryActions = ({ email, phone, subject, id, onDelete }) => (
   <div className="flex items-center justify-end gap-1.5">
@@ -45,14 +116,25 @@ const AdminInquiriesPage = (props) => {
   const onDeleteInquiry = props.onDeleteInquiry || context.handleDeleteInquiry;
   const showToast = props.showToast || context.showToast || showDialog;
 
+  const [localInquiries, setLocalInquiries] = useState(inquiries);
+  useEffect(() => {
+    setLocalInquiries(inquiries);
+  }, [inquiries]);
+
   const [activeTab, setActiveTab] = useState("order_issues");
   const [filterState, setFilterState] = useState("all");
 
-  const orderIssues = inquiries.filter((inq) => inq.type === "order_issue" || (inq.orderId && String(inq.orderId).trim() !== ""));
-  const generalInquiries = inquiries.filter((inq) => inq.type !== "order_issue" && (!inq.orderId || String(inq.orderId).trim() === ""));
+  const orderIssues = localInquiries.filter((inq) => inq.type === "order_issue" || (inq.orderId && String(inq.orderId).trim() !== ""));
+  const generalInquiries = localInquiries.filter((inq) => inq.type !== "order_issue" && (!inq.orderId || String(inq.orderId).trim() === ""));
   const unresolvedOrderIssuesCount = orderIssues.filter((i) => !i.isResolved).length;
+  const unresolvedGeneralCount = generalInquiries.filter((i) => !i.isResolved).length;
 
   const handleToggleResolve = async (inquiryId, currentResolved) => {
+    // Instant optimistic update for tab badges and row UI
+    setLocalInquiries((prev) =>
+      prev.map((i) => (String(i._id || i.id) === String(inquiryId) ? { ...i, isResolved: !currentResolved } : i))
+    );
+
     try {
       const res = await fetch(`${API_BASE_URL}/contact/${inquiryId}/resolve`, {
         method: "PATCH",
@@ -64,11 +146,18 @@ const AdminInquiriesPage = (props) => {
         showToast(`Ticket marked as ${!currentResolved ? "Resolved" : "Open"}`);
         if (onRefresh) onRefresh();
       } else {
+        setLocalInquiries(inquiries);
         showDialog(data.message || "Failed to update ticket status.", { title: "Update failed", variant: "error" });
       }
     } catch {
+      setLocalInquiries(inquiries);
       showDialog("Could not connect to the server. Please try again.", { title: "Connection error", variant: "error" });
     }
+  };
+
+  const handleDelete = (id) => {
+    setLocalInquiries((prev) => prev.filter((i) => String(i._id || i.id) !== String(id)));
+    if (onDeleteInquiry) onDeleteInquiry(id);
   };
 
   const currentList = activeTab === "order_issues" ? orderIssues : generalInquiries;
@@ -85,10 +174,15 @@ const AdminInquiriesPage = (props) => {
           <h2 className="text-sm font-bold text-slate-900">Customer Inquiries & Order Resolution Desk</h2>
           <p className="text-xs text-slate-400 mt-0.5">Resolve live order issues directly or reply to general customer messages</p>
         </div>
-        {unresolvedOrderIssuesCount > 0 && (
+        {unresolvedOrderIssuesCount > 0 ? (
           <div className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 border border-rose-200 px-3 py-1 text-xs font-bold text-rose-800">
             <span className="h-2 w-2 rounded-full bg-rose-600 animate-pulse" />
             <span>{unresolvedOrderIssuesCount} Urgent Order Issue{unresolvedOrderIssuesCount > 1 ? "s" : ""} Pending</span>
+          </div>
+        ) : (
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-800">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+            <span>All Order Issues Resolved</span>
           </div>
         )}
       </div>
@@ -96,8 +190,8 @@ const AdminInquiriesPage = (props) => {
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pb-2">
         <div className="flex items-center gap-2">
           {[
-            { id: "order_issues", label: "Live Order Issues", count: orderIssues.length, badgeBg: "bg-rose-500" },
-            { id: "general", label: "General Inquiries", count: generalInquiries.length, badgeBg: "bg-emerald-600" },
+            { id: "order_issues", label: "Live Order Issues", openCount: unresolvedOrderIssuesCount, totalCount: orderIssues.length, badgeBg: "bg-rose-500" },
+            { id: "general", label: "General Inquiries", openCount: unresolvedGeneralCount, totalCount: generalInquiries.length, badgeBg: "bg-emerald-600" },
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -110,8 +204,17 @@ const AdminInquiriesPage = (props) => {
                 }`}
               >
                 <span>{tab.label}</span>
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${isActive ? `${tab.badgeBg} text-white` : "bg-slate-200 text-slate-700"}`}>
-                  {tab.count}
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                    tab.openCount > 0
+                      ? `${tab.badgeBg} text-white`
+                      : isActive
+                      ? "bg-slate-800 text-slate-300 border border-slate-700"
+                      : "bg-slate-200 text-slate-600"
+                  }`}
+                  title={`${tab.openCount} open of ${tab.totalCount} total`}
+                >
+                  {tab.openCount}
                 </span>
               </button>
             );
@@ -144,32 +247,23 @@ const AdminInquiriesPage = (props) => {
           <table className="w-full text-left text-xs min-w-[750px]">
             <thead>
               <tr className="border-b border-slate-100 text-slate-400 font-semibold uppercase text-[10px]">
-                <th className="pb-3 min-w-[150px]">Order & Customer</th>
+                <th className="pb-3 min-w-[170px]">Order & Customer</th>
                 <th className="pb-3 min-w-[130px]">Issue & Priority</th>
                 <th className="pb-3 min-w-[260px]">Customer Message</th>
                 <th className="pb-3 min-w-[110px]">Resolution</th>
-                <th className="pb-3 text-right pr-2 min-w-[140px]">Actions</th>
+                <th className="pb-3 text-right pr-2 min-w-[130px]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredList.map((inq) => {
                 const phone = inq.phone?.trim() || "";
                 const isUrgent = inq.priority === "urgent" || inq.priority === "high";
+                const timeStr = inq.createdAt ? new Date(inq.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "";
 
                 return (
-                  <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/40 text-slate-500" : "hover:bg-slate-50/70 text-slate-800"}`}>
+                  <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/50 text-slate-500" : "hover:bg-slate-50/70 text-slate-800"}`}>
                     <td className="py-3.5 align-top">
-                      {inq.orderId ? (
-                        <Link to={`/orders/${inq.orderId}`} target="_blank" className="font-mono font-bold text-emerald-700 hover:underline flex items-center gap-1">
-                          <span>Order #{inq.orderId}</span>
-                          <span className="text-[10px]">↗</span>
-                        </Link>
-                      ) : (
-                        <span className="text-slate-400 text-[11px]">Unlinked Order</span>
-                      )}
-                      <p className="font-bold text-slate-900 mt-1">{inq.name}</p>
-                      <p className="text-[11px] text-slate-500 font-mono truncate">{inq.email}</p>
-                      {phone && <p className="text-[11px] text-emerald-700 font-mono mt-0.5">{phone}</p>}
+                      <CustomerInfo name={inq.name} email={inq.email} phone={phone} orderId={inq.orderId} />
                     </td>
 
                     <td className="py-3.5 align-top space-y-1.5">
@@ -190,24 +284,14 @@ const AdminInquiriesPage = (props) => {
                     </td>
 
                     <td className="py-3.5 align-top max-w-sm">
-                      <p className="text-slate-800 text-xs leading-relaxed break-words font-medium">{inq.message}</p>
-                      <p className="text-[10px] text-slate-400 mt-1">
-                        Received: {inq.createdAt ? new Date(inq.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "Recent"}
-                      </p>
+                      <ExpandableMessage text={inq.message} time={timeStr} />
                     </td>
 
                     <td className="py-3.5 align-top whitespace-nowrap">
-                      <button
-                        type="button"
+                      <ResolutionToggle
+                        isResolved={inq.isResolved}
                         onClick={() => handleToggleResolve(inq._id || inq.id, inq.isResolved)}
-                        className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer border ${
-                          inq.isResolved ? "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100" : "bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100"
-                        }`}
-                        title="Click to toggle resolution state"
-                      >
-                        <span className={`h-1.5 w-1.5 rounded-full ${inq.isResolved ? "bg-emerald-600" : "bg-amber-600"}`} />
-                        <span>{inq.isResolved ? "Resolved" : "Open / Active"}</span>
-                      </button>
+                      />
                     </td>
 
                     <td className="py-3.5 align-top text-right whitespace-nowrap">
@@ -216,7 +300,7 @@ const AdminInquiriesPage = (props) => {
                         phone={phone}
                         subject={`[Food Ninja] Regarding Order #${inq.orderId || ""} Issue: ${inq.issueCategory || inq.subject || ""}`}
                         id={inq._id || inq.id}
-                        onDelete={onDeleteInquiry}
+                        onDelete={handleDelete}
                       />
                     </td>
                   </tr>
@@ -227,25 +311,26 @@ const AdminInquiriesPage = (props) => {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs min-w-[650px]">
+          <table className="w-full text-left text-xs min-w-[700px]">
             <thead>
               <tr className="border-b border-slate-100 text-slate-400 font-semibold uppercase text-[10px]">
-                <th className="pb-3 min-w-[150px]">Customer</th>
-                <th className="pb-3 min-w-[110px]">Subject</th>
+                <th className="pb-3 min-w-[170px]">Customer</th>
+                <th className="pb-3 min-w-[120px]">Subject</th>
                 <th className="pb-3 min-w-[260px]">Customer Message</th>
-                <th className="pb-3 min-w-[90px]">Date</th>
-                <th className="pb-3 text-right pr-2 min-w-[140px]">Contact Customer</th>
+                <th className="pb-3 min-w-[110px]">Resolution</th>
+                <th className="pb-3 min-w-[80px]">Date</th>
+                <th className="pb-3 text-right pr-2 min-w-[130px]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredList.map((inq) => {
                 const phone = inq.phone?.trim() || "";
+                const timeStr = inq.createdAt ? new Date(inq.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric" }) : "";
+
                 return (
-                  <tr key={inq._id || inq.id} className="text-slate-700 hover:bg-slate-50/50 transition">
+                  <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/50 text-slate-500" : "hover:bg-slate-50/60 text-slate-700"}`}>
                     <td className="py-3.5 align-top">
-                      <p className="font-semibold text-slate-900">{inq.name}</p>
-                      <p className="text-[11px] text-slate-500 font-mono">{inq.email}</p>
-                      {phone && <p className="text-[11px] text-emerald-700 font-mono mt-0.5">{phone}</p>}
+                      <CustomerInfo name={inq.name} email={inq.email} phone={phone} />
                     </td>
                     <td className="py-3.5 align-top">
                       <span className="inline-block rounded bg-slate-100 border border-slate-200/60 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
@@ -253,10 +338,16 @@ const AdminInquiriesPage = (props) => {
                       </span>
                     </td>
                     <td className="py-3.5 align-top max-w-sm">
-                      <p className="text-slate-800 text-xs leading-relaxed break-words font-medium">{inq.message}</p>
+                      <ExpandableMessage text={inq.message} />
+                    </td>
+                    <td className="py-3.5 align-top whitespace-nowrap">
+                      <ResolutionToggle
+                        isResolved={inq.isResolved}
+                        onClick={() => handleToggleResolve(inq._id || inq.id, inq.isResolved)}
+                      />
                     </td>
                     <td className="py-3.5 align-top text-[11px] text-slate-400 whitespace-nowrap">
-                      {inq.createdAt ? new Date(inq.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric" }) : "Recent"}
+                      {timeStr || "Recent"}
                     </td>
                     <td className="py-3.5 align-top text-right whitespace-nowrap">
                       <InquiryActions
@@ -264,7 +355,7 @@ const AdminInquiriesPage = (props) => {
                         phone={phone}
                         subject={`Re: ${inq.subject || "Your Food Ninja Inquiry"}`}
                         id={inq._id || inq.id}
-                        onDelete={onDeleteInquiry}
+                        onDelete={handleDelete}
                       />
                     </td>
                   </tr>
