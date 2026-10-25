@@ -240,14 +240,14 @@ const AdminLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-100/70 text-slate-900 flex flex-col">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-2xs">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 py-3">
           <div className="shrink-0">
             <Link to="/admin" className="flex items-center gap-2.5">
-              <img src={LOGO} alt="Food Ninja Admin" className="h-8 w-8 rounded-full object-cover" />
+              <img src={LOGO} alt="Food Ninja Admin" className="h-8 w-8 rounded-full object-cover shadow-2xs" />
               <span className="font-black text-lg tracking-tight text-slate-900">Food<span className="text-emerald-600">Ninja</span></span>
-              <span className="text-[10px] font-black uppercase tracking-wider bg-slate-900 text-white px-1.5 py-0.5 rounded">Admin</span>
+              <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white px-2 py-0.5 rounded-full shadow-xs">Admin</span>
             </Link>
           </div>
 
@@ -258,17 +258,21 @@ const AdminLayout = () => {
                 to={link.to}
                 end={link.end}
                 className={({ isActive }) =>
-                  `flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition whitespace-nowrap ${
+                  `flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition whitespace-nowrap ${
                     isActive
-                      ? "bg-slate-900 text-white font-bold shadow-xs"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                      ? "bg-emerald-600 text-white font-bold shadow-xs"
+                      : "text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70"
                   }`
                 }
               >
                 {link.icon}
                 <span>{link.label}</span>
                 {link.badge !== null && (
-                  <span className="rounded-full bg-emerald-100 text-emerald-800 px-1.5 py-0.2 text-[9px] font-bold">
+                  <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold transition ${
+                    location.pathname === link.to || (link.to !== "/admin" && location.pathname.startsWith(link.to))
+                      ? "bg-white text-emerald-800"
+                      : "bg-emerald-100 text-emerald-800"
+                  }`}>
                     {link.badge}
                   </span>
                 )}
@@ -283,7 +287,7 @@ const AdminLayout = () => {
               className="flex items-center gap-1.5 focus:outline-none cursor-pointer"
               aria-label="Admin profile menu"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white shadow-xs">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white shadow-xs ring-2 ring-emerald-500/20">
                 A
               </div>
               <svg viewBox="0 0 20 20" className="h-4 w-4 text-slate-500" fill="currentColor">
@@ -353,17 +357,21 @@ const AdminLayout = () => {
                 to={link.to}
                 end={link.end}
                 className={({ isActive }) =>
-                  `flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition whitespace-nowrap ${
+                  `flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition whitespace-nowrap ${
                     isActive
-                      ? "bg-slate-900 text-white font-bold"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                      ? "bg-emerald-600 text-white font-bold shadow-xs"
+                      : "text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/70"
                   }`
                 }
               >
                 {link.icon}
                 <span>{link.label}</span>
                 {link.badge !== null && (
-                  <span className="rounded-full bg-emerald-100 text-emerald-800 px-1.5 py-0.2 text-[9px] font-bold">
+                  <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold transition ${
+                    location.pathname === link.to || (link.to !== "/admin" && location.pathname.startsWith(link.to))
+                      ? "bg-white text-emerald-800"
+                      : "bg-emerald-100 text-emerald-800"
+                  }`}>
                     {link.badge}
                   </span>
                 )}
