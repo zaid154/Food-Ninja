@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import UserContext from "./Usercontext";
 import { API_BASE_URL, LOGO } from "../utils/Constants";
 
@@ -12,6 +12,9 @@ const LoginPage = () => {
 
     const { setUser } = useContext(UserContext);
     const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
+    const isFromCheckout = from === "/checkout";
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -50,7 +53,7 @@ const LoginPage = () => {
                     localStorage.setItem("adminAuth", "true");
                     navigate("/admin");
                 } else {
-                    navigate("/");
+                    navigate(from, { replace: true });
                 }
             } else {
                 setError(data.message || "Invalid email or password. Please check your credentials.");
@@ -79,8 +82,15 @@ const LoginPage = () => {
                     </p>
                 </div>
 
+                {isFromCheckout && (
+                    <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs font-semibold text-emerald-800 mb-4 flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+                        <span>Please sign in to complete your checkout and place your order.</span>
+                    </div>
+                )}
+
                 {/* Form */}
-                <form onSubmit={handleLogin} className="mt-6 space-y-4 text-xs">
+                <form onSubmit={handleLogin} className="mt-4 space-y-4 text-xs">
                     <div>
                         <label className="block font-bold text-slate-700 mb-1">Email Address</label>
                         <input
@@ -119,6 +129,24 @@ const LoginPage = () => {
                             {error}
                         </div>
                     )}
+
+                    {/* Quick Demo Customer Account Card */}
+                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-xl p-2.5">
+                        <div className="text-[11px] text-slate-500">
+                            <p className="font-semibold text-slate-700">Customer Demo Account</p>
+                            <p className="font-mono text-slate-500">zaid@foodninja.com / user123</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setEmail("zaid@foodninja.com");
+                                setPassword("user123");
+                            }}
+                            className="text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg px-2.5 py-1 text-[11px] font-bold transition cursor-pointer"
+                        >
+                            Auto-Fill
+                        </button>
+                    </div>
 
                     <button
                         type="submit"

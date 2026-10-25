@@ -126,7 +126,7 @@ const Header = () => {
         : "text-slate-600 hover:text-slate-900"
     }`;
 
-  const userInitial = user ? (user.name ? user.name[0].toUpperCase() : "M") : "M";
+  const userInitial = user ? (user.name ? user.name[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : "U") : null;
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
@@ -234,81 +234,74 @@ const Header = () => {
             )}
           </Link>
 
-          <div className="relative" ref={dropdownRef}>
-            <button
-              type="button"
-              onClick={() => setUserDropdown(!userDropdown)}
-              className="flex items-center gap-1.5 focus:outline-none cursor-pointer"
-              aria-label="User profile menu"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white shadow-xs">
-                {userInitial}
-              </div>
-              <svg viewBox="0 0 20 20" className="h-4 w-4 text-slate-500" fill="currentColor">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </button>
-
-            {userDropdown && (
-              <div className="absolute right-0 mt-2.5 w-52 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl z-50">
-                <div className="px-4 py-2 border-b border-slate-100">
-                  <p className="text-xs font-bold text-slate-900 truncate">
-                    {user ? user.name || user.email : "Demo User"}
-                  </p>
-                  <p className="text-[11px] text-slate-400 truncate">
-                    {user ? user.email : "foodninja@gmail.com"}
-                  </p>
+          {user ? (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setUserDropdown(!userDropdown)}
+                className="flex items-center gap-1.5 focus:outline-none cursor-pointer"
+                aria-label="User profile menu"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white shadow-xs ring-2 ring-emerald-500/20">
+                  {userInitial}
                 </div>
-                <Link
-                  to="/orders"
-                  onClick={() => setUserDropdown(false)}
-                  className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  My Orders
-                </Link>
-                <Link
-                  to="/wishlist"
-                  onClick={() => setUserDropdown(false)}
-                  className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  My Wishlist
-                </Link>
-                {isAdmin && (
+                <svg viewBox="0 0 20 20" className="h-4 w-4 text-slate-500" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+
+              {userDropdown && (
+                <div className="absolute right-0 mt-2.5 w-52 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl z-50">
+                  <div className="px-4 py-2 border-b border-slate-100">
+                    <p className="text-xs font-bold text-slate-900 truncate">
+                      {user.name || user.email}
+                    </p>
+                    <p className="text-[11px] text-slate-400 truncate">
+                      {user.email}
+                    </p>
+                  </div>
                   <Link
-                    to="/admin"
+                    to="/orders"
                     onClick={() => setUserDropdown(false)}
-                    className="block px-4 py-2 text-xs font-bold text-emerald-600 hover:bg-emerald-50"
+                    className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
-                    Admin Dashboard
+                    My Orders
                   </Link>
-                )}
-                {user ? (
+                  <Link
+                    to="/wishlist"
+                    onClick={() => setUserDropdown(false)}
+                    className="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    My Wishlist
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setUserDropdown(false)}
+                      className="block px-4 py-2 text-xs font-bold text-emerald-600 hover:bg-emerald-50"
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 border-t border-slate-100"
+                    className="w-full text-left px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 border-t border-slate-100 cursor-pointer"
                   >
                     Logout
                   </button>
-                ) : (
-                  <Link
-                    to="/login"
-                    onClick={() => setUserDropdown(false)}
-                    className="block px-4 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-50 border-t border-slate-100"
-                  >
-                    Sign In / Login
-                  </Link>
-                )}
-              </div>
-            )}
-          </div>
-
-          {!user && (
+                </div>
+              )}
+            </div>
+          ) : (
             <Link
               to="/login"
-              className="hidden"
+              className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 hover:bg-emerald-600 text-white px-3.5 py-1.5 text-xs font-bold transition shadow-xs"
             >
-              Sign In
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>Sign In</span>
             </Link>
           )}
 
