@@ -51,7 +51,7 @@ Food Ninja/
 ├── backend/
 │   ├── config/
 │   │   └── connectionDb.js     # MongoDB connection setup
-│   ├── controller/             # Business logic for catalog, orders, reviews, settings, etc.
+│   ├── controllers/            # Business logic for catalog, orders, reviews, settings, etc.
 │   ├── models/                 # Mongoose schemas for users, dishes, orders, reviews, settings, etc.
 │   ├── routes/                 # Express route definitions, including payment
 │   ├── data/                   # Seed dish data
@@ -72,6 +72,12 @@ Food Ninja/
 │   └── package.json
 └── README.md
 ```
+
+### Finding a page or API file
+
+- Frontend route definitions are in `frontend/src/App.js`. Route pages use a `*Page.js` filename; for example, `/admin/categories` is rendered by `frontend/src/Component/admin/AdminCategoriesPage.js` and `/checkout` by `frontend/src/Component/CheckoutPage.js`.
+- Shared UI pieces such as `frontend/src/Component/food/FoodCard.js` are reusable components, not route pages.
+- Backend endpoints are mounted in `backend/server.js`. Their files use `backend/routes/*Routes.js`, `backend/controllers/*Controller.js`, and `backend/models/*Model.js`. For example, `/api/categories` is defined in `backend/routes/categoriesRoutes.js`, handled by `backend/controllers/categoryController.js`, and stored through `backend/models/categoryModel.js`.
 
 ---
 

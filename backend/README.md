@@ -7,7 +7,7 @@ REST API for the Food Ninja storefront and admin dashboard. The backend uses Nod
 ```text
 backend/
 ├── config/connectionDb.js       # MongoDB connection and reconnect handling
-├── controller/                  # Catalog, category, inquiry, order, review, settings, and user logic
+├── controllers/                 # Catalog, category, inquiry, order, review, settings, and user logic
 ├── data/                        # Initial dish data used by the seeder
 ├── models/                      # Mongoose schemas
 ├── routes/                      # API route definitions, including Razorpay payments
@@ -15,6 +15,12 @@ backend/
 ├── server.js                    # Express app and route mounts
 └── package.json
 ```
+
+## Finding API code
+
+`server.js` connects each API prefix to a route file. Route files end in `Routes.js`, request logic files in `controllers/` end in `Controller.js`, and Mongoose schema files in `models/` end in `Model.js`.
+
+For example, `/api/categories` uses `routes/categoriesRoutes.js`, `controllers/categoryController.js`, and `models/categoryModel.js`. `/api/orders` uses the corresponding `ordersRoutes.js`, `orderController.js`, and `orderModel.js` files. The recipes router also serves `/api/foods` for compatibility.
 
 ## Run locally
 
