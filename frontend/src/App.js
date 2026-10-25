@@ -26,6 +26,7 @@ import AdminLayout from "./Component/AdminLayout";
 import AdminOverviewPage from "./Component/admin/AdminOverviewPage";
 import AdminOrdersPage from "./Component/admin/AdminOrdersPage";
 import AdminFoodsPage from "./Component/admin/AdminFoodsPage";
+import AdminFoodEditPage from "./Component/admin/AdminFoodEditPage";
 import AdminInquiriesPage from "./Component/admin/AdminInquiriesPage";
 import AdminCategoriesPage from "./Component/admin/AdminCategoriesPage";
 import AdminCustomersPage from "./Component/admin/AdminCustomersPage";
@@ -34,6 +35,7 @@ import AdminSettingsPage from "./Component/admin/AdminSettingsPage";
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
 import appStore from "./utils/Store";
+import { AppDialogProvider } from "./Component/AppDialog";
 
 const App = () => {
   const [user, setUser] = useState(() => {
@@ -102,6 +104,9 @@ const appRouter = createBrowserRouter([
           { path: "overview", element: <AdminOverviewPage /> },
           { path: "orders", element: <AdminOrdersPage /> },
           { path: "foods", element: <AdminFoodsPage /> },
+          { path: "foods/new", element: <AdminFoodEditPage /> },
+          { path: "foods/add", element: <AdminFoodEditPage /> },
+          { path: "foods/edit/:id", element: <AdminFoodEditPage /> },
           { path: "categories", element: <AdminCategoriesPage /> },
           { path: "customers", element: <AdminCustomersPage /> },
           { path: "settings", element: <AdminSettingsPage /> },
@@ -116,4 +121,8 @@ const appRouter = createBrowserRouter([
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<RouterProvider router={appRouter} />);
+root.render(
+  <AppDialogProvider>
+    <RouterProvider router={appRouter} />
+  </AppDialogProvider>
+);

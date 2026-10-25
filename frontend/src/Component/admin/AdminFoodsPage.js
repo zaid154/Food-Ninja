@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
 import FoodDishModal from "./FoodDishModal";
+import { useAppDialog } from "../AppDialog";
 
 export const FOOD_CUISINES = [
   "Indian",
@@ -19,13 +20,18 @@ export const FOOD_CUISINES = [
   "Middle Eastern",
   "Thai"
 ];
+const optionalNumber = (value) => value === "" || value == null ? null : Number(value);
+const parseList = (value) => Array.isArray(value)
+  ? value.map((item) => String(item).trim()).filter(Boolean)
+  : String(value || "").split(/[\n,]/).map((item) => item.trim()).filter(Boolean);
 
 const AdminFoodsPage = (props) => {
   const context = useOutletContext() || {};
+  const { confirm, alert: showDialog } = useAppDialog();
   const foods = props.foods || context.foods || [];
   const categories = props.categories || context.categories || [];
   const onRefresh = props.onRefresh || context.fetchData;
-  const showToast = props.showToast || context.showToast || alert;
+  const showToast = props.showToast || context.showToast || showDialog;
 
   const availableCategories = categories.map((category) => category.name).filter(Boolean);
 
@@ -42,6 +48,7 @@ const AdminFoodsPage = (props) => {
   const [selectedStock, setSelectedStock] = useState("All"); // "All" | "In Stock" | "Sold Out"
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const initialFood = {
     name: "",
@@ -53,17 +60,24 @@ const AdminFoodsPage = (props) => {
     servingInfo: "",
     hasPortions: false,
     halfPrice: "",
+    quarterPrice: "",
     caloriesPerServing: "",
+    proteinGrams: "",
+    carbsGrams: "",
+    fatGrams: "",
     deliveryTime: "25-30 mins",
     dietary: "Veg",
     isVeg: true,
     image: "",
     description: "",
-    ingredients: ""
+    ingredients: "",
+    keyFeatures: ""
   };
 
   const [foodForm, setFoodForm] = useState(initialFood);
+  const [savedFoodForm, setSavedFoodForm] = useState(initialFood);
   const [editingFoodId, setEditingFoodId] = useState(null);
+  const hasUnsavedChanges = JSON.stringify(foodForm) !== JSON.stringify(savedFoodForm);
 
   // Filter foods based on search query, category chip, and stock status
   const filteredFoods = foods.filter((f) => {
@@ -89,15 +103,18 @@ const AdminFoodsPage = (props) => {
   });
 
   const handleOpenAddModal = () => {
+    const blankFood = { ...initialFood };
     setEditingFoodId(null);
-    setFoodForm(initialFood);
+    setFoodForm(blankFood);
+    setSavedFoodForm(blankFood);
+    setSaveError("");
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (f) => {
     setEditingFoodId(f.id);
     const foodDietary = f.dietary || (f.isVeg !== false ? "Veg" : "Non-Veg");
-    setFoodForm({
+    const nextFoodForm = {
       name: f.name || "",
       category: f.category || "",
       cuisine: f.cuisine || "Indian",
@@ -107,15 +124,34 @@ const AdminFoodsPage = (props) => {
       servingInfo: f.servingInfo || "",
       hasPortions: Boolean(f.hasPortions),
       halfPrice: f.halfPrice || "",
-      caloriesPerServing: f.caloriesPerServing || 300,
+      quarterPrice: f.quarterPrice || "",
+      caloriesPerServing: f.caloriesPerServing ?? "",
+      proteinGrams: f.proteinGrams ?? "",
+      carbsGrams: f.carbsGrams ?? "",
+      fatGrams: f.fatGrams ?? "",
       deliveryTime: f.deliveryTime || "25-30 mins",
       dietary: foodDietary,
       isVeg: foodDietary !== "Non-Veg",
       image: f.image || "",
       description: f.description || "",
-      ingredients: Array.isArray(f.ingredients) ? f.ingredients.join(", ") : (f.ingredients || "")
-    });
+      ingredients: Array.isArray(f.ingredients) ? f.ingredients.join(", ") : (f.ingredients || ""),
+      keyFeatures: Array.isArray(f.keyFeatures) ? f.keyFeatures.join(", ") : (f.keyFeatures || "")
+    };
+    setFoodForm(nextFoodForm);
+    setSavedFoodForm(nextFoodForm);
+    setSaveError("");
     setIsModalOpen(true);
+  };
+
+  const handleCloseFoodModal = () => {
+    if (saving) return;
+    setSaveError("");
+    setIsModalOpen(false);
+  };
+
+  const handleFoodFormChange = (nextForm) => {
+    setFoodForm(nextForm);
+    setSaveError("");
   };
 
   const handleToggleStock = async (food) => {
@@ -130,15 +166,16 @@ const AdminFoodsPage = (props) => {
         showToast(`${food.name} is now ${newStock ? "In Stock" : "Out of Stock"}`);
         if (onRefresh) onRefresh();
       } else {
-        alert("Failed to update stock status.");
+        showDialog("Failed to update stock status.", { title: "Update failed", variant: "error" });
       }
     } catch {
-      alert("Error connecting to server.");
+      showDialog("Could not connect to the server. Please try again.", { title: "Connection error", variant: "error" });
     }
   };
 
   const handleSaveFood = async (e) => {
     e.preventDefault();
+    if (!hasUnsavedChanges) return;
     const ingArray = typeof foodForm.ingredients === "string"
       ? foodForm.ingredients.split(",").map((i) => i.trim()).filter(Boolean)
       : foodForm.ingredients;
@@ -155,18 +192,24 @@ const AdminFoodsPage = (props) => {
       servingInfo: foodForm.servingInfo ? String(foodForm.servingInfo).trim() : "",
       hasPortions: Boolean(foodForm.hasPortions),
       halfPrice: foodForm.hasPortions && foodForm.halfPrice ? Number(foodForm.halfPrice) : 0,
-      caloriesPerServing: Number(foodForm.caloriesPerServing) || 350,
+      quarterPrice: foodForm.hasPortions && foodForm.quarterPrice ? Number(foodForm.quarterPrice) : 0,
+      caloriesPerServing: optionalNumber(foodForm.caloriesPerServing),
+      proteinGrams: optionalNumber(foodForm.proteinGrams),
+      carbsGrams: optionalNumber(foodForm.carbsGrams),
+      fatGrams: optionalNumber(foodForm.fatGrams),
       deliveryTime: foodForm.deliveryTime || "25-30 mins",
       isVeg: isVegVal,
       dietary: foodForm.dietary || (isVegVal ? "Veg" : "Non-Veg"),
       image: foodForm.image.trim(),
       description: foodForm.description.trim() || `Authentic ${foodForm.name} prepared fresh with aromatic ingredients.`,
       ingredients: ingArray.length > 0 ? ingArray : ["Fresh Ingredients", "Spices", "Chef Special Blend"],
+      keyFeatures: parseList(foodForm.keyFeatures),
       rating: 4.8
     };
 
     try {
       setSaving(true);
+      setSaveError("");
       const url = editingFoodId ? `${API_BASE_URL}/recipes/${editingFoodId}` : `${API_BASE_URL}/recipes`;
       const res = await fetch(url, {
         method: editingFoodId ? "PUT" : "POST",
@@ -175,23 +218,29 @@ const AdminFoodsPage = (props) => {
       });
 
       if (res.ok) {
-        showToast(editingFoodId ? "Dish updated successfully!" : "New food dish added to menu!");
+        showToast(editingFoodId ? `${payload.name} saved successfully. Changes are live.` : `${payload.name} added successfully. It is now on the menu.`);
         setFoodForm(initialFood);
+        setSavedFoodForm(initialFood);
         setEditingFoodId(null);
         setIsModalOpen(false);
         if (onRefresh) onRefresh();
       } else {
-        alert("Failed to save food dish.");
+        const result = await res.json().catch(() => ({}));
+        setSaveError(result.message || "Dish could not be saved. Your changes are still here—please try again.");
       }
     } catch {
-      alert("Error connecting to server.");
+      setSaveError("Could not connect to the server. Your changes are still here—please try again.");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDeleteFood = async (id, dishName) => {
-    if (!window.confirm(`Are you sure you want to delete "${dishName || "this dish"}" from the menu?`)) return;
+    if (!await confirm(`Remove "${dishName || "this dish"}" from the menu?`, {
+      title: "Delete dish?",
+      variant: "danger",
+      confirmLabel: "Delete Dish",
+    })) return;
     try {
       const res = await fetch(`${API_BASE_URL}/recipes/${id}`, { method: "DELETE" });
       if (res.ok) {
@@ -199,7 +248,7 @@ const AdminFoodsPage = (props) => {
         if (onRefresh) onRefresh();
       }
     } catch {
-      alert("Failed to delete dish");
+      showDialog("Failed to delete dish.", { title: "Could not delete dish", variant: "error" });
     }
   };
 
@@ -236,11 +285,9 @@ const AdminFoodsPage = (props) => {
               </svg>
             </div>
 
-            <button
-              type="button"
-              onClick={handleOpenAddModal}
-              disabled={availableCategories.length === 0}
-              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold text-white shadow-sm transition shrink-0 ${availableCategories.length ? "bg-emerald-700 hover:bg-emerald-800 cursor-pointer" : "bg-slate-400 cursor-not-allowed"}`}
+            <Link
+              to="/admin/foods/new"
+              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold text-white shadow-sm transition shrink-0 ${availableCategories.length ? "bg-emerald-700 hover:bg-emerald-800 cursor-pointer" : "bg-slate-400 pointer-events-none"}`}
               title={availableCategories.length ? "Add a new dish to the live customer menu" : "Create a category before adding dishes"}
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -248,7 +295,7 @@ const AdminFoodsPage = (props) => {
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
               <span>Add New Food Dish</span>
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -402,13 +449,12 @@ const AdminFoodsPage = (props) => {
                       </td>
 
                       <td className="text-right space-x-1.5 whitespace-nowrap pr-2">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEditModal(f)}
-                          className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 hover:bg-slate-200 cursor-pointer transition shadow-2xs"
+                        <Link
+                          to={`/admin/foods/edit/${f.id}`}
+                          className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 hover:bg-slate-200 cursor-pointer transition shadow-2xs inline-block"
                         >
                           Edit
-                        </button>
+                        </Link>
                         <button
                           type="button"
                           onClick={() => handleDeleteFood(f.id, f.name)}
@@ -428,11 +474,13 @@ const AdminFoodsPage = (props) => {
 
       <FoodDishModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseFoodModal}
         onSave={handleSaveFood}
         editingFoodId={editingFoodId}
         foodForm={foodForm}
-        setFoodForm={setFoodForm}
+        setFoodForm={handleFoodFormChange}
+        hasUnsavedChanges={hasUnsavedChanges}
+        saveError={saveError}
         availableCategories={availableCategories}
         foodCuisines={dynamicCuisines}
         saving={saving}
