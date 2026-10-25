@@ -1,18 +1,44 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import AdminDropdown from "./AdminDropdown";
+import { useAppDialog } from "../AppDialog";
 const FoodDishModal = ({
   isOpen,
   onClose,
   onSave,
+  saveError = "",
   editingFoodId,
   foodForm,
   setFoodForm,
+  hasUnsavedChanges = false,
   availableCategories = [],
   foodCuisines = [],
   saving = false,
 }) => {
   const [imageLoadError, setImageLoadError] = useState(false);
   const [localCuisines, setLocalCuisines] = useState(foodCuisines);
+  const closePromptRef = useRef(false);
+  const { confirm } = useAppDialog();
+
+  const requestClose = async () => {
+    if (saving) return;
+    if (hasUnsavedChanges) {
+      if (closePromptRef.current) return;
+      closePromptRef.current = true;
+      const shouldDiscard = await confirm(
+        `Your edits${foodForm.name ? ` to ${foodForm.name}` : ""} haven’t been saved. Keep editing or discard them.`,
+        {
+          title: "Discard unsaved changes?",
+          variant: "warning",
+          confirmLabel: "Discard Changes",
+          cancelLabel: "Keep Editing",
+        }
+      );
+      closePromptRef.current = false;
+      if (shouldDiscard) onClose();
+      return;
+    }
+    onClose();
+  };
 
   // Sync cuisines prop with local list
   useEffect(() => {
@@ -29,8 +55,8 @@ const FoodDishModal = ({
   // Close on Escape key press
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
+      if (e.key === "Escape" && isOpen && !saving) {
+        requestClose();
       }
     };
     if (isOpen) {
@@ -41,7 +67,7 @@ const FoodDishModal = ({
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "unset";
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, saving, hasUnsavedChanges]);
 
   if (!isOpen) return null;
 
@@ -54,14 +80,14 @@ const FoodDishModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto"
-      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-2 sm:p-3 overflow-y-auto"
+      onClick={requestClose}
     >
       <div
-        className="relative w-full max-w-3xl rounded-2xl bg-white shadow-2xl border border-slate-200 my-auto animate-in fade-in zoom-in-95 duration-200"
+        className="relative flex max-h-[90vh] w-full max-w-3xl flex-col rounded-2xl bg-white shadow-2xl border border-slate-200 my-auto animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/90 px-5 py-3 rounded-t-2xl">
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/90 px-4 py-2.5 rounded-t-2xl">
           <div className="flex items-center gap-2.5">
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 shrink-0">
               <svg
@@ -91,6 +117,21 @@ const FoodDishModal = ({
                     ID: {editingFoodId}
                   </span>
                 )}
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold border ${
+                    hasUnsavedChanges
+                      ? "border-amber-200 bg-amber-50 text-amber-700"
+                      : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  }`}
+                  role="status"
+                  aria-live="polite"
+                >
+                  {hasUnsavedChanges
+                    ? "Unsaved changes"
+                    : editingFoodId
+                      ? "All changes saved"
+                      : "Not saved yet"}
+                </span>
               </div>
               <p className="text-[11px] text-slate-400">
                 {editingFoodId
@@ -102,8 +143,9 @@ const FoodDishModal = ({
 
           <button
             type="button"
-            onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 transition cursor-pointer"
+            onClick={requestClose}
+            disabled={saving}
+            className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 transition cursor-pointer disabled:cursor-wait disabled:opacity-50"
             aria-label="Close modal"
           >
             <svg
@@ -120,10 +162,10 @@ const FoodDishModal = ({
           </button>
         </div>
 
-        <form onSubmit={onSave} className="p-4 sm:p-5 space-y-3.5 text-xs overflow-visible">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+        <form onSubmit={onSave} className="min-h-0 overflow-y-auto p-3 sm:p-4 space-y-2.5 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
             
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               <div>
                 <label className="block font-bold text-slate-700 mb-1 text-[11px]">Dish Name *</label>
                 <input
@@ -162,7 +204,7 @@ const FoodDishModal = ({
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">Price (₹) *</label>
+                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">{foodForm.hasPortions ? "Full Plate Price (₹) *" : "Price (₹) *"}</label>
                   <input
                     type="number"
                     required
@@ -175,7 +217,7 @@ const FoodDishModal = ({
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">Calories (Kcal)</label>
+                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">Energy (kcal)</label>
                   <input
                     type="number"
                     value={foodForm.caloriesPerServing}
@@ -194,6 +236,24 @@ const FoodDishModal = ({
                     placeholder="25-30 mins"
                     className="w-full rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
                   />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1 text-[11px]">Nutrition per serving (optional)</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[['proteinGrams', 'Protein (g)'], ['carbsGrams', 'Carbs (g)'], ['fatGrams', 'Fat (g)']].map(([field, label]) => (
+                    <input
+                      key={field}
+                      type="number"
+                      min="0"
+                      value={foodForm[field] ?? ""}
+                      onChange={(e) => setFoodForm({ ...foodForm, [field]: e.target.value })}
+                      placeholder={label}
+                      aria-label={label}
+                      className="w-full rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500"
+                    />
+                  ))}
                 </div>
               </div>
 
@@ -220,51 +280,6 @@ const FoodDishModal = ({
                   />
                 </div>
               </div>
-
-              <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-2.5 space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={Boolean(foodForm.hasPortions)}
-                      onChange={(e) => setFoodForm({ ...foodForm, hasPortions: e.target.checked })}
-                      className="h-4 w-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
-                    />
-                    <span className="font-bold text-slate-800 text-[11px]">Enable Half Plate & Full Plate Options</span>
-                  </label>
-                  <span className="text-[10px] text-slate-400 font-medium">Half / Full variant</span>
-                </div>
-
-                {foodForm.hasPortions && (
-                  <div className="grid grid-cols-2 gap-2 pt-1">
-                    <div>
-                      <label className="block font-bold text-slate-700 mb-0.5 text-[10px]">Half Plate Price (₹) *</label>
-                      <input
-                        type="number"
-                        min="1"
-                        required={foodForm.hasPortions}
-                        value={foodForm.halfPrice || ""}
-                        onChange={(e) => setFoodForm({ ...foodForm, halfPrice: e.target.value })}
-                        placeholder="e.g. 130"
-                        className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs outline-none focus:border-emerald-500 font-mono"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-bold text-slate-700 mb-0.5 text-[10px]">Full Plate Price (₹) *</label>
-                      <input
-                        type="number"
-                        min="1"
-                        required
-                        value={foodForm.price || ""}
-                        onChange={(e) => setFoodForm({ ...foodForm, price: e.target.value })}
-                        placeholder="e.g. 240"
-                        className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs outline-none focus:border-emerald-500 font-mono"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
               <div>
                 <label className="block font-bold text-slate-700 mb-1 text-[11px]">Dietary / Food Classification *</label>
                 <div className="grid grid-cols-3 gap-2">
@@ -315,19 +330,32 @@ const FoodDishModal = ({
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1 text-[11px]">Key Ingredients (Comma Separated)</label>
-                <input
-                  type="text"
-                  value={Array.isArray(foodForm.ingredients) ? foodForm.ingredients.join(", ") : foodForm.ingredients}
-                  onChange={(e) => setFoodForm({ ...foodForm, ingredients: e.target.value })}
-                  placeholder="Basmati Rice, Spices, Ghee, Mint"
-                  className="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition"
-                />
+              {/* Key Ingredients & Key Features (balanced into left column) */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">Key Ingredients</label>
+                  <input
+                    type="text"
+                    value={Array.isArray(foodForm.ingredients) ? foodForm.ingredients.join(", ") : foodForm.ingredients}
+                    onChange={(e) => setFoodForm({ ...foodForm, ingredients: e.target.value })}
+                    placeholder="Rice, Spices, Ghee"
+                    className="w-full rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">Key Features</label>
+                  <input
+                    type="text"
+                    value={Array.isArray(foodForm.keyFeatures) ? foodForm.keyFeatures.join(", ") : foodForm.keyFeatures}
+                    onChange={(e) => setFoodForm({ ...foodForm, keyFeatures: e.target.value })}
+                    placeholder="Freshly prepared, House-made sauce"
+                    className="w-full rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="block font-bold text-slate-700 text-[11px]">Image URL (Direct Link) *</label>
@@ -445,38 +473,99 @@ const FoodDishModal = ({
               <div>
                 <label className="block font-bold text-slate-700 mb-1 text-[11px]">Description / Summary</label>
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={foodForm.description}
                   onChange={(e) => setFoodForm({ ...foodForm, description: e.target.value })}
                   placeholder="Authentic dish prepared fresh with traditional herbs and premium ingredients."
                   className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition resize-none leading-relaxed"
                 />
               </div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-2.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(foodForm.hasPortions)}
+                      onChange={(e) => setFoodForm({ ...foodForm, hasPortions: e.target.checked })}
+                      className="h-4 w-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
+                    />
+                    <span className="font-bold text-slate-800 text-[11px]">Set Full, Half & Quarter Plate Prices</span>
+                  </label>
+                  <span className="text-[10px] text-slate-400 font-medium">Separate portion prices</span>
+                </div>
+
+                {foodForm.hasPortions && (
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-0.5 text-[10px]">Half Plate Price (₹) *</label>
+                      <input
+                        type="number"
+                        min="1"
+                        required={foodForm.hasPortions}
+                        value={foodForm.halfPrice || ""}
+                        onChange={(e) => setFoodForm({ ...foodForm, halfPrice: e.target.value })}
+                        placeholder="e.g. 130"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs outline-none focus:border-emerald-500 font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-0.5 text-[10px]">Quarter Plate Price (₹) *</label>
+                      <input
+                        type="number"
+                        min="1"
+                        required
+                        value={foodForm.quarterPrice || ""}
+                        onChange={(e) => setFoodForm({ ...foodForm, quarterPrice: e.target.value })}
+                        placeholder="e.g. 40"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs outline-none focus:border-emerald-500 font-mono"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
           </div>
 
-          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          {saveError && (
+            <div role="alert" className="flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-[11px] font-semibold text-rose-700">
+              <svg className="mt-0.5 h-3.5 w-3.5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <circle cx="10" cy="10" r="7" />
+                <path d="M10 6.5v4.5m0 2.5h.01" strokeLinecap="round" />
+              </svg>
+              <span>{saveError}</span>
+            </div>
+          )}
+
+          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
             <button
               type="button"
-              onClick={onClose}
-              className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer"
+              onClick={requestClose}
+              disabled={saving}
+              className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer disabled:cursor-wait disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || !hasUnsavedChanges}
               className="rounded-xl bg-emerald-700 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800 transition disabled:opacity-50 shadow-2xs cursor-pointer flex items-center gap-1.5"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
-              <span>{saving ? "Saving..." : editingFoodId ? "Save Changes" : "Add Dish to Menu"}</span>
+              <span>
+                {saving
+                  ? "Saving..."
+                  : hasUnsavedChanges
+                    ? editingFoodId ? "Save Changes" : "Add Dish to Menu"
+                    : "No Changes"}
+              </span>
             </button>
           </div>
         </form>
       </div>
+
     </div>
   );
 };
