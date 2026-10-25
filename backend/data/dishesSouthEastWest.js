@@ -1,1521 +1,554 @@
-// 40 Authentic Dishes Dataset
-module.exports = [
+const dishesSouthEastWest = [
   {
-    "name": "Gujarati Nylon Khaman Dhokla",
-    "category": "Street Food",
-    "price": 110,
-    "caloriesPerServing": 180,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/SPECIAL_SURATI_KHAMAN.jpg/960px-SPECIAL_SURATI_KHAMAN.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.8,
-    "reviewCount": 310,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Gujarati",
-    "description": "Soft, spongy and juicy steamed gram flour cakes tempered with mustard seeds, green chilies, fresh coriander and grated coconut.",
-    "ingredients": [
-      "Besan (Gram Flour)",
-      "Fruit Salt (Eno)",
-      "Mustard Seeds",
-      "Curry Leaves",
-      "Green Chilies",
-      "Fresh Coconut",
-      "Lemon Sugar Water"
-    ],
-    "instructions": [
-      "Whisk besan with lemon juice, turmeric, salt and water to a smooth batter",
-      "Add fruit salt and steam immediately in greased plates for 15 minutes",
-      "Pour hot sweet-tangy mustard and green chili tadka water over dhokla"
-    ]
+    name: "Gujarati Nylon Khaman Dhokla",
+    category: "Street Food", price: 110, caloriesPerServing: 180,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/SPECIAL_SURATI_KHAMAN.jpg/960px-SPECIAL_SURATI_KHAMAN.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.8, reviewCount: 310, deliveryTime: "15-20 mins",
+    cuisine: "Gujarati",
+    description: "Soft, spongy and juicy steamed gram flour cakes tempered with mustard seeds, green chilies, fresh coriander and grated coconut.",
+    ingredients: ["Besan (Gram Flour)","Fruit Salt (Eno)","Mustard Seeds","Curry Leaves","Green Chilies","Fresh Coconut","Lemon Sugar Water"],
+    instructions: ["Whisk besan with lemon juice, turmeric, salt and water to a smooth batter","Add fruit salt and steam immediately in greased plates for 15 minutes","Pour hot sweet-tangy mustard and green chili tadka water over dhokla"]
   },
   {
-    "name": "Gujarati Khandvi Rolls",
-    "category": "Street Food",
-    "price": 130,
-    "caloriesPerServing": 190,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/Khandvi_%2810497367994%29.jpg/960px-Khandvi_%2810497367994%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.7,
-    "reviewCount": 190,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Gujarati",
-    "description": "Melt-in-mouth tightly rolled savory bites made from cooked gram flour and buttermilk, tempered with sesame and mustard seeds.",
-    "ingredients": [
-      "Gram Flour (Besan)",
-      "Sour Buttermilk",
-      "Mustard Seeds",
-      "White Sesame Seeds",
-      "Curry Leaves",
-      "Fresh Coconut",
-      "Asafoetida"
-    ],
-    "instructions": [
-      "Cook besan and buttermilk paste on low flame until glossy and spreadable",
-      "Spread thinly on reverse side of stainless steel thali and let cool",
-      "Roll into tight cylinders and temper with sizzling sesame mustard seeds"
-    ]
+    name: "Gujarati Khandvi Rolls",
+    category: "Street Food", price: 130, caloriesPerServing: 190,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/Khandvi_%2810497367994%29.jpg/960px-Khandvi_%2810497367994%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.7, reviewCount: 190, deliveryTime: "15-20 mins",
+    cuisine: "Gujarati",
+    description: "Melt-in-mouth tightly rolled savory bites made from cooked gram flour and buttermilk, tempered with sesame and mustard seeds.",
+    ingredients: ["Gram Flour (Besan)","Sour Buttermilk","Mustard Seeds","White Sesame Seeds","Curry Leaves","Fresh Coconut","Asafoetida"],
+    instructions: ["Cook besan and buttermilk paste on low flame until glossy and spreadable","Spread thinly on reverse side of stainless steel thali and let cool","Roll into tight cylinders and temper with sizzling sesame mustard seeds"]
   },
   {
-    "name": "Surati Undhiyu",
-    "category": "North Indian",
-    "price": 240,
-    "caloriesPerServing": 360,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Undhiyu.jpg/960px-Undhiyu.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 260,
-    "deliveryTime": "25-30 mins",
-    "cuisine": "Gujarati",
-    "description": "Traditional winter vegetable casserole of surti papdi, purple yam, baby eggplants and fenugreek muthiyas cooked in green herb masala.",
-    "ingredients": [
-      "Surti Papdi (Beans)",
-      "Kand (Purple Yam)",
-      "Small Brinjals",
-      "Methi Muthiyas",
-      "Fresh Coconut",
-      "Coriander Green Garlic Paste",
-      "Peanut Oil"
-    ],
-    "instructions": [
-      "Prepare methi muthiyas and fry until crisp",
-      "Stuff baby brinjals and potatoes with green coconut garlic masala",
-      "Layer vegetables and muthiyas in heavy pot and slow cook in peanut oil"
-    ]
+    name: "Surati Undhiyu",
+    category: "North Indian", price: 240, caloriesPerServing: 360,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Undhiyu.jpg/960px-Undhiyu.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 260, deliveryTime: "25-30 mins",
+    cuisine: "Gujarati",
+    description: "Traditional winter vegetable casserole of surti papdi, purple yam, baby eggplants and fenugreek muthiyas cooked in green herb masala.",
+    ingredients: ["Surti Papdi (Beans)","Kand (Purple Yam)","Small Brinjals","Methi Muthiyas","Fresh Coconut","Coriander Green Garlic Paste","Peanut Oil"],
+    instructions: ["Prepare methi muthiyas and fry until crisp","Stuff baby brinjals and potatoes with green coconut garlic masala","Layer vegetables and muthiyas in heavy pot and slow cook in peanut oil"]
   },
   {
-    "name": "Sev Tameta Nu Shaak with Paratha",
-    "category": "North Indian",
-    "price": 160,
-    "caloriesPerServing": 320,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Sev_Tameta_Nu_Shaak.jpg/960px-Sev_Tameta_Nu_Shaak.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.6,
-    "reviewCount": 175,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Gujarati",
-    "description": "Sweet, sour and spicy tomato curry made with fresh tomatoes and jaggery, topped with crispy ratlami sev and served with flatbread.",
-    "ingredients": [
-      "Ripe Red Tomatoes",
-      "Ratlami Sev",
-      "Jaggery (Gud)",
-      "Mustard & Cumin Seeds",
-      "Hing",
-      "Turmeric & Chili Powder",
-      "Fresh Coriander"
-    ],
-    "instructions": [
-      "Tadka mustard seeds and hing in oil, add chopped tomatoes",
-      "Cook with turmeric, red chili and jaggery until juicy and soft",
-      "Top generously with crisp ratlami sev right before serving"
-    ]
+    name: "Sev Tameta Nu Shaak with Paratha",
+    category: "North Indian", price: 160, caloriesPerServing: 320,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Sev_Tameta_Nu_Shaak.jpg/960px-Sev_Tameta_Nu_Shaak.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.6, reviewCount: 175, deliveryTime: "15-20 mins",
+    cuisine: "Gujarati",
+    description: "Sweet, sour and spicy tomato curry made with fresh tomatoes and jaggery, topped with crispy ratlami sev and served with flatbread.",
+    ingredients: ["Ripe Red Tomatoes","Ratlami Sev","Jaggery (Gud)","Mustard & Cumin Seeds","Hing","Turmeric & Chili Powder","Fresh Coriander"],
+    instructions: ["Tadka mustard seeds and hing in oil, add chopped tomatoes","Cook with turmeric, red chili and jaggery until juicy and soft","Top generously with crisp ratlami sev right before serving"]
   },
   {
-    "name": "Crispy Fafda Jalebi Combo",
-    "category": "Desserts",
-    "price": 150,
-    "caloriesPerServing": 440,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Fafra_-_jalebi.JPG/960px-Fafra_-_jalebi.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 380,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Gujarati",
-    "description": "Classic Sunday breakfast combo: crispy carom-infused besan fafda strips served with hot saffron jalebis, raw papaya sambharo and fried green chilies.",
-    "ingredients": [
-      "Besan (Gram Flour)",
-      "Papad Khar",
-      "Ajwain",
-      "Maida Jalebi Batter",
-      "Saffron Sugar Syrup",
-      "Papaya Sambharo",
-      "Fried Salted Chilies"
-    ],
-    "instructions": [
-      "Knead besan with papad khar and ajwain, drag with palm and fry into crisp strips",
-      "Pipe fermented jalebi batter into spirals in hot ghee and soak in saffron syrup",
-      "Serve fresh fafda with crunchy jalebi and grated raw papaya relish"
-    ]
+    name: "Crispy Fafda Jalebi Combo",
+    category: "Desserts", price: 150, caloriesPerServing: 440,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Fafra_-_jalebi.JPG/960px-Fafra_-_jalebi.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 380, deliveryTime: "15-20 mins",
+    cuisine: "Gujarati",
+    description: "Classic Sunday breakfast combo: crispy carom-infused besan fafda strips served with hot saffron jalebis, raw papaya sambharo and fried green chilies.",
+    ingredients: ["Besan (Gram Flour)","Papad Khar","Ajwain","Maida Jalebi Batter","Saffron Sugar Syrup","Papaya Sambharo","Fried Salted Chilies"],
+    instructions: ["Knead besan with papad khar and ajwain, drag with palm and fry into crisp strips","Pipe fermented jalebi batter into spirals in hot ghee and soak in saffron syrup","Serve fresh fafda with crunchy jalebi and grated raw papaya relish"]
   },
   {
-    "name": "Mumbai Butter Pav Bhaji",
-    "category": "Street Food",
-    "price": 170,
-    "caloriesPerServing": 490,
-    "image": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Bambayya_Pav_bhaji.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 480,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Maharashtrian",
-    "description": "Mashed mixed vegetable curry loaded with butter and special pav bhaji spices, served with toasted butter pav buns, chopped onions and lemon.",
-    "ingredients": [
-      "Potatoes",
-      "Cauliflower",
-      "Green Peas",
-      "Capsicum",
-      "Amul Butter",
-      "Pav Bhaji Masala",
-      "Ladi Pav Buns"
-    ],
-    "instructions": [
-      "Boil and mash vegetables smoothly on a wide iron griddle",
-      "Saute onions, tomatoes, garlic chili paste and generous butter",
-      "Simmer bhaji with pav bhaji masala and toast ladi pav in butter"
-    ]
+    name: "Mumbai Butter Pav Bhaji",
+    category: "Street Food", price: 170, caloriesPerServing: 490,
+    image: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Bambayya_Pav_bhaji.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 480, deliveryTime: "15-20 mins",
+    cuisine: "Maharashtrian",
+    description: "Mashed mixed vegetable curry loaded with butter and special pav bhaji spices, served with toasted butter pav buns, chopped onions and lemon.",
+    ingredients: ["Potatoes","Cauliflower","Green Peas","Capsicum","Amul Butter","Pav Bhaji Masala","Ladi Pav Buns"],
+    instructions: ["Boil and mash vegetables smoothly on a wide iron griddle","Saute onions, tomatoes, garlic chili paste and generous butter","Simmer bhaji with pav bhaji masala and toast ladi pav in butter"]
   },
   {
-    "name": "Classic Mumbai Vada Pav (2 Pcs)",
-    "category": "Burgers",
-    "price": 90,
-    "caloriesPerServing": 380,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Vada_Pav-Indian_street_food.JPG/960px-Vada_Pav-Indian_street_food.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.8,
-    "reviewCount": 420,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Maharashtrian",
-    "description": "Golden batter-fried spiced potato batata vada sandwiched inside soft pav slathered with fiery dry garlic chutney and green chutney.",
-    "ingredients": [
-      "Boiled Potatoes",
-      "Mustard Seeds",
-      "Curry Leaves",
-      "Gram Flour Batter",
-      "Garlic Coconut Chutney",
-      "Pav",
-      "Fried Green Chili"
-    ],
-    "instructions": [
-      "Prepare mustard and curry leaf tadka with mashed spiced potatoes",
-      "Shape into round balls and dip in seasoned besan batter",
-      "Deep fry until golden and assemble inside pav with dry garlic powder"
-    ]
+    name: "Classic Mumbai Vada Pav (2 Pcs)",
+    category: "Burgers", price: 90, caloriesPerServing: 380,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Vada_Pav-Indian_street_food.JPG/960px-Vada_Pav-Indian_street_food.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.8, reviewCount: 420, deliveryTime: "15-20 mins",
+    cuisine: "Maharashtrian",
+    description: "Golden batter-fried spiced potato batata vada sandwiched inside soft pav slathered with fiery dry garlic chutney and green chutney.",
+    ingredients: ["Boiled Potatoes","Mustard Seeds","Curry Leaves","Gram Flour Batter","Garlic Coconut Chutney","Pav","Fried Green Chili"],
+    instructions: ["Prepare mustard and curry leaf tadka with mashed spiced potatoes","Shape into round balls and dip in seasoned besan batter","Deep fry until golden and assemble inside pav with dry garlic powder"]
   },
   {
-    "name": "Kolhapuri Spicy Misal Pav",
-    "category": "Street Food",
-    "price": 150,
-    "caloriesPerServing": 420,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Kolhapuri_Misal_Pav.jpg/960px-Kolhapuri_Misal_Pav.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.7,
-    "reviewCount": 310,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Maharashtrian",
-    "description": "Fiery sprouted moth bean curry topped with crunchy farsan, chopped onions, coriander and fiery red rassa (tarri), served with ladi pav.",
-    "ingredients": [
-      "Sprouted Matki (Moth Beans)",
-      "Kolhapuri Kanda Lasun Masala",
-      "Farsan Mixture",
-      "Tarri / Rassa (Spicy Oil Broth)",
-      "Ladi Pav",
-      "Lemon"
-    ],
-    "instructions": [
-      "Cook sprouted moth beans with turmeric and salt",
-      "Prepare blazing fiery red kat / tarri gravy with Kolhapuri masala",
-      "Layer usal, farsan and onions in bowl, pour hot rassa over it and serve with pav"
-    ]
+    name: "Kolhapuri Spicy Misal Pav",
+    category: "Street Food", price: 150, caloriesPerServing: 420,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Kolhapuri_Misal_Pav.jpg/960px-Kolhapuri_Misal_Pav.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.7, reviewCount: 310, deliveryTime: "15-20 mins",
+    cuisine: "Maharashtrian",
+    description: "Fiery sprouted moth bean curry topped with crunchy farsan, chopped onions, coriander and fiery red rassa (tarri), served with ladi pav.",
+    ingredients: ["Sprouted Matki (Moth Beans)","Kolhapuri Kanda Lasun Masala","Farsan Mixture","Tarri / Rassa (Spicy Oil Broth)","Ladi Pav","Lemon"],
+    instructions: ["Cook sprouted moth beans with turmeric and salt","Prepare blazing fiery red kat / tarri gravy with Kolhapuri masala","Layer usal, farsan and onions in bowl, pour hot rassa over it and serve with pav"]
   },
   {
-    "name": "Kolhapuri Mutton Sukka",
-    "category": "North Indian",
-    "price": 390,
-    "caloriesPerServing": 520,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Mutton_Fry.jpg/960px-Mutton_Fry.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.8,
-    "reviewCount": 340,
-    "deliveryTime": "30-35 mins",
-    "cuisine": "Maharashtrian",
-    "description": "Dry spiced tender mutton tossed with roasted dry coconut, sesame seeds and authentic Kolhapuri lavangi chili masala.",
-    "ingredients": [
-      "Mutton Pieces",
-      "Roasted Dry Coconut (Khobro)",
-      "White Sesame Seeds",
-      "Kolhapuri Lavangi Chili",
-      "Ginger Garlic",
-      "Ghee",
-      "Curry Leaves"
-    ],
-    "instructions": [
-      "Pressure cook mutton with turmeric and onions",
-      "Roast desiccated coconut, sesame and whole spices until dark brown",
-      "Fry cooked mutton in hot pan with ground masala until dry and coated"
-    ]
+    name: "Kolhapuri Mutton Sukka",
+    category: "North Indian", price: 390, caloriesPerServing: 520,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Mutton_Fry.jpg/960px-Mutton_Fry.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.8, reviewCount: 340, deliveryTime: "30-35 mins",
+    cuisine: "Maharashtrian",
+    description: "Dry spiced tender mutton tossed with roasted dry coconut, sesame seeds and authentic Kolhapuri lavangi chili masala.",
+    ingredients: ["Mutton Pieces","Roasted Dry Coconut (Khobro)","White Sesame Seeds","Kolhapuri Lavangi Chili","Ginger Garlic","Ghee","Curry Leaves"],
+    instructions: ["Pressure cook mutton with turmeric and onions","Roast desiccated coconut, sesame and whole spices until dark brown","Fry cooked mutton in hot pan with ground masala until dry and coated"]
   },
   {
-    "name": "Maharashtrian Puran Poli (2 Pcs)",
-    "category": "Desserts",
-    "price": 140,
-    "caloriesPerServing": 390,
-    "image": "https://upload.wikimedia.org/wikipedia/commons/1/13/Puran_Poli.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 290,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Maharashtrian",
-    "description": "Sweet, soft whole wheat flatbread stuffed with a fragrant cardamom and nutmeg-infused chana dal and jaggery filling, served with pure ghee.",
-    "ingredients": [
-      "Chana Dal",
-      "Organic Jaggery",
-      "Nutmeg (Jaiphal)",
-      "Green Cardamom",
-      "Wheat Flour & Maida",
-      "Desi Ghee",
-      "Milk (Katachi Amti optional)"
-    ],
-    "instructions": [
-      "Boil chana dal and cook with jaggery until thick sweet puran",
-      "Pass puran through masher with nutmeg and cardamom",
-      "Stuff in soft wheat dough, roll thin and cook with pure desi ghee on griddle"
-    ]
+    name: "Maharashtrian Puran Poli (2 Pcs)",
+    category: "Desserts", price: 140, caloriesPerServing: 390,
+    image: "https://upload.wikimedia.org/wikipedia/commons/1/13/Puran_Poli.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 290, deliveryTime: "15-20 mins",
+    cuisine: "Maharashtrian",
+    description: "Sweet, soft whole wheat flatbread stuffed with a fragrant cardamom and nutmeg-infused chana dal and jaggery filling, served with pure ghee.",
+    ingredients: ["Chana Dal","Organic Jaggery","Nutmeg (Jaiphal)","Green Cardamom","Wheat Flour & Maida","Desi Ghee","Milk (Katachi Amti optional)"],
+    instructions: ["Boil chana dal and cook with jaggery until thick sweet puran","Pass puran through masher with nutmeg and cardamom","Stuff in soft wheat dough, roll thin and cook with pure desi ghee on griddle"]
   },
   {
-    "name": "Kanda Batata Poha",
-    "category": "Street Food",
-    "price": 90,
-    "caloriesPerServing": 260,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Poha.jpg/960px-Poha.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.7,
-    "reviewCount": 250,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Maharashtrian",
-    "description": "Flattened rice flakes tempered with mustard seeds, crunchy peanuts, green chilies, diced potatoes and onions, topped with sev and lemon.",
-    "ingredients": [
-      "Thick Poha (Rice Flakes)",
-      "Diced Potatoes (Batata)",
-      "Chopped Onions (Kanda)",
-      "Mustard Seeds",
-      "Roasted Peanuts",
-      "Curry Leaves",
-      "Nylon Sev"
-    ],
-    "instructions": [
-      "Rinse poha and drain water completely",
-      "Saute mustard seeds, green chilies, peanuts and potatoes in oil",
-      "Add turmeric, rinsed poha and steam for 3 mins, top with fresh coriander"
-    ]
+    name: "Kanda Batata Poha",
+    category: "Street Food", price: 90, caloriesPerServing: 260,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Poha.jpg/960px-Poha.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.7, reviewCount: 250, deliveryTime: "15-20 mins",
+    cuisine: "Maharashtrian",
+    description: "Flattened rice flakes tempered with mustard seeds, crunchy peanuts, green chilies, diced potatoes and onions, topped with sev and lemon.",
+    ingredients: ["Thick Poha (Rice Flakes)","Diced Potatoes (Batata)","Chopped Onions (Kanda)","Mustard Seeds","Roasted Peanuts","Curry Leaves","Nylon Sev"],
+    instructions: ["Rinse poha and drain water completely","Saute mustard seeds, green chilies, peanuts and potatoes in oil","Add turmeric, rinsed poha and steam for 3 mins, top with fresh coriander"]
   },
   {
-    "name": "Crispy Bombil Fry (Bombay Duck)",
-    "category": "North Indian",
-    "price": 290,
-    "caloriesPerServing": 310,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Bombay_Duck_Fry_-_Kolkata_2013-10-11_3288.JPG/960px-Bombay_Duck_Fry_-_Kolkata_2013-10-11_3288.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.8,
-    "reviewCount": 210,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "Maharashtrian",
-    "description": "Fresh coastal Bombay Duck fish flattened and marinated in fiery red chili-garlic paste, coated in semolina (rava) and shallow-fried crisp.",
-    "ingredients": [
-      "Fresh Bombil Fish",
-      "Semolina (Rawa)",
-      "Rice Flour",
-      "Red Chili Powder",
-      "Kokum Extract",
-      "Turmeric",
-      "Garlic Paste"
-    ],
-    "instructions": [
-      "Press bombil under weight to drain excess moisture",
-      "Marinate in kokum extract, garlic and red chili paste",
-      "Dredge in rawa-rice flour mix and shallow fry on high heat until extra crispy"
-    ]
+    name: "Crispy Bombil Fry (Bombay Duck)",
+    category: "North Indian", price: 290, caloriesPerServing: 310,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Bombay_Duck_Fry_-_Kolkata_2013-10-11_3288.JPG/960px-Bombay_Duck_Fry_-_Kolkata_2013-10-11_3288.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.8, reviewCount: 210, deliveryTime: "20-25 mins",
+    cuisine: "Maharashtrian",
+    description: "Fresh coastal Bombay Duck fish flattened and marinated in fiery red chili-garlic paste, coated in semolina (rava) and shallow-fried crisp.",
+    ingredients: ["Fresh Bombil Fish","Semolina (Rawa)","Rice Flour","Red Chili Powder","Kokum Extract","Turmeric","Garlic Paste"],
+    instructions: ["Press bombil under weight to drain excess moisture","Marinate in kokum extract, garlic and red chili paste","Dredge in rawa-rice flour mix and shallow fry on high heat until extra crispy"]
   },
   {
-    "name": "Steamed Ukadiche Modak (4 Pcs)",
-    "category": "Desserts",
-    "price": 160,
-    "caloriesPerServing": 280,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Ukadiche_Modak_%28Rice%29.jpg/960px-Ukadiche_Modak_%28Rice%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 340,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "Maharashtrian",
-    "description": "Lord Ganesha's favorite steamed dumplings made from tender rice flour dough filled with grated fresh coconut, jaggery, cardamom and nutmeg.",
-    "ingredients": [
-      "Rice Flour (Basmati Ukad)",
-      "Fresh Grated Coconut",
-      "Jaggery (Gud)",
-      "Cardamom & Nutmeg",
-      "Pure Desi Ghee",
-      "Poppy Seeds",
-      "Saffron Milk"
-    ],
-    "instructions": [
-      "Cook fresh coconut and jaggery together until moist and aromatic",
-      "Knead steamed rice flour ukad dough with a little ghee",
-      "Shape dough into cups, fill coconut stuffing, pleat into modak and steam"
-    ]
+    name: "Steamed Ukadiche Modak (4 Pcs)",
+    category: "Desserts", price: 160, caloriesPerServing: 280,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Ukadiche_Modak_%28Rice%29.jpg/960px-Ukadiche_Modak_%28Rice%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 340, deliveryTime: "20-25 mins",
+    cuisine: "Maharashtrian",
+    description: "Lord Ganesha's favorite steamed dumplings made from tender rice flour dough filled with grated fresh coconut, jaggery, cardamom and nutmeg.",
+    ingredients: ["Rice Flour (Basmati Ukad)","Fresh Grated Coconut","Jaggery (Gud)","Cardamom & Nutmeg","Pure Desi Ghee","Poppy Seeds","Saffron Milk"],
+    instructions: ["Cook fresh coconut and jaggery together until moist and aromatic","Knead steamed rice flour ukad dough with a little ghee","Shape dough into cups, fill coconut stuffing, pleat into modak and steam"]
   },
   {
-    "name": "Goan Fish Curry with Steamed Rice",
-    "category": "North Indian",
-    "price": 310,
-    "caloriesPerServing": 440,
-    "image": "https://images.unsplash.com/photo-1535400255456-984241443b29?w=800&auto=format&fit=crop&q=80",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.8,
-    "reviewCount": 320,
-    "deliveryTime": "25-30 mins",
-    "cuisine": "Goan",
-    "description": "Fresh kingfish steaks simmered in a tangy and velvety coconut curry infused with kokum, Kashmiri red chilies and coriander seeds.",
-    "ingredients": [
-      "Kingfish (Surmai) Steaks",
-      "Fresh Grated Coconut",
-      "Kokum Petals",
-      "Kashmiri Dried Red Chilies",
-      "Coriander Seeds",
-      "Garlic & Ginger",
-      "Steamed Rice"
-    ],
-    "instructions": [
-      "Grind fresh coconut, dried chilies, coriander and turmeric to an ultra-fine paste",
-      "Simmer coconut gravy in an earthen pot with sour kokum extract",
-      "Add fish steaks and cook gently for 6 minutes until tender"
-    ]
+    name: "Goan Fish Curry with Steamed Rice",
+    category: "North Indian", price: 310, caloriesPerServing: 440,
+    image: "https://images.unsplash.com/photo-1535400255456-984241443b29?w=800&auto=format&fit=crop&q=80",
+    isVeg: false, dietary: "Non-Veg", rating: 4.8, reviewCount: 320, deliveryTime: "25-30 mins",
+    cuisine: "Goan",
+    description: "Fresh kingfish steaks simmered in a tangy and velvety coconut curry infused with kokum, Kashmiri red chilies and coriander seeds.",
+    ingredients: ["Kingfish (Surmai) Steaks","Fresh Grated Coconut","Kokum Petals","Kashmiri Dried Red Chilies","Coriander Seeds","Garlic & Ginger","Steamed Rice"],
+    instructions: ["Grind fresh coconut, dried chilies, coriander and turmeric to an ultra-fine paste","Simmer coconut gravy in an earthen pot with sour kokum extract","Add fish steaks and cook gently for 6 minutes until tender"]
   },
   {
-    "name": "Goan Chicken Xacuti",
-    "category": "North Indian",
-    "price": 330,
-    "caloriesPerServing": 470,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Xacuti-2.jpg/960px-Xacuti-2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.7,
-    "reviewCount": 230,
-    "deliveryTime": "25-30 mins",
-    "cuisine": "Goan",
-    "description": "Rich and complex Goan curry of tender chicken pieces cooked in a deeply roasted coconut and white poppy seed sauce with star anise.",
-    "ingredients": [
-      "Chicken Pieces",
-      "Desiccated Coconut (Roasted)",
-      "White Poppy Seeds (Khus Khus)",
-      "Star Anise & Mace",
-      "Nutmeg",
-      "Tamarind Pulp",
-      "Onions"
-    ],
-    "instructions": [
-      "Roast coconut, poppy seeds and whole spices until dark golden brown",
-      "Blend into a silky aromatic spice paste with tamarind",
-      "Brown chicken with onions and simmer in the roasted xacuti gravy"
-    ]
+    name: "Goan Chicken Xacuti",
+    category: "North Indian", price: 330, caloriesPerServing: 470,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Xacuti-2.jpg/960px-Xacuti-2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.7, reviewCount: 230, deliveryTime: "25-30 mins",
+    cuisine: "Goan",
+    description: "Rich and complex Goan curry of tender chicken pieces cooked in a deeply roasted coconut and white poppy seed sauce with star anise.",
+    ingredients: ["Chicken Pieces","Desiccated Coconut (Roasted)","White Poppy Seeds (Khus Khus)","Star Anise & Mace","Nutmeg","Tamarind Pulp","Onions"],
+    instructions: ["Roast coconut, poppy seeds and whole spices until dark golden brown","Blend into a silky aromatic spice paste with tamarind","Brown chicken with onions and simmer in the roasted xacuti gravy"]
   },
   {
-    "name": "Spicy Goan Prawn Balchao",
-    "category": "North Indian",
-    "price": 380,
-    "caloriesPerServing": 410,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Balchao.jpg/960px-Balchao.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.8,
-    "reviewCount": 280,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "Goan",
-    "description": "Pickled, fiery and tangy prawn dish prepared with fresh tiger prawns sauteed in a spicy vinegar, ginger-garlic and chili masala paste.",
-    "ingredients": [
-      "Tiger Prawns",
-      "Toddy / Cane Vinegar",
-      "Kashmiri Dried Chilies",
-      "Cumin Seeds",
-      "Mustard Seeds",
-      "Garlic Cloves",
-      "Browned Onions"
-    ],
-    "instructions": [
-      "Soak red chilies and whole spices in vinegar and grind to smooth balchao paste",
-      "Sear tiger prawns in oil until pink",
-      "Cook onions until dark, add balchao paste and toss prawns in the fiery sauce"
-    ]
+    name: "Spicy Goan Prawn Balchao",
+    category: "North Indian", price: 380, caloriesPerServing: 410,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Balchao.jpg/960px-Balchao.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.8, reviewCount: 280, deliveryTime: "20-25 mins",
+    cuisine: "Goan",
+    description: "Pickled, fiery and tangy prawn dish prepared with fresh tiger prawns sauteed in a spicy vinegar, ginger-garlic and chili masala paste.",
+    ingredients: ["Tiger Prawns","Toddy / Cane Vinegar","Kashmiri Dried Chilies","Cumin Seeds","Mustard Seeds","Garlic Cloves","Browned Onions"],
+    instructions: ["Soak red chilies and whole spices in vinegar and grind to smooth balchao paste","Sear tiger prawns in oil until pink","Cook onions until dark, add balchao paste and toss prawns in the fiery sauce"]
   },
   {
-    "name": "Traditional Goan Bebinca (2 Slices)",
-    "category": "Desserts",
-    "price": 170,
-    "caloriesPerServing": 350,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Bebinca_com_gelado.jpg/960px-Bebinca_com_gelado.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.9,
-    "reviewCount": 240,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Goan",
-    "description": "Traditional 7-layered Indo-Portuguese pudding made from thick coconut milk, egg yolks, flour, sugar and pure ghee with a hint of nutmeg.",
-    "ingredients": [
-      "Thick Coconut Milk",
-      "Egg Yolks",
-      "Refined Flour",
-      "Pure Desi Ghee",
-      "Nutmeg Powder",
-      "Caramelized Sugar"
-    ],
-    "instructions": [
-      "Whisk coconut milk, egg yolks, sugar and flour into a smooth batter",
-      "Bake each layer under direct heat with melted ghee until golden brown",
-      "Repeat layering process 7 times to produce distinct layered cake"
-    ]
+    name: "Traditional Goan Bebinca (2 Slices)",
+    category: "Desserts", price: 170, caloriesPerServing: 350,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Bebinca_com_gelado.jpg/960px-Bebinca_com_gelado.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.9, reviewCount: 240, deliveryTime: "15-20 mins",
+    cuisine: "Goan",
+    description: "Traditional 7-layered Indo-Portuguese pudding made from thick coconut milk, egg yolks, flour, sugar and pure ghee with a hint of nutmeg.",
+    ingredients: ["Thick Coconut Milk","Egg Yolks","Refined Flour","Pure Desi Ghee","Nutmeg Powder","Caramelized Sugar"],
+    instructions: ["Whisk coconut milk, egg yolks, sugar and flour into a smooth batter","Bake each layer under direct heat with melted ghee until golden brown","Repeat layering process 7 times to produce distinct layered cake"]
   },
   {
-    "name": "Chettinad Pepper Chicken",
-    "category": "North Indian",
-    "price": 320,
-    "caloriesPerServing": 440,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/ChickenChettinad.JPG/960px-ChickenChettinad.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.9,
-    "reviewCount": 390,
-    "deliveryTime": "25-30 mins",
-    "cuisine": "Chettinad",
-    "description": "Spicy South Indian chicken dry fry roasted with freshly crushed black Tellicherry peppercorns, curry leaves, shallots and kalpasi.",
-    "ingredients": [
-      "Chicken on Bone",
-      "Black Peppercorns",
-      "Shallots (Sambar Onions)",
-      "Curry Leaves",
-      "Kalpasi (Stone Flower)",
-      "Fennel Seeds",
-      "Sesame Oil"
-    ],
-    "instructions": [
-      "Dry roast black pepper, fennel, cumin and stone flower, then grind coarsely",
-      "Saute sliced shallots and fresh curry leaves in gingelly oil",
-      "Toss chicken with ground spices and simmer until roasted dry"
-    ]
+    name: "Chettinad Pepper Chicken",
+    category: "North Indian", price: 320, caloriesPerServing: 440,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/ChickenChettinad.JPG/960px-ChickenChettinad.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.9, reviewCount: 390, deliveryTime: "25-30 mins",
+    cuisine: "Chettinad",
+    description: "Spicy South Indian chicken dry fry roasted with freshly crushed black Tellicherry peppercorns, curry leaves, shallots and kalpasi.",
+    ingredients: ["Chicken on Bone","Black Peppercorns","Shallots (Sambar Onions)","Curry Leaves","Kalpasi (Stone Flower)","Fennel Seeds","Sesame Oil"],
+    instructions: ["Dry roast black pepper, fennel, cumin and stone flower, then grind coarsely","Saute sliced shallots and fresh curry leaves in gingelly oil","Toss chicken with ground spices and simmer until roasted dry"]
   },
   {
-    "name": "Crispy Masala Dosa",
-    "category": "South Indian",
-    "price": 140,
-    "caloriesPerServing": 340,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Masala_Dosa_2023.jpg/960px-Masala_Dosa_2023.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 470,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "South Indian",
-    "description": "Golden crispy fermented rice-lentil crepe smeared with spiced potato masala, served with piping hot vegetable sambar and coconut chutneys.",
-    "ingredients": [
-      "Fermented Dosa Batter",
-      "Spiced Potato Masala",
-      "Mustard & Curry Leaves",
-      "Desi Ghee",
-      "Coconut Chutney",
-      "Tomato Chutney",
-      "Drumstick Sambar"
-    ],
-    "instructions": [
-      "Spread fermented batter thinly on hot cast-iron tawa in circular motion",
-      "Drizzle pure ghee along edges until golden and crisp",
-      "Fill center with spiced potato masala, fold and serve immediately with sambar"
-    ]
+    name: "Crispy Masala Dosa",
+    category: "South Indian", price: 140, caloriesPerServing: 340,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Masala_Dosa_2023.jpg/960px-Masala_Dosa_2023.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 470, deliveryTime: "15-20 mins",
+    cuisine: "South Indian",
+    description: "Golden crispy fermented rice-lentil crepe smeared with spiced potato masala, served with piping hot vegetable sambar and coconut chutneys.",
+    ingredients: ["Fermented Dosa Batter","Spiced Potato Masala","Mustard & Curry Leaves","Desi Ghee","Coconut Chutney","Tomato Chutney","Drumstick Sambar"],
+    instructions: ["Spread fermented batter thinly on hot cast-iron tawa in circular motion","Drizzle pure ghee along edges until golden and crisp","Fill center with spiced potato masala, fold and serve immediately with sambar"]
   },
   {
-    "name": "Steamed Idli & Medu Vada Combo",
-    "category": "South Indian",
-    "price": 130,
-    "caloriesPerServing": 290,
-    "image": "https://upload.wikimedia.org/wikipedia/commons/1/11/Idli_Sambar.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.8,
-    "reviewCount": 360,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "South Indian",
-    "description": "Pair of melt-in-mouth steamed rice idlis and one crispy golden urad dal medu vada, served with freshly ground coconut chutney and hot sambar.",
-    "ingredients": [
-      "Urad Dal & Parboiled Rice",
-      "Curry Leaves",
-      "Whole Black Peppercorns",
-      "Fresh Coconut",
-      "Drumsticks & Lentils",
-      "Mustard Seeds",
-      "Gingelly Oil"
-    ],
-    "instructions": [
-      "Steam naturally fermented rice-dal batter in moulds for 10 minutes",
-      "Beat urad dal batter with peppercorns, shape into doughnuts and fry crisp",
-      "Serve together immersed in steaming bowl of hot sambar"
-    ]
+    name: "Steamed Idli & Medu Vada Combo",
+    category: "South Indian", price: 130, caloriesPerServing: 290,
+    image: "https://upload.wikimedia.org/wikipedia/commons/1/11/Idli_Sambar.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    isVeg: true, dietary: "Veg", rating: 4.8, reviewCount: 360, deliveryTime: "15-20 mins",
+    cuisine: "South Indian",
+    description: "Pair of melt-in-mouth steamed rice idlis and one crispy golden urad dal medu vada, served with freshly ground coconut chutney and hot sambar.",
+    ingredients: ["Urad Dal & Parboiled Rice","Curry Leaves","Whole Black Peppercorns","Fresh Coconut","Drumsticks & Lentils","Mustard Seeds","Gingelly Oil"],
+    instructions: ["Steam naturally fermented rice-dal batter in moulds for 10 minutes","Beat urad dal batter with peppercorns, shape into doughnuts and fry crisp","Serve together immersed in steaming bowl of hot sambar"]
   },
   {
-    "name": "Ghee Ven Pongal with Vadai",
-    "category": "South Indian",
-    "price": 150,
-    "caloriesPerServing": 420,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Ven_pongal_with_sambar_and_chutney.jpg/960px-Ven_pongal_with_sambar_and_chutney.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.8,
-    "reviewCount": 280,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "South Indian",
-    "description": "Creamy comfort porridge made of rice and yellow moong dal, loaded with pure desi ghee, crushed pepper, cumin, ginger and fried cashew nuts.",
-    "ingredients": [
-      "Raw Rice",
-      "Yellow Moong Dal",
-      "Desi Ghee",
-      "Cashew Nuts",
-      "Black Peppercorns",
-      "Cumin Seeds",
-      "Minced Ginger"
-    ],
-    "instructions": [
-      "Cook rice and moong dal together until soft and mushy",
-      "Fry cashews, crushed peppercorns, cumin and ginger in generous desi ghee",
-      "Stir hot ghee tadka into the rice-dal porridge and serve piping hot"
-    ]
+    name: "Ghee Ven Pongal with Vadai",
+    category: "South Indian", price: 150, caloriesPerServing: 420,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/Ven_pongal_with_sambar_and_chutney.jpg/960px-Ven_pongal_with_sambar_and_chutney.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.8, reviewCount: 280, deliveryTime: "15-20 mins",
+    cuisine: "South Indian",
+    description: "Creamy comfort porridge made of rice and yellow moong dal, loaded with pure desi ghee, crushed pepper, cumin, ginger and fried cashew nuts.",
+    ingredients: ["Raw Rice","Yellow Moong Dal","Desi Ghee","Cashew Nuts","Black Peppercorns","Cumin Seeds","Minced Ginger"],
+    instructions: ["Cook rice and moong dal together until soft and mushy","Fry cashews, crushed peppercorns, cumin and ginger in generous desi ghee","Stir hot ghee tadka into the rice-dal porridge and serve piping hot"]
   },
   {
-    "name": "Madurai Chicken Kothu Parotta",
-    "category": "South Indian",
-    "price": 210,
-    "caloriesPerServing": 510,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Kothu_Parotta.jpg/960px-Kothu_Parotta.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.8,
-    "reviewCount": 330,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "South Indian",
-    "description": "Flaky parotta shredded and vigorously beaten on hot tawa with spiced chicken salna, eggs, onions, green chilies and fresh curry leaves.",
-    "ingredients": [
-      "Shredded Malabar Parotta",
-      "Spiced Chicken Salna",
-      "Farm Eggs",
-      "Red Onions",
-      "Green Chilies",
-      "Curry Leaves",
-      "Black Pepper"
-    ],
-    "instructions": [
-      "Tear flaky parottas into small bite-sized strips",
-      "Saute onions, chilies, eggs and chicken salna on large iron griddle",
-      "Chop and beat vigorously with two metal spatulas producing rhythmic sound"
-    ]
+    name: "Madurai Chicken Kothu Parotta",
+    category: "South Indian", price: 210, caloriesPerServing: 510,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Kothu_Parotta.jpg/960px-Kothu_Parotta.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.8, reviewCount: 330, deliveryTime: "20-25 mins",
+    cuisine: "South Indian",
+    description: "Flaky parotta shredded and vigorously beaten on hot tawa with spiced chicken salna, eggs, onions, green chilies and fresh curry leaves.",
+    ingredients: ["Shredded Malabar Parotta","Spiced Chicken Salna","Farm Eggs","Red Onions","Green Chilies","Curry Leaves","Black Pepper"],
+    instructions: ["Tear flaky parottas into small bite-sized strips","Saute onions, chilies, eggs and chicken salna on large iron griddle","Chop and beat vigorously with two metal spatulas producing rhythmic sound"]
   },
   {
-    "name": "Madurai Special Jigarthanda",
-    "category": "Beverages",
-    "price": 120,
-    "caloriesPerServing": 310,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Jigarthanda.JPG/960px-Jigarthanda.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 350,
-    "deliveryTime": "10-15 mins",
-    "cuisine": "South Indian",
-    "description": "Madurai's world-famous cooling drink made from almond gum (badam pisin), nannari syrup, reduced basundi milk and topped with creamy ice cream.",
-    "ingredients": [
-      "Badam Pisin (Almond Gum)",
-      "Nannari (Sarsaparilla) Syrup",
-      "Caramelized Basundi Milk",
-      "Vanilla Ice Cream Scoop",
-      "Condensed Milk"
-    ],
-    "instructions": [
-      "Soak natural almond gum in water overnight until jelly-like",
-      "Layer badam pisin jelly in tall glass, add nannari root syrup",
-      "Top with slow-reduced caramelized milk and crown with rich ice cream"
-    ]
+    name: "Madurai Special Jigarthanda",
+    category: "Beverages", price: 120, caloriesPerServing: 310,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Jigarthanda.JPG/960px-Jigarthanda.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 350, deliveryTime: "10-15 mins",
+    cuisine: "South Indian",
+    description: "Madurai's world-famous cooling drink made from almond gum (badam pisin), nannari syrup, reduced basundi milk and topped with creamy ice cream.",
+    ingredients: ["Badam Pisin (Almond Gum)","Nannari (Sarsaparilla) Syrup","Caramelized Basundi Milk","Vanilla Ice Cream Scoop","Condensed Milk"],
+    instructions: ["Soak natural almond gum in water overnight until jelly-like","Layer badam pisin jelly in tall glass, add nannari root syrup","Top with slow-reduced caramelized milk and crown with rich ice cream"]
   },
   {
-    "name": "South Indian Filter Coffee (2 Cups)",
-    "category": "Beverages",
-    "price": 90,
-    "caloriesPerServing": 110,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/51/Filter_kaapi.JPG/960px-Filter_kaapi.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 410,
-    "deliveryTime": "10-15 mins",
-    "cuisine": "South Indian",
-    "description": "Frothy, strong Kumbakonam degree filter kaapi brewed with fresh chicory-blend coffee decoction and boiling hot full-cream milk.",
-    "ingredients": [
-      "Dark Roasted Coffee Powder",
-      "Chicory (15%)",
-      "Full Cream Milk",
-      "Sugar",
-      "Traditional Brass Davarah & Tumbler"
-    ],
-    "instructions": [
-      "Drip brew strong dark coffee decoction in brass filter",
-      "Boil fresh full cream milk until frothy",
-      "Mix decoction and milk by pouring back and forth between dabara and tumbler"
-    ]
+    name: "South Indian Filter Coffee (2 Cups)",
+    category: "Beverages", price: 90, caloriesPerServing: 110,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/51/Filter_kaapi.JPG/960px-Filter_kaapi.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 410, deliveryTime: "10-15 mins",
+    cuisine: "South Indian",
+    description: "Frothy, strong Kumbakonam degree filter kaapi brewed with fresh chicory-blend coffee decoction and boiling hot full-cream milk.",
+    ingredients: ["Dark Roasted Coffee Powder","Chicory (15%)","Full Cream Milk","Sugar","Traditional Brass Davarah & Tumbler"],
+    instructions: ["Drip brew strong dark coffee decoction in brass filter","Boil fresh full cream milk until frothy","Mix decoction and milk by pouring back and forth between dabara and tumbler"]
   },
   {
-    "name": "Malabar Chicken Dum Biryani",
-    "category": "Biryani",
-    "price": 290,
-    "caloriesPerServing": 530,
-    "image": "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=800&auto=format&fit=crop&q=80",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.9,
-    "reviewCount": 430,
-    "deliveryTime": "30-35 mins",
-    "cuisine": "Kerala",
-    "description": "Authentic Thalassery biryani cooked with fragrant small-grain Jeerakasala rice, soft marinated chicken, fried cashew nuts, raisins and caramelized onions.",
-    "ingredients": [
-      "Jeerakasala (Khaima) Rice",
-      "Malabar Chicken Masala",
-      "Fried Cashews & Sultanas",
-      "Fried Brown Onions",
-      "Ghee",
-      "Fennel & Star Anise",
-      "Mint Leaves"
-    ],
-    "instructions": [
-      "Cook short grain rice in fragrant ghee with whole spices until fluffy",
-      "Prepare thick green chili fennel chicken masala",
-      "Dum cook layers in handi sealed with dough and serve with date pickle"
-    ]
+    name: "Malabar Chicken Dum Biryani",
+    category: "Biryani", price: 290, caloriesPerServing: 530,
+    image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=800&auto=format&fit=crop&q=80",
+    isVeg: false, dietary: "Non-Veg", rating: 4.9, reviewCount: 430, deliveryTime: "30-35 mins",
+    cuisine: "Kerala",
+    description: "Authentic Thalassery biryani cooked with fragrant small-grain Jeerakasala rice, soft marinated chicken, fried cashew nuts, raisins and caramelized onions.",
+    ingredients: ["Jeerakasala (Khaima) Rice","Malabar Chicken Masala","Fried Cashews & Sultanas","Fried Brown Onions","Ghee","Fennel & Star Anise","Mint Leaves"],
+    instructions: ["Cook short grain rice in fragrant ghee with whole spices until fluffy","Prepare thick green chili fennel chicken masala","Dum cook layers in handi sealed with dough and serve with date pickle"]
   },
   {
-    "name": "Kerala Parotta with Chicken Roast",
-    "category": "South Indian",
-    "price": 240,
-    "caloriesPerServing": 560,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Parotta_from_Kerala.jpg/960px-Parotta_from_Kerala.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.9,
-    "reviewCount": 460,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "Kerala",
-    "description": "Flaky, multi-layered spiral Malabar parottas served with spicy, semi-dry caramelized onion and tomato Kerala chicken roast.",
-    "ingredients": [
-      "Maida Layered Parotta",
-      "Chicken Thighs",
-      "Coconut Oil",
-      "Shallots & Curry Leaves",
-      "Crushed Black Pepper",
-      "Fennel Powder",
-      "Tomato Puree"
-    ],
-    "instructions": [
-      "Knead and stretch parotta dough, spiral and grill on griddle until flaky",
-      "Brown chicken with shallots, curry leaves and pepper masala in coconut oil",
-      "Toss together and crush hot parottas between hands before plating"
-    ]
+    name: "Kerala Parotta with Chicken Roast",
+    category: "South Indian", price: 240, caloriesPerServing: 560,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Parotta_from_Kerala.jpg/960px-Parotta_from_Kerala.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.9, reviewCount: 460, deliveryTime: "20-25 mins",
+    cuisine: "Kerala",
+    description: "Flaky, multi-layered spiral Malabar parottas served with spicy, semi-dry caramelized onion and tomato Kerala chicken roast.",
+    ingredients: ["Maida Layered Parotta","Chicken Thighs","Coconut Oil","Shallots & Curry Leaves","Crushed Black Pepper","Fennel Powder","Tomato Puree"],
+    instructions: ["Knead and stretch parotta dough, spiral and grill on griddle until flaky","Brown chicken with shallots, curry leaves and pepper masala in coconut oil","Toss together and crush hot parottas between hands before plating"]
   },
   {
-    "name": "Alleppey Fish Curry with Coconut Milk",
-    "category": "North Indian",
-    "price": 330,
-    "caloriesPerServing": 420,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Fish_curry_with_coconut_milk.jpg/960px-Fish_curry_with_coconut_milk.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.8,
-    "reviewCount": 310,
-    "deliveryTime": "25-30 mins",
-    "cuisine": "Kerala",
-    "description": "Delicate fish curry prepared in pure coconut oil with raw mango slices, fresh coconut milk, ginger, green chilies and curry leaves in clay manchatti.",
-    "ingredients": [
-      "Seer Fish (Surmai)",
-      "Raw Green Mango",
-      "First & Second Coconut Milk",
-      "Shallots",
-      "Fresh Ginger",
-      "Green Chilies",
-      "Coconut Oil"
-    ],
-    "instructions": [
-      "Cook shallots, ginger and green chilies in pure coconut oil in earthen pot",
-      "Add thin coconut milk and raw mango slices and bring to gentle boil",
-      "Simmer fish pieces gently and finish with thick creamy first-extract coconut milk"
-    ]
+    name: "Alleppey Fish Curry with Coconut Milk",
+    category: "North Indian", price: 330, caloriesPerServing: 420,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Fish_curry_with_coconut_milk.jpg/960px-Fish_curry_with_coconut_milk.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.8, reviewCount: 310, deliveryTime: "25-30 mins",
+    cuisine: "Kerala",
+    description: "Delicate fish curry prepared in pure coconut oil with raw mango slices, fresh coconut milk, ginger, green chilies and curry leaves in clay manchatti.",
+    ingredients: ["Seer Fish (Surmai)","Raw Green Mango","First & Second Coconut Milk","Shallots","Fresh Ginger","Green Chilies","Coconut Oil"],
+    instructions: ["Cook shallots, ginger and green chilies in pure coconut oil in earthen pot","Add thin coconut milk and raw mango slices and bring to gentle boil","Simmer fish pieces gently and finish with thick creamy first-extract coconut milk"]
   },
   {
-    "name": "Appam with Vegetable Coconut Stew",
-    "category": "South Indian",
-    "price": 180,
-    "caloriesPerServing": 310,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Appam_-_%E0%AE%85%E0%AE%AA%E0%AF%8D%E0%AE%AA%E0%AE%AE%E0%AF%8D.jpg/960px-Appam_-_%E0%AE%85%E0%AE%AA%E0%AF%8D%E0%AE%AA%E0%AE%AE%E0%AF%8D.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.8,
-    "reviewCount": 290,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "Kerala",
-    "description": "Lacy bowl-shaped fermented rice pancakes with soft spongy centers, served with aromatic coconut milk vegetable stew spiced with cinnamon and cloves.",
-    "ingredients": [
-      "Fermented Rice & Coconut Batter",
-      "Carrots & Green Peas",
-      "Potatoes",
-      "Thick Coconut Milk",
-      "Green Chilies",
-      "Whole Cloves & Cinnamon",
-      "Curry Leaves"
-    ],
-    "instructions": [
-      "Swirl fermented batter in hot appa-chatti pan to create lacy crisp borders",
-      "Cover and steam until center is soft and fluffy",
-      "Serve with gentle mild vegetable stew simmered in fresh coconut milk"
-    ]
+    name: "Appam with Vegetable Coconut Stew",
+    category: "South Indian", price: 180, caloriesPerServing: 310,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Appam_-_%E0%AE%85%E0%AE%AA%E0%AF%8D%E0%AE%AA%E0%AE%AE%E0%AF%8D.jpg/960px-Appam_-_%E0%AE%85%E0%AE%AA%E0%AF%8D%E0%AE%AA%E0%AE%AE%E0%AF%8D.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.8, reviewCount: 290, deliveryTime: "20-25 mins",
+    cuisine: "Kerala",
+    description: "Lacy bowl-shaped fermented rice pancakes with soft spongy centers, served with aromatic coconut milk vegetable stew spiced with cinnamon and cloves.",
+    ingredients: ["Fermented Rice & Coconut Batter","Carrots & Green Peas","Potatoes","Thick Coconut Milk","Green Chilies","Whole Cloves & Cinnamon","Curry Leaves"],
+    instructions: ["Swirl fermented batter in hot appa-chatti pan to create lacy crisp borders","Cover and steam until center is soft and fluffy","Serve with gentle mild vegetable stew simmered in fresh coconut milk"]
   },
   {
-    "name": "Kerala Puttu and Kadala Curry",
-    "category": "South Indian",
-    "price": 160,
-    "caloriesPerServing": 350,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Puttu_%28Rice_Flour_steamed_cake%29.jpg/960px-Puttu_%28Rice_Flour_steamed_cake%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.7,
-    "reviewCount": 240,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "Kerala",
-    "description": "Cylindrical steamed rice flour cake layered with fresh grated coconut, served alongside spicy black chickpea coconut curry.",
-    "ingredients": [
-      "Coarse Rice Flour",
-      "Fresh Grated Coconut",
-      "Black Chickpeas (Kadala)",
-      "Roasted Coconut Paste",
-      "Shallots",
-      "Curry Leaves",
-      "Mustard Tadka"
-    ],
-    "instructions": [
-      "Moisten rice flour with water and salt to crumbly texture",
-      "Layer alternating rice flour and grated coconut inside cylindrical puttu-maker",
-      "Steam until fragrant and serve hot with spicy roasted coconut kadala curry"
-    ]
+    name: "Kerala Puttu and Kadala Curry",
+    category: "South Indian", price: 160, caloriesPerServing: 350,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Puttu_%28Rice_Flour_steamed_cake%29.jpg/960px-Puttu_%28Rice_Flour_steamed_cake%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.7, reviewCount: 240, deliveryTime: "20-25 mins",
+    cuisine: "Kerala",
+    description: "Cylindrical steamed rice flour cake layered with fresh grated coconut, served alongside spicy black chickpea coconut curry.",
+    ingredients: ["Coarse Rice Flour","Fresh Grated Coconut","Black Chickpeas (Kadala)","Roasted Coconut Paste","Shallots","Curry Leaves","Mustard Tadka"],
+    instructions: ["Moisten rice flour with water and salt to crumbly texture","Layer alternating rice flour and grated coconut inside cylindrical puttu-maker","Steam until fragrant and serve hot with spicy roasted coconut kadala curry"]
   },
   {
-    "name": "Palada Pradhaman / Payasam",
-    "category": "Desserts",
-    "price": 140,
-    "caloriesPerServing": 360,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Semiya_payasam%2C_Alappuzha.jpg/960px-Semiya_payasam%2C_Alappuzha.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 320,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Kerala",
-    "description": "Royal Onam dessert of steamed rice pasta flakes (ada) slow simmered in rich condensed milk, sugar, cardamom and ghee-roasted cashews.",
-    "ingredients": [
-      "Rice Ada Flakes",
-      "Full Fat Buffalo Milk",
-      "Sugar",
-      "Green Cardamom",
-      "Desi Ghee",
-      "Roasted Cashew Nuts & Raisins"
-    ],
-    "instructions": [
-      "Boil and rinse soft rice ada flakes in warm water",
-      "Simmer milk continuously on low heat for hours until creamy pinkish hue",
-      "Add sugar, cardamom and cooked ada, garnish with ghee-fried nuts"
-    ]
+    name: "Palada Pradhaman / Payasam",
+    category: "Desserts", price: 140, caloriesPerServing: 360,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Semiya_payasam%2C_Alappuzha.jpg/960px-Semiya_payasam%2C_Alappuzha.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 320, deliveryTime: "15-20 mins",
+    cuisine: "Kerala",
+    description: "Royal Onam dessert of steamed rice pasta flakes (ada) slow simmered in rich condensed milk, sugar, cardamom and ghee-roasted cashews.",
+    ingredients: ["Rice Ada Flakes","Full Fat Buffalo Milk","Sugar","Green Cardamom","Desi Ghee","Roasted Cashew Nuts & Raisins"],
+    instructions: ["Boil and rinse soft rice ada flakes in warm water","Simmer milk continuously on low heat for hours until creamy pinkish hue","Add sugar, cardamom and cooked ada, garnish with ghee-fried nuts"]
   },
   {
-    "name": "Andhra Gongura Mutton Curry",
-    "category": "North Indian",
-    "price": 390,
-    "caloriesPerServing": 520,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Mutton_Curry_1.jpg/960px-Mutton_Curry_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.9,
-    "reviewCount": 390,
-    "deliveryTime": "30-35 mins",
-    "cuisine": "Andhra",
-    "description": "Signature Andhra spicy mutton curry slow cooked with tangy sorrel leaves (gongura), red chilies, garlic and coriander seeds.",
-    "ingredients": [
-      "Mutton with Bone",
-      "Fresh Red Gongura Leaves",
-      "Guntur Red Chilies",
-      "Coriander & Cumin Seeds",
-      "Garlic Cloves",
-      "Sesame Oil",
-      "Onions"
-    ],
-    "instructions": [
-      "Cook gongura leaves with chilies and mash into a tangy sour paste",
-      "Sear mutton with onions, ginger-garlic paste and spices",
-      "Combine tender mutton with tangy gongura paste and simmer until aromatic oil surfaces"
-    ]
+    name: "Andhra Gongura Mutton Curry",
+    category: "North Indian", price: 390, caloriesPerServing: 520,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Mutton_Curry_1.jpg/960px-Mutton_Curry_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.9, reviewCount: 390, deliveryTime: "30-35 mins",
+    cuisine: "Andhra",
+    description: "Signature Andhra spicy mutton curry slow cooked with tangy sorrel leaves (gongura), red chilies, garlic and coriander seeds.",
+    ingredients: ["Mutton with Bone","Fresh Red Gongura Leaves","Guntur Red Chilies","Coriander & Cumin Seeds","Garlic Cloves","Sesame Oil","Onions"],
+    instructions: ["Cook gongura leaves with chilies and mash into a tangy sour paste","Sear mutton with onions, ginger-garlic paste and spices","Combine tender mutton with tangy gongura paste and simmer until aromatic oil surfaces"]
   },
   {
-    "name": "Authentic Hyderabadi Mutton Haleem",
-    "category": "Biryani",
-    "price": 340,
-    "caloriesPerServing": 580,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Pakistani_Haleem_served_with_garnish.jpg/960px-Pakistani_Haleem_served_with_garnish.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.9,
-    "reviewCount": 490,
-    "deliveryTime": "25-30 mins",
-    "cuisine": "Hyderabadi",
-    "description": "GI-tagged Ramadan delicacy: tender mutton, broken wheat, lentils and royal spices slow-cooked and pounded for 8 hours into a silky, savory puree.",
-    "ingredients": [
-      "Boneless Mutton",
-      "Broken Wheat (Dalia)",
-      "Chana, Urad & Moong Lentils",
-      "Desi Ghee",
-      "Birista (Fried Onions)",
-      "Mint & Coriander",
-      "Fried Cashews & Lime"
-    ],
-    "instructions": [
-      "Slow cook mutton, wheat and lentils in large cauldrons with spices",
-      "Pound vigorously with wooden pestles (ghotni) until meat dissolves completely",
-      "Top with sizzling hot desi ghee, caramelized onions and roasted cashews"
-    ]
+    name: "Authentic Hyderabadi Mutton Haleem",
+    category: "Biryani", price: 340, caloriesPerServing: 580,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Pakistani_Haleem_served_with_garnish.jpg/960px-Pakistani_Haleem_served_with_garnish.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.9, reviewCount: 490, deliveryTime: "25-30 mins",
+    cuisine: "Hyderabadi",
+    description: "GI-tagged Ramadan delicacy: tender mutton, broken wheat, lentils and royal spices slow-cooked and pounded for 8 hours into a silky, savory puree.",
+    ingredients: ["Boneless Mutton","Broken Wheat (Dalia)","Chana, Urad & Moong Lentils","Desi Ghee","Birista (Fried Onions)","Mint & Coriander","Fried Cashews & Lime"],
+    instructions: ["Slow cook mutton, wheat and lentils in large cauldrons with spices","Pound vigorously with wooden pestles (ghotni) until meat dissolves completely","Top with sizzling hot desi ghee, caramelized onions and roasted cashews"]
   },
   {
-    "name": "Andhra Chilli Chicken Roast",
-    "category": "North Indian",
-    "price": 290,
-    "caloriesPerServing": 410,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Chicken_65_%28Dish%29.jpg/960px-Chicken_65_%28Dish%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.8,
-    "reviewCount": 360,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "Andhra",
-    "description": "Fiery green chili chicken dry fry tossed with slit spicy chilies, shallots, garlic, lemon juice and fresh curry leaves.",
-    "ingredients": [
-      "Boneless Chicken Chunks",
-      "Spicy Green Chilies",
-      "Curry Leaves",
-      "Soy Sauce Splash",
-      "Ginger Garlic",
-      "Lemon Juice",
-      "Black Pepper"
-    ],
-    "instructions": [
-      "Marinate chicken with egg, cornstarch, ginger garlic and pepper",
-      "Flash fry chicken bites until crisp",
-      "Toss in high heat wok with abundant slit green chilies and curry leaves"
-    ]
+    name: "Andhra Chilli Chicken Roast",
+    category: "North Indian", price: 290, caloriesPerServing: 410,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Chicken_65_%28Dish%29.jpg/960px-Chicken_65_%28Dish%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.8, reviewCount: 360, deliveryTime: "20-25 mins",
+    cuisine: "Andhra",
+    description: "Fiery green chili chicken dry fry tossed with slit spicy chilies, shallots, garlic, lemon juice and fresh curry leaves.",
+    ingredients: ["Boneless Chicken Chunks","Spicy Green Chilies","Curry Leaves","Soy Sauce Splash","Ginger Garlic","Lemon Juice","Black Pepper"],
+    instructions: ["Marinate chicken with egg, cornstarch, ginger garlic and pepper","Flash fry chicken bites until crisp","Toss in high heat wok with abundant slit green chilies and curry leaves"]
   },
   {
-    "name": "Hyderabadi Mirchi Ka Salan",
-    "category": "North Indian",
-    "price": 190,
-    "caloriesPerServing": 340,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Hyderabadi_Hari_Mirchi_Ka_Salan.JPG/960px-Hyderabadi_Hari_Mirchi_Ka_Salan.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.7,
-    "reviewCount": 270,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "Hyderabadi",
-    "description": "Large mild green bhavnagri chilies pan-fried and simmered in a rich, nutty sesame, peanut and coconut gravy with tamarind.",
-    "ingredients": [
-      "Large Bhavnagri Green Chilies",
-      "Roasted Peanuts",
-      "White Sesame Seeds",
-      "Dry Coconut (Khobro)",
-      "Tamarind Extract",
-      "Mustard Seeds",
-      "Kalonji"
-    ],
-    "instructions": [
-      "Slit and shallow-fry whole large green chilies",
-      "Blend roasted peanuts, sesame seeds and coconut with tamarind into a paste",
-      "Simmer gravy with curry leaves and mustard seeds, then add chilies"
-    ]
+    name: "Hyderabadi Mirchi Ka Salan",
+    category: "North Indian", price: 190, caloriesPerServing: 340,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Hyderabadi_Hari_Mirchi_Ka_Salan.JPG/960px-Hyderabadi_Hari_Mirchi_Ka_Salan.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.7, reviewCount: 270, deliveryTime: "20-25 mins",
+    cuisine: "Hyderabadi",
+    description: "Large mild green bhavnagri chilies pan-fried and simmered in a rich, nutty sesame, peanut and coconut gravy with tamarind.",
+    ingredients: ["Large Bhavnagri Green Chilies","Roasted Peanuts","White Sesame Seeds","Dry Coconut (Khobro)","Tamarind Extract","Mustard Seeds","Kalonji"],
+    instructions: ["Slit and shallow-fry whole large green chilies","Blend roasted peanuts, sesame seeds and coconut with tamarind into a paste","Simmer gravy with curry leaves and mustard seeds, then add chilies"]
   },
   {
-    "name": "Hyderabadi Double Ka Meetha",
-    "category": "Desserts",
-    "price": 150,
-    "caloriesPerServing": 420,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Double_ka_meetha_with_a_big_spoon.jpg/960px-Double_ka_meetha_with_a_big_spoon.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 340,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Hyderabadi",
-    "description": "Royal Hyderabadi bread pudding soaked in saffron-infused condensed milk, baked with pure desi ghee and topped with roasted dry fruits.",
-    "ingredients": [
-      "Milk Bread Loaf",
-      "Pure Desi Ghee",
-      "Reduced Sweet Milk (Khoya)",
-      "Saffron & Cardamom",
-      "Almonds & Cashews",
-      "Edible Silver Leaf"
-    ],
-    "instructions": [
-      "Deep-fry thick crustless bread slices in desi ghee until crunchy gold",
-      "Soak in warm sugar-saffron syrup until syrup is absorbed",
-      "Pour rich creamy condensed milk over bread and bake until set"
-    ]
+    name: "Hyderabadi Double Ka Meetha",
+    category: "Desserts", price: 150, caloriesPerServing: 420,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Double_ka_meetha_with_a_big_spoon.jpg/960px-Double_ka_meetha_with_a_big_spoon.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 340, deliveryTime: "15-20 mins",
+    cuisine: "Hyderabadi",
+    description: "Royal Hyderabadi bread pudding soaked in saffron-infused condensed milk, baked with pure desi ghee and topped with roasted dry fruits.",
+    ingredients: ["Milk Bread Loaf","Pure Desi Ghee","Reduced Sweet Milk (Khoya)","Saffron & Cardamom","Almonds & Cashews","Edible Silver Leaf"],
+    instructions: ["Deep-fry thick crustless bread slices in desi ghee until crunchy gold","Soak in warm sugar-saffron syrup until syrup is absorbed","Pour rich creamy condensed milk over bread and bake until set"]
   },
   {
-    "name": "Andhra Pesarattu with Upma",
-    "category": "South Indian",
-    "price": 150,
-    "caloriesPerServing": 320,
-    "image": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Pesarattu.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.8,
-    "reviewCount": 220,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Andhra",
-    "description": "Wholesome green gram (moong dal) crepe topped with finely chopped onions, ginger, green chilies and stuffed with warm rava upma.",
-    "ingredients": [
-      "Whole Green Moong Gram",
-      "Rava Upma",
-      "Ginger & Green Chilies",
-      "Cumin Seeds",
-      "Onions",
-      "Desi Ghee",
-      "Allam (Ginger) Chutney"
-    ],
-    "instructions": [
-      "Soak green moong and grind with ginger and green chilies into a batter",
-      "Spread batter on hot griddle and sprinkle finely chopped onions",
-      "Place a spoonful of hot rava upma in center, fold and serve with ginger chutney"
-    ]
+    name: "Andhra Pesarattu with Upma",
+    category: "South Indian", price: 150, caloriesPerServing: 320,
+    image: "https://upload.wikimedia.org/wikipedia/commons/6/6c/Pesarattu.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    isVeg: true, dietary: "Veg", rating: 4.8, reviewCount: 220, deliveryTime: "15-20 mins",
+    cuisine: "Andhra",
+    description: "Wholesome green gram (moong dal) crepe topped with finely chopped onions, ginger, green chilies and stuffed with warm rava upma.",
+    ingredients: ["Whole Green Moong Gram","Rava Upma","Ginger & Green Chilies","Cumin Seeds","Onions","Desi Ghee","Allam (Ginger) Chutney"],
+    instructions: ["Soak green moong and grind with ginger and green chilies into a batter","Spread batter on hot griddle and sprinkle finely chopped onions","Place a spoonful of hot rava upma in center, fold and serve with ginger chutney"]
   },
   {
-    "name": "Karnataka Bisi Bele Bath with Boondi",
-    "category": "South Indian",
-    "price": 170,
-    "caloriesPerServing": 430,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Bisi_Bele_Bath_with_Boondi.jpg/960px-Bisi_Bele_Bath_with_Boondi.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.8,
-    "reviewCount": 320,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "Karnataka",
-    "description": "Spicy and tangy rice-lentil dish cooked with seasonal vegetables, tamarind, pure desi ghee and freshly roasted Bisi Bele Bath spice powder.",
-    "ingredients": [
-      "Sona Masoori Rice",
-      "Toor Dal",
-      "Mixed Veggies (Carrot, Beans, Drumstick)",
-      "Tamarind Pulp",
-      "Bisi Bele Bath Masala",
-      "Ghee & Cashews",
-      "Kara Boondi"
-    ],
-    "instructions": [
-      "Cook rice, toor dal and chopped vegetables together until soft",
-      "Add tamarind extract, jaggery and roasted coconut-spice masala",
-      "Finish with a generous tadka of cashews in desi ghee and top with boondi"
-    ]
+    name: "Karnataka Bisi Bele Bath with Boondi",
+    category: "South Indian", price: 170, caloriesPerServing: 430,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Bisi_Bele_Bath_with_Boondi.jpg/960px-Bisi_Bele_Bath_with_Boondi.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.8, reviewCount: 320, deliveryTime: "20-25 mins",
+    cuisine: "Karnataka",
+    description: "Spicy and tangy rice-lentil dish cooked with seasonal vegetables, tamarind, pure desi ghee and freshly roasted Bisi Bele Bath spice powder.",
+    ingredients: ["Sona Masoori Rice","Toor Dal","Mixed Veggies (Carrot, Beans, Drumstick)","Tamarind Pulp","Bisi Bele Bath Masala","Ghee & Cashews","Kara Boondi"],
+    instructions: ["Cook rice, toor dal and chopped vegetables together until soft","Add tamarind extract, jaggery and roasted coconut-spice masala","Finish with a generous tadka of cashews in desi ghee and top with boondi"]
   },
   {
-    "name": "Mangalorean Chicken Ghee Roast",
-    "category": "North Indian",
-    "price": 360,
-    "caloriesPerServing": 490,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Chicken_ghee_roast.jpg/960px-Chicken_ghee_roast.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.9,
-    "reviewCount": 420,
-    "deliveryTime": "25-30 mins",
-    "cuisine": "Karnataka",
-    "description": "Iconic Kundapur coastal chicken roasted in copious amounts of pure desi ghee with fiery Byadagi chilies, tamarind and whole spices.",
-    "ingredients": [
-      "Boneless Chicken",
-      "Byadagi Dried Red Chilies",
-      "Pure Desi Ghee",
-      "Curd (Yogurt)",
-      "Tamarind",
-      "Fennel & Peppercorns",
-      "Curry Leaves"
-    ],
-    "instructions": [
-      "Marinate chicken in curd and turmeric",
-      "Roast Byadagi chilies and spices in ghee and grind with tamarind into paste",
-      "Slow roast chicken in abundant pure ghee until glossy and caramelized"
-    ]
+    name: "Mangalorean Chicken Ghee Roast",
+    category: "North Indian", price: 360, caloriesPerServing: 490,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Chicken_ghee_roast.jpg/960px-Chicken_ghee_roast.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.9, reviewCount: 420, deliveryTime: "25-30 mins",
+    cuisine: "Karnataka",
+    description: "Iconic Kundapur coastal chicken roasted in copious amounts of pure desi ghee with fiery Byadagi chilies, tamarind and whole spices.",
+    ingredients: ["Boneless Chicken","Byadagi Dried Red Chilies","Pure Desi Ghee","Curd (Yogurt)","Tamarind","Fennel & Peppercorns","Curry Leaves"],
+    instructions: ["Marinate chicken in curd and turmeric","Roast Byadagi chilies and spices in ghee and grind with tamarind into paste","Slow roast chicken in abundant pure ghee until glossy and caramelized"]
   },
   {
-    "name": "Mysore Masala Dosa with Red Chutney",
-    "category": "South Indian",
-    "price": 150,
-    "caloriesPerServing": 370,
-    "image": "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=800&auto=format&fit=crop&q=80",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 440,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Karnataka",
-    "description": "Crispy golden butter dosa coated inside with spicy red garlic-chana dal chutney, stuffed with spiced potato palya and served with sambar.",
-    "ingredients": [
-      "Fermented Dosa Batter",
-      "Spicy Red Garlic Chutney",
-      "Potato Palya",
-      "Amul Butter / Desi Ghee",
-      "Coconut Chutney",
-      "Hot Sambar"
-    ],
-    "instructions": [
-      "Pour batter on hot tawa and spread slightly thicker than standard dosa",
-      "Generously smear internal face with fiery red garlic-chana chutney and butter",
-      "Add potato filling, fold and roast until crisp and dark golden"
-    ]
+    name: "Mysore Masala Dosa with Red Chutney",
+    category: "South Indian", price: 150, caloriesPerServing: 370,
+    image: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=800&auto=format&fit=crop&q=80",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 440, deliveryTime: "15-20 mins",
+    cuisine: "Karnataka",
+    description: "Crispy golden butter dosa coated inside with spicy red garlic-chana dal chutney, stuffed with spiced potato palya and served with sambar.",
+    ingredients: ["Fermented Dosa Batter","Spicy Red Garlic Chutney","Potato Palya","Amul Butter / Desi Ghee","Coconut Chutney","Hot Sambar"],
+    instructions: ["Pour batter on hot tawa and spread slightly thicker than standard dosa","Generously smear internal face with fiery red garlic-chana chutney and butter","Add potato filling, fold and roast until crisp and dark golden"]
   },
   {
-    "name": "Neer Dosa with Coastal Coconut Chutney",
-    "category": "South Indian",
-    "price": 140,
-    "caloriesPerServing": 240,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Neer-dosa.jpg/960px-Neer-dosa.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.8,
-    "reviewCount": 280,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Karnataka",
-    "description": "Delicate, feather-light and paper-thin crepes made from unfermented rice batter, served with coconut-jaggery dip and spicy tomato chutney.",
-    "ingredients": [
-      "Soaked Raw Rice",
-      "Fresh Grated Coconut",
-      "Water (Watery Batter)",
-      "Desi Ghee",
-      "Jaggery Coconut Mix",
-      "Spicy Chutney"
-    ],
-    "instructions": [
-      "Grind soaked rice with coconut into a watery thin batter",
-      "Splash batter on hot greased pan and cover for 1 minute without flipping",
-      "Fold gently into triangles and serve warm"
-    ]
+    name: "Neer Dosa with Coastal Coconut Chutney",
+    category: "South Indian", price: 140, caloriesPerServing: 240,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Neer-dosa.jpg/960px-Neer-dosa.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.8, reviewCount: 280, deliveryTime: "15-20 mins",
+    cuisine: "Karnataka",
+    description: "Delicate, feather-light and paper-thin crepes made from unfermented rice batter, served with coconut-jaggery dip and spicy tomato chutney.",
+    ingredients: ["Soaked Raw Rice","Fresh Grated Coconut","Water (Watery Batter)","Desi Ghee","Jaggery Coconut Mix","Spicy Chutney"],
+    instructions: ["Grind soaked rice with coconut into a watery thin batter","Splash batter on hot greased pan and cover for 1 minute without flipping","Fold gently into triangles and serve warm"]
   },
   {
-    "name": "Maddur Vada Crispy Snack (4 Pcs)",
-    "category": "South Indian",
-    "price": 110,
-    "caloriesPerServing": 340,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Maddur_vada_and_Gulab_jamun.jpg/960px-Maddur_vada_and_Gulab_jamun.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.7,
-    "reviewCount": 210,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Karnataka",
-    "description": "Crispy on the outside, tender on the inside heritage fritters made from rice flour, semolina, maida, sliced onions, curry leaves and green chilies.",
-    "ingredients": [
-      "Rice Flour",
-      "Chiroti Rava (Semolina)",
-      "Maida",
-      "Sliced Onions",
-      "Curry Leaves & Green Chilies",
-      "Hot Oil / Ghee",
-      "Asafoetida"
-    ],
-    "instructions": [
-      "Mix flours with hot oil, sliced onions, chilies and curry leaves into stiff dough",
-      "Flatten small portions into discs on greased sheet",
-      "Deep fry on medium heat until dark golden and super crunchy"
-    ]
+    name: "Maddur Vada Crispy Snack (4 Pcs)",
+    category: "South Indian", price: 110, caloriesPerServing: 340,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Maddur_vada_and_Gulab_jamun.jpg/960px-Maddur_vada_and_Gulab_jamun.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.7, reviewCount: 210, deliveryTime: "15-20 mins",
+    cuisine: "Karnataka",
+    description: "Crispy on the outside, tender on the inside heritage fritters made from rice flour, semolina, maida, sliced onions, curry leaves and green chilies.",
+    ingredients: ["Rice Flour","Chiroti Rava (Semolina)","Maida","Sliced Onions","Curry Leaves & Green Chilies","Hot Oil / Ghee","Asafoetida"],
+    instructions: ["Mix flours with hot oil, sliced onions, chilies and curry leaves into stiff dough","Flatten small portions into discs on greased sheet","Deep fry on medium heat until dark golden and super crunchy"]
   },
   {
-    "name": "Traditional Mysore Pak (250g)",
-    "category": "Desserts",
-    "price": 170,
-    "caloriesPerServing": 460,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Mysore_pak.jpg/960px-Mysore_pak.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 360,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Karnataka",
-    "description": "Melt-in-mouth royal sweet created in the kitchens of the Mysore Palace, made with roasted gram flour, sugar and pure hot desi ghee.",
-    "ingredients": [
-      "Gram Flour (Besan)",
-      "Sugar Syrup",
-      "Pure Desi Ghee",
-      "Cardamom Hint"
-    ],
-    "instructions": [
-      "Sift besan and combine with warm melted ghee",
-      "Add to boiling one-string sugar syrup and stir continuously",
-      "Pour sizzling hot ghee gradually until mixture froths and separates, then set in tray"
-    ]
+    name: "Traditional Mysore Pak (250g)",
+    category: "Desserts", price: 170, caloriesPerServing: 460,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Mysore_pak.jpg/960px-Mysore_pak.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 360, deliveryTime: "15-20 mins",
+    cuisine: "Karnataka",
+    description: "Melt-in-mouth royal sweet created in the kitchens of the Mysore Palace, made with roasted gram flour, sugar and pure hot desi ghee.",
+    ingredients: ["Gram Flour (Besan)","Sugar Syrup","Pure Desi Ghee","Cardamom Hint"],
+    instructions: ["Sift besan and combine with warm melted ghee","Add to boiling one-string sugar syrup and stir continuously","Pour sizzling hot ghee gradually until mixture froths and separates, then set in tray"]
   },
   {
-    "name": "Kolkata Mutton Biryani (with Aloo & Egg)",
-    "category": "Biryani",
-    "price": 330,
-    "caloriesPerServing": 560,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Kolkata_mutton_biryani.jpg/960px-Kolkata_mutton_biryani.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.9,
-    "reviewCount": 470,
-    "deliveryTime": "30-35 mins",
-    "cuisine": "Bengali",
-    "description": "Aromatic Awadhi-descended biryani featuring long-grain basmati, tender mutton, whole slow-braised potato and boiled egg with subtle kewra.",
-    "ingredients": [
-      "Basmati Rice",
-      "Mutton Cuts",
-      "Whole Fried Potato",
-      "Boiled Egg",
-      "Mitha Attar & Kewra",
-      "Saffron Milk",
-      "Shahi Garam Masala"
-    ],
-    "instructions": [
-      "Slow cook mutton and whole potatoes in spiced broth",
-      "Layer fragrant parboiled rice with meat, saffron milk and potato",
-      "Dum cook handi sealed with dough over low flame"
-    ]
+    name: "Kolkata Mutton Biryani (with Aloo & Egg)",
+    category: "Biryani", price: 330, caloriesPerServing: 560,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Kolkata_mutton_biryani.jpg/960px-Kolkata_mutton_biryani.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.9, reviewCount: 470, deliveryTime: "30-35 mins",
+    cuisine: "Bengali",
+    description: "Aromatic Awadhi-descended biryani featuring long-grain basmati, tender mutton, whole slow-braised potato and boiled egg with subtle kewra.",
+    ingredients: ["Basmati Rice","Mutton Cuts","Whole Fried Potato","Boiled Egg","Mitha Attar & Kewra","Saffron Milk","Shahi Garam Masala"],
+    instructions: ["Slow cook mutton and whole potatoes in spiced broth","Layer fragrant parboiled rice with meat, saffron milk and potato","Dum cook handi sealed with dough over low flame"]
   },
   {
-    "name": "Kosha Mangsho with Fluffy Luchi (4 Pcs)",
-    "category": "North Indian",
-    "price": 380,
-    "caloriesPerServing": 580,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Bengali_Mutton_Curry.JPG/960px-Bengali_Mutton_Curry.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.9,
-    "reviewCount": 410,
-    "deliveryTime": "30-35 mins",
-    "cuisine": "Bengali",
-    "description": "Rich, dark brown slow-braised Bengali mutton curry cooked in mustard oil with caramelized onions and yogurt, served with deep-fried maida luchis.",
-    "ingredients": [
-      "Mutton Pieces",
-      "Mustard Oil",
-      "Caramelized Sugar & Onions",
-      "Whisked Curd",
-      "Whole Garam Masala",
-      "Maida Luchis",
-      "Ghee"
-    ],
-    "instructions": [
-      "Brown mutton patiently in mustard oil with caramelized sugar for dark color",
-      "Bhuna meat on low heat with ginger garlic and yogurt for over an hour",
-      "Deep fry fluffy white maida luchis in hot ghee and serve together"
-    ]
+    name: "Kosha Mangsho with Fluffy Luchi (4 Pcs)",
+    category: "North Indian", price: 380, caloriesPerServing: 580,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Bengali_Mutton_Curry.JPG/960px-Bengali_Mutton_Curry.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.9, reviewCount: 410, deliveryTime: "30-35 mins",
+    cuisine: "Bengali",
+    description: "Rich, dark brown slow-braised Bengali mutton curry cooked in mustard oil with caramelized onions and yogurt, served with deep-fried maida luchis.",
+    ingredients: ["Mutton Pieces","Mustard Oil","Caramelized Sugar & Onions","Whisked Curd","Whole Garam Masala","Maida Luchis","Ghee"],
+    instructions: ["Brown mutton patiently in mustard oil with caramelized sugar for dark color","Bhuna meat on low heat with ginger garlic and yogurt for over an hour","Deep fry fluffy white maida luchis in hot ghee and serve together"]
   },
   {
-    "name": "Kolkata Kathi Chicken Roll",
-    "category": "Rolls",
-    "price": 150,
-    "caloriesPerServing": 420,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Kolkata_Rolls.jpg/960px-Kolkata_Rolls.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.8,
-    "reviewCount": 390,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Bengali",
-    "description": "Flaky layered paratha lined with fried egg and wrapped around spiced skewer-grilled chicken chunks, sliced red onions and lime chili splash.",
-    "ingredients": [
-      "Lachha Paratha",
-      "Farm Egg",
-      "Spiced Chicken Tikka",
-      "Sliced Red Onions",
-      "Green Chillies",
-      "Chaat Masala",
-      "Kasundi (Mustard)"
-    ],
-    "instructions": [
-      "Pan fry paratha on tawa, crack an egg on top and flip to stick",
-      "Place grilled spiced chicken cubes down the center",
-      "Top with sliced onions, chaat masala, lemon and roll tightly in parchment"
-    ]
+    name: "Kolkata Kathi Chicken Roll",
+    category: "Rolls", price: 150, caloriesPerServing: 420,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Kolkata_Rolls.jpg/960px-Kolkata_Rolls.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.8, reviewCount: 390, deliveryTime: "15-20 mins",
+    cuisine: "Bengali",
+    description: "Flaky layered paratha lined with fried egg and wrapped around spiced skewer-grilled chicken chunks, sliced red onions and lime chili splash.",
+    ingredients: ["Lachha Paratha","Farm Egg","Spiced Chicken Tikka","Sliced Red Onions","Green Chillies","Chaat Masala","Kasundi (Mustard)"],
+    instructions: ["Pan fry paratha on tawa, crack an egg on top and flip to stick","Place grilled spiced chicken cubes down the center","Top with sliced onions, chaat masala, lemon and roll tightly in parchment"]
   },
   {
-    "name": "Bengali Macher Jhol (Rohu Fish Curry)",
-    "category": "North Indian",
-    "price": 270,
-    "caloriesPerServing": 350,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Pabda_macher_jhol%2C_cuisine_of_West_Bengal_20200305142405.jpg/960px-Pabda_macher_jhol%2C_cuisine_of_West_Bengal_20200305142405.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.8,
-    "reviewCount": 290,
-    "deliveryTime": "25-30 mins",
-    "cuisine": "Bengali",
-    "description": "Traditional light and comforting fish stew cooked with rohu steaks, potato wedges, cauliflower florets and tempered with panch phoron in mustard oil.",
-    "ingredients": [
-      "Fresh Rohu Fish Steaks",
-      "Potato Wedges",
-      "Panch Phoron (5 Spices)",
-      "Turmeric & Green Chilies",
-      "Mustard Oil",
-      "Ginger Paste",
-      "Coriander"
-    ],
-    "instructions": [
-      "Rub fish with turmeric and salt, lightly fry in mustard oil",
-      "Tadka panch phoron and green chilies, add potato and cauliflower",
-      "Simmer fish in light spiced broth until tender and fragrant"
-    ]
+    name: "Bengali Macher Jhol (Rohu Fish Curry)",
+    category: "North Indian", price: 270, caloriesPerServing: 350,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Pabda_macher_jhol%2C_cuisine_of_West_Bengal_20200305142405.jpg/960px-Pabda_macher_jhol%2C_cuisine_of_West_Bengal_20200305142405.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.8, reviewCount: 290, deliveryTime: "25-30 mins",
+    cuisine: "Bengali",
+    description: "Traditional light and comforting fish stew cooked with rohu steaks, potato wedges, cauliflower florets and tempered with panch phoron in mustard oil.",
+    ingredients: ["Fresh Rohu Fish Steaks","Potato Wedges","Panch Phoron (5 Spices)","Turmeric & Green Chilies","Mustard Oil","Ginger Paste","Coriander"],
+    instructions: ["Rub fish with turmeric and salt, lightly fry in mustard oil","Tadka panch phoron and green chilies, add potato and cauliflower","Simmer fish in light spiced broth until tender and fragrant"]
   },
   {
-    "name": "Daab Chingri (Jumbo Prawns in Coconut)",
-    "category": "North Indian",
-    "price": 460,
-    "caloriesPerServing": 430,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/02/Daab_Chingri.jpg/960px-Daab_Chingri.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.9,
-    "reviewCount": 330,
-    "deliveryTime": "30-35 mins",
-    "cuisine": "Bengali",
-    "description": "Fresh tiger prawns cooked with tender coconut meat, yellow mustard paste, green chilies and mustard oil, baked inside a green coconut shell.",
-    "ingredients": [
-      "Tiger Prawns",
-      "Tender Coconut Pulp (Daab Malaai)",
-      "Yellow Mustard Paste",
-      "Green Chillies",
-      "Pure Mustard Oil",
-      "Panch Phoron"
-    ],
-    "instructions": [
-      "Marinate prawns in mustard paste, coconut pulp and mustard oil",
-      "Stuff mixture inside whole hollow green coconut",
-      "Seal opening with flour dough and bake in oven until prawns are juicy"
-    ]
+    name: "Daab Chingri (Jumbo Prawns in Coconut)",
+    category: "North Indian", price: 460, caloriesPerServing: 430,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/02/Daab_Chingri.jpg/960px-Daab_Chingri.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.9, reviewCount: 330, deliveryTime: "30-35 mins",
+    cuisine: "Bengali",
+    description: "Fresh tiger prawns cooked with tender coconut meat, yellow mustard paste, green chilies and mustard oil, baked inside a green coconut shell.",
+    ingredients: ["Tiger Prawns","Tender Coconut Pulp (Daab Malaai)","Yellow Mustard Paste","Green Chillies","Pure Mustard Oil","Panch Phoron"],
+    instructions: ["Marinate prawns in mustard paste, coconut pulp and mustard oil","Stuff mixture inside whole hollow green coconut","Seal opening with flour dough and bake in oven until prawns are juicy"]
   },
   {
-    "name": "Kolkata Sponge Rosogolla (4 Pcs)",
-    "category": "Desserts",
-    "price": 110,
-    "caloriesPerServing": 220,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Rasgulla.jpg/960px-Rasgulla.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 420,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Bengali",
-    "description": "Mouth-watering, spongy chenna (cottage cheese) balls boiled in light sugar syrup until plump and juicy.",
-    "ingredients": [
-      "Fresh Cow Milk Chenna",
-      "Semolina (Pinch)",
-      "Light Sugar Syrup",
-      "Cardamom Pods",
-      "Rose Water Hint"
-    ],
-    "instructions": [
-      "Knead fresh chenna with palm until completely smooth without grain",
-      "Shape into smooth round crack-free balls",
-      "Boil on high flame in boiling sugar syrup for 15 minutes until spongy"
-    ]
+    name: "Kolkata Sponge Rosogolla (4 Pcs)",
+    category: "Desserts", price: 110, caloriesPerServing: 220,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Rasgulla.jpg/960px-Rasgulla.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 420, deliveryTime: "15-20 mins",
+    cuisine: "Bengali",
+    description: "Mouth-watering, spongy chenna (cottage cheese) balls boiled in light sugar syrup until plump and juicy.",
+    ingredients: ["Fresh Cow Milk Chenna","Semolina (Pinch)","Light Sugar Syrup","Cardamom Pods","Rose Water Hint"],
+    instructions: ["Knead fresh chenna with palm until completely smooth without grain","Shape into smooth round crack-free balls","Boil on high flame in boiling sugar syrup for 15 minutes until spongy"]
   },
   {
-    "name": "Baked Mishti Doi (Clay Pot)",
-    "category": "Desserts",
-    "price": 120,
-    "caloriesPerServing": 260,
-    "image": "https://upload.wikimedia.org/wikipedia/commons/3/34/Mishti_Doi.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 380,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Bengali",
-    "description": "Classic Bengali sweet yogurt prepared with caramelized sugar and reduced milk, set in an unglazed earthen pot for earthy aroma.",
-    "ingredients": [
-      "Full Fat Milk",
-      "Caramelized Sugar / Nolen Gur",
-      "Hung Curd Starter",
-      "Green Cardamom",
-      "Earthen Clay Kulhad"
-    ],
-    "instructions": [
-      "Reduce milk to half its volume and sweeten with dark caramelized sugar",
-      "Whisk with hung curd starter when lukewarm",
-      "Pour into earthen clay pots and bake/ferment in warm spot until thick and set"
-    ]
+    name: "Baked Mishti Doi (Clay Pot)",
+    category: "Desserts", price: 120, caloriesPerServing: 260,
+    image: "https://upload.wikimedia.org/wikipedia/commons/3/34/Mishti_Doi.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 380, deliveryTime: "15-20 mins",
+    cuisine: "Bengali",
+    description: "Classic Bengali sweet yogurt prepared with caramelized sugar and reduced milk, set in an unglazed earthen pot for earthy aroma.",
+    ingredients: ["Full Fat Milk","Caramelized Sugar / Nolen Gur","Hung Curd Starter","Green Cardamom","Earthen Clay Kulhad"],
+    instructions: ["Reduce milk to half its volume and sweeten with dark caramelized sugar","Whisk with hung curd starter when lukewarm","Pour into earthen clay pots and bake/ferment in warm spot until thick and set"]
   },
   {
-    "name": "Odisha Chhena Poda",
-    "category": "Desserts",
-    "price": 160,
-    "caloriesPerServing": 320,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Chenapoda.jpg/960px-Chenapoda.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": true,
-    "dietary": "Veg",
-    "rating": 4.9,
-    "reviewCount": 310,
-    "deliveryTime": "15-20 mins",
-    "cuisine": "Odisha",
-    "description": "The pride of Odisha: baked fresh cottage cheese cake caramelized with sugar, cardamom, cashews and wrapped in sal leaves for hours of roasting.",
-    "ingredients": [
-      "Fresh Cow Milk Chhena",
-      "Sugar (for Caramel Crust)",
-      "Semolina (Suji)",
-      "Cardamom Powder",
-      "Ghee & Cashews",
-      "Sal Leaves"
-    ],
-    "instructions": [
-      "Knead chhena thoroughly with sugar, semolina and roasted nuts",
-      "Line baking pan with sal leaves and add caramel sugar base",
-      "Bake on slow heat until top crust turns burnt golden-brown"
-    ]
+    name: "Odisha Chhena Poda",
+    category: "Desserts", price: 160, caloriesPerServing: 320,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/Chenapoda.jpg/960px-Chenapoda.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: true, dietary: "Veg", rating: 4.9, reviewCount: 310, deliveryTime: "15-20 mins",
+    cuisine: "Odisha",
+    description: "The pride of Odisha: baked fresh cottage cheese cake caramelized with sugar, cardamom, cashews and wrapped in sal leaves for hours of roasting.",
+    ingredients: ["Fresh Cow Milk Chhena","Sugar (for Caramel Crust)","Semolina (Suji)","Cardamom Powder","Ghee & Cashews","Sal Leaves"],
+    instructions: ["Knead chhena thoroughly with sugar, semolina and roasted nuts","Line baking pan with sal leaves and add caramel sugar base","Bake on slow heat until top crust turns burnt golden-brown"]
   },
   {
-    "name": "Assamese Masor Tenga (Tangy Fish Curry)",
-    "category": "North Indian",
-    "price": 280,
-    "caloriesPerServing": 290,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Masor_Tenga.jpg/960px-Masor_Tenga.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.7,
-    "reviewCount": 190,
-    "deliveryTime": "25-30 mins",
-    "cuisine": "Assamese",
-    "description": "Refreshing and tangy Assamese sour fish curry cooked with fresh tomatoes, elephant apple (ou tenga) or lemon, fenugreek and mustard oil.",
-    "ingredients": [
-      "Rohu Fish Steaks",
-      "Ou Tenga / Ripe Tomatoes",
-      "Kaji Nemu (Assam Lemon)",
-      "Panch Phoron / Methi Seeds",
-      "Mustard Oil",
-      "Coriander"
-    ],
-    "instructions": [
-      "Lightly fry seasoned fish in mustard oil",
-      "Tadka fenugreek seeds and saute tomatoes with turmeric until pulpy",
-      "Simmer fish in broth and finish with squeeze of fresh Assam lemon juice"
-    ]
+    name: "Assamese Masor Tenga (Tangy Fish Curry)",
+    category: "North Indian", price: 280, caloriesPerServing: 290,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Masor_Tenga.jpg/960px-Masor_Tenga.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.7, reviewCount: 190, deliveryTime: "25-30 mins",
+    cuisine: "Assamese",
+    description: "Refreshing and tangy Assamese sour fish curry cooked with fresh tomatoes, elephant apple (ou tenga) or lemon, fenugreek and mustard oil.",
+    ingredients: ["Rohu Fish Steaks","Ou Tenga / Ripe Tomatoes","Kaji Nemu (Assam Lemon)","Panch Phoron / Methi Seeds","Mustard Oil","Coriander"],
+    instructions: ["Lightly fry seasoned fish in mustard oil","Tadka fenugreek seeds and saute tomatoes with turmeric until pulpy","Simmer fish in broth and finish with squeeze of fresh Assam lemon juice"]
   },
   {
-    "name": "Sikkimese Chicken Thukpa",
-    "category": "Chinese",
-    "price": 210,
-    "caloriesPerServing": 360,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Thukpa%2C_Tibetan_noodle_in_Osaka%2C_Japan.jpg/960px-Thukpa%2C_Tibetan_noodle_in_Osaka%2C_Japan.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.8,
-    "reviewCount": 290,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "Tibetan",
-    "description": "Steaming Himalayan noodle soup packed with shredded chicken, crunchy cabbage, carrots and spring onions in a rich spiced garlic-ginger broth.",
-    "ingredients": [
-      "Egg Noodles",
-      "Shredded Chicken Breast",
-      "Clear Chicken Broth",
-      "Bok Choy & Cabbage",
-      "Ginger Garlic Paste",
-      "Szechuan Pepper",
-      "Spring Onions"
-    ],
-    "instructions": [
-      "Boil egg noodles until al dente and place in serving bowls",
-      "Simmer clear chicken broth with ginger, garlic, vegetables and Himalayan spices",
-      "Ladle hot soup and shredded chicken over noodles and garnish with scallions"
-    ]
+    name: "Sikkimese Chicken Thukpa",
+    category: "Chinese", price: 210, caloriesPerServing: 360,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Thukpa%2C_Tibetan_noodle_in_Osaka%2C_Japan.jpg/960px-Thukpa%2C_Tibetan_noodle_in_Osaka%2C_Japan.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.8, reviewCount: 290, deliveryTime: "20-25 mins",
+    cuisine: "Tibetan",
+    description: "Steaming Himalayan noodle soup packed with shredded chicken, crunchy cabbage, carrots and spring onions in a rich spiced garlic-ginger broth.",
+    ingredients: ["Egg Noodles","Shredded Chicken Breast","Clear Chicken Broth","Bok Choy & Cabbage","Ginger Garlic Paste","Szechuan Pepper","Spring Onions"],
+    instructions: ["Boil egg noodles until al dente and place in serving bowls","Simmer clear chicken broth with ginger, garlic, vegetables and Himalayan spices","Ladle hot soup and shredded chicken over noodles and garnish with scallions"]
   },
   {
-    "name": "Naga Smoked Pork with Bamboo Shoots",
-    "category": "North Indian",
-    "price": 360,
-    "caloriesPerServing": 480,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Naga_style_smoked_Pork_ribs_with_bamboo_shoots_and_rice.jpg/960px-Naga_style_smoked_Pork_ribs_with_bamboo_shoots_and_rice.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.8,
-    "reviewCount": 260,
-    "deliveryTime": "25-30 mins",
-    "cuisine": "Naga",
-    "description": "Smoked meat cooked with fermented bamboo shoots, fiery Raja Mircha (Bhut Jolokia) and local wild ginger.",
-    "ingredients": [
-      "Wood-Smoked Pork / Meat",
-      "Fermented Bamboo Shoots",
-      "Bhut Jolokia (Ghost Pepper)",
-      "Garlic Cloves",
-      "Local Herbs",
-      "Salt & Water"
-    ],
-    "instructions": [
-      "Boil smoked meat with fermented bamboo shoot paste and water",
-      "Crush garlic and ghost pepper into the pot",
-      "Simmer until broth reduces and infuses intense smoky aroma"
-    ]
+    name: "Naga Smoked Pork with Bamboo Shoots",
+    category: "North Indian", price: 360, caloriesPerServing: 480,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Naga_style_smoked_Pork_ribs_with_bamboo_shoots_and_rice.jpg/960px-Naga_style_smoked_Pork_ribs_with_bamboo_shoots_and_rice.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.8, reviewCount: 260, deliveryTime: "25-30 mins",
+    cuisine: "Naga",
+    description: "Smoked meat cooked with fermented bamboo shoots, fiery Raja Mircha (Bhut Jolokia) and local wild ginger.",
+    ingredients: ["Wood-Smoked Pork / Meat","Fermented Bamboo Shoots","Bhut Jolokia (Ghost Pepper)","Garlic Cloves","Local Herbs","Salt & Water"],
+    instructions: ["Boil smoked meat with fermented bamboo shoot paste and water","Crush garlic and ghost pepper into the pot","Simmer until broth reduces and infuses intense smoky aroma"]
   },
   {
-    "name": "Assamese Kunkura Mangxo (Country Chicken Curry)",
-    "category": "North Indian",
-    "price": 330,
-    "caloriesPerServing": 420,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Chicken_curry%2C_Lakhimpur.jpg/960px-Chicken_curry%2C_Lakhimpur.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.7,
-    "reviewCount": 210,
-    "deliveryTime": "25-30 mins",
-    "cuisine": "Assamese",
-    "description": "Rustic Assamese chicken curry cooked with potatoes, ginger, garlic, cumin paste and mustard oil.",
-    "ingredients": [
-      "Country Chicken",
-      "Quartered Potatoes",
-      "Mustard Oil",
-      "Pounded Ginger & Garlic",
-      "Cumin & Coriander Paste",
-      "Turmeric & Salt"
-    ],
-    "instructions": [
-      "Fry potatoes in mustard oil and set aside",
-      "Saute chicken with ginger garlic and fresh cumin paste until browned",
-      "Add water and fried potatoes and simmer until meat is tender"
-    ]
+    name: "Assamese Kunkura Mangxo (Country Chicken Curry)",
+    category: "North Indian", price: 330, caloriesPerServing: 420,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Chicken_curry%2C_Lakhimpur.jpg/960px-Chicken_curry%2C_Lakhimpur.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.7, reviewCount: 210, deliveryTime: "25-30 mins",
+    cuisine: "Assamese",
+    description: "Rustic Assamese chicken curry cooked with potatoes, ginger, garlic, cumin paste and mustard oil.",
+    ingredients: ["Country Chicken","Quartered Potatoes","Mustard Oil","Pounded Ginger & Garlic","Cumin & Coriander Paste","Turmeric & Salt"],
+    instructions: ["Fry potatoes in mustard oil and set aside","Saute chicken with ginger garlic and fresh cumin paste until browned","Add water and fried potatoes and simmer until meat is tender"]
   },
   {
-    "name": "Meghalaya Jadoh with Mint Chutney",
-    "category": "Biryani",
-    "price": 240,
-    "caloriesPerServing": 440,
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Jadoh.jpg/960px-Jadoh.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "isVeg": false,
-    "dietary": "Non-Veg",
-    "rating": 4.7,
-    "reviewCount": 180,
-    "deliveryTime": "20-25 mins",
-    "cuisine": "Khasi / Meghalaya",
-    "description": "Iconic Khasi specialty of short-grain red hill rice cooked in savory chicken broth with bay leaves, black pepper and ginger.",
-    "ingredients": [
-      "Khasi Red Rice",
-      "Chicken Morsels",
-      "Meat Broth",
-      "Ginger Paste",
-      "Bay Leaves",
-      "Black Peppercorns",
-      "Fried Onions"
-    ],
-    "instructions": [
-      "Saute onions, ginger and chicken pieces in a dash of oil",
-      "Add red hill rice and toast for 2 minutes",
-      "Cook in rich aromatic meat broth until rice grains are fluffy and tender"
-    ]
+    name: "Meghalaya Jadoh with Mint Chutney",
+    category: "Biryani", price: 240, caloriesPerServing: 440,
+    image: "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Jadoh.jpg/960px-Jadoh.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    isVeg: false, dietary: "Non-Veg", rating: 4.7, reviewCount: 180, deliveryTime: "20-25 mins",
+    cuisine: "Khasi / Meghalaya",
+    description: "Iconic Khasi specialty of short-grain red hill rice cooked in savory chicken broth with bay leaves, black pepper and ginger.",
+    ingredients: ["Khasi Red Rice","Chicken Morsels","Meat Broth","Ginger Paste","Bay Leaves","Black Peppercorns","Fried Onions"],
+    instructions: ["Saute onions, ginger and chicken pieces in a dash of oil","Add red hill rice and toast for 2 minutes","Cook in rich aromatic meat broth until rice grains are fluffy and tender"]
   }
 ];
+
+module.exports = dishesSouthEastWest;

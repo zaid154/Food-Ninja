@@ -1,99 +1,84 @@
 const Recipe = require("../models/recipeModel");
-const optionalNumber = (value) => value === "" || value === null || value === undefined ? null : Number(value);
-const normalizeList = (value) => Array.isArray(value)
-  ? value.map((item) => String(item).trim()).filter(Boolean)
-  : String(value || "").split(/[\n,]/).map((item) => item.trim()).filter(Boolean);
 
-// Get food items with server-side pagination, search, category filtering, and sorting
+const optionalNumber = (v) => (v === "" || v === null || v === undefined ? null : Number(v));
+const normalizeList = (v) => (Array.isArray(v) ? v.filter(Boolean) : String(v || "").split(/[\n,]/).map((s) => s.trim()).filter(Boolean));
+
+const INDIAN_CUISINES = [
+  "indian", "north indian", "south indian", "punjabi", "awadhi", "mughlai", "rajasthani", "kashmiri",
+  "himachali", "bihari", "gujarati", "maharashtrian", "goan", "chettinad", "kerala", "hyderabadi",
+  "andhra", "karnataka", "bengali", "odisha", "assamese", "naga", "khasi / meghalaya", "kolkata street food", "indo-chinese"
+];
+
+const parseDishPayload = (body) => {
+  const d = {};
+  if (body.name !== undefined) d.name = String(body.name).trim();
+  if (body.category !== undefined) d.category = String(body.category).trim() || "Fast Food";
+  if (body.price !== undefined) d.price = Number(body.price);
+  if (body.image !== undefined) d.image = String(body.image).trim();
+  if (body.imageFit !== undefined) d.imageFit = body.imageFit || "cover";
+  if (body.isVeg !== undefined || body.dietary !== undefined) {
+    d.isVeg = body.isVeg === undefined ? body.dietary !== "Non-Veg" : Boolean(body.isVeg);
+    d.dietary = body.dietary || (d.isVeg ? "Veg" : "Non-Veg");
+  }
+  ["caloriesPerServing", "proteinGrams", "carbsGrams", "fatGrams"].forEach((k) => {
+    if (body[k] !== undefined) d[k] = optionalNumber(body[k]);
+  });
+  ["halfPrice", "quarterPrice", "originalPrice"].forEach((k) => {
+    if (body[k] !== undefined) d[k] = Number(body[k]) || 0;
+  });
+  if (body.hasPortions !== undefined) d.hasPortions = Boolean(body.hasPortions);
+  if (body.servingInfo !== undefined) d.servingInfo = String(body.servingInfo).trim();
+  if (body.deliveryTime !== undefined) d.deliveryTime = body.deliveryTime || "25-30 mins";
+  if (body.cuisine !== undefined) d.cuisine = body.cuisine || "Indian";
+  if (body.description !== undefined) d.description = body.description || "Freshly made restaurant preparation.";
+  if (body.inStock !== undefined) d.inStock = Boolean(body.inStock);
+  if (body.ingredients !== undefined) {
+    d.ingredients = Array.isArray(body.ingredients) ? body.ingredients : String(body.ingredients).split(",").map((s) => s.trim()).filter(Boolean);
+  }
+  if (body.keyFeatures !== undefined) d.keyFeatures = normalizeList(body.keyFeatures);
+  return d;
+};
+
 const getRecipes = async (req, res) => {
   try {
-    const {
-      page: rawPage,
-      limit: rawLimit,
-      category,
-      search,
-      sort,
-      all
-    } = req.query;
-
-    // 1. Build Query Filter
+    const { page: rawPage, limit: rawLimit, category, search, sort, all } = req.query;
     const filter = {};
 
-    // Category / Cuisine filter
     if (category && category.trim() && category.toLowerCase() !== "all") {
       const catTrim = category.trim();
-      const catLower = catTrim.toLowerCase();
-
-      if (catLower === "indian") {
-        const indianCuisines = [
-          "indian", "north indian", "south indian", "punjabi", "awadhi", "mughlai",
-          "rajasthani", "kashmiri", "himachali", "bihari", "gujarati", "maharashtrian",
-          "goan", "chettinad", "kerala", "hyderabadi", "andhra", "karnataka", "bengali",
-          "odisha", "assamese", "naga", "khasi / meghalaya", "kolkata street food", "indo-chinese"
-        ];
-        const cuisineRegexes = indianCuisines.map((c) => new RegExp(`^${c}$`, "i"));
-        filter.$or = [
-          { category: /indian/i },
-          { cuisine: { $in: cuisineRegexes } }
-        ];
+      if (catTrim.toLowerCase() === "indian") {
+        const regexes = INDIAN_CUISINES.map((c) => new RegExp(`^${c}$`, "i"));
+        filter.$or = [{ category: /indian/i }, { cuisine: { $in: regexes } }];
       } else {
         const catRegex = new RegExp(`^${catTrim}$`, "i");
-        filter.$or = [
-          { category: catRegex },
-          { cuisine: catRegex }
-        ];
+        filter.$or = [{ category: catRegex }, { cuisine: catRegex }];
       }
     }
 
-    // Text Search filter (name, category, cuisine, description)
     if (search && search.trim()) {
       const sRegex = new RegExp(search.trim(), "i");
-      const searchConditions = [
-        { name: sRegex },
-        { category: sRegex },
-        { cuisine: sRegex },
-        { description: sRegex }
-      ];
-
+      const searchConditions = [{ name: sRegex }, { category: sRegex }, { cuisine: sRegex }, { description: sRegex }];
       if (filter.$or) {
-        // If both category and search are present, combine with $and
-        filter.$and = [
-          { $or: filter.$or },
-          { $or: searchConditions }
-        ];
+        filter.$and = [{ $or: filter.$or }, { $or: searchConditions }];
         delete filter.$or;
       } else {
         filter.$or = searchConditions;
       }
     }
 
-    // 2. Build Sorting
     let sortObj = { id: -1 };
-    if (sort === "price_asc") {
-      sortObj = { price: 1, id: 1 };
-    } else if (sort === "price_desc") {
-      sortObj = { price: -1, id: -1 };
-    } else if (sort === "rating" || sort === "rating_desc") {
-      sortObj = { rating: -1, id: -1 };
-    }
+    if (sort === "price_asc") sortObj = { price: 1, id: 1 };
+    else if (sort === "price_desc") sortObj = { price: -1, id: -1 };
+    else if (sort === "rating" || sort === "rating_desc") sortObj = { rating: -1, id: -1 };
 
-    // 3. Admin / Full bypass check
     if (all === "true") {
       const recipes = await Recipe.find(filter).sort(sortObj);
       return res.status(200).json({
-        success: true,
-        recipes,
-        foods: recipes,
-        pagination: {
-          currentPage: 1,
-          limit: recipes.length,
-          totalItems: recipes.length,
-          totalPages: 1
-        }
+        success: true, recipes, foods: recipes,
+        pagination: { currentPage: 1, limit: recipes.length, totalItems: recipes.length, totalPages: 1 }
       });
     }
 
-    // 4. Server-Side Pagination
     const page = Math.max(1, parseInt(rawPage, 10) || 1);
     const limit = Math.min(24, Math.max(1, parseInt(rawLimit, 10) || 12));
     const skip = (page - 1) * limit;
@@ -103,101 +88,41 @@ const getRecipes = async (req, res) => {
       Recipe.find(filter).sort(sortObj).skip(skip).limit(limit)
     ]);
 
-    const totalPages = Math.ceil(totalItems / limit) || 1;
-
     return res.status(200).json({
-      success: true,
-      recipes,
-      foods: recipes,
-      pagination: {
-        currentPage: page,
-        limit,
-        totalItems,
-        totalPages
-      }
+      success: true, recipes, foods: recipes,
+      pagination: { currentPage: page, limit, totalItems, totalPages: Math.ceil(totalItems / limit) || 1 }
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch food items",
-      error: error.message
-    });
+    return res.status(500).json({ success: false, message: "Failed to fetch food items", error: error.message });
   }
 };
 
-// Get single food item
 const getRecipe = async (req, res) => {
   try {
-    const recipe = await Recipe.findOne({ id: Number(req.params.id) });
-    if (!recipe) return res.status(404).json({ message: "Dish not found" });
+    const rawId = req.params.id;
+    let query = { id: Number(rawId) };
+    if (isNaN(query.id)) query = { _id: rawId };
+    const recipe = await Recipe.findOne(query);
+    if (!recipe) return res.status(404).json({ message: "Food item not found." });
     return res.status(200).json(recipe);
   } catch (error) {
-    return res.status(500).json({ message: "Failed to fetch dish", error: error.message });
+    return res.status(500).json({ message: "Failed to fetch food item", error: error.message });
   }
 };
 
-// Admin: Add new food item
 const addRecipe = async (req, res) => {
   try {
-    const {
-      name,
-      category,
-      price,
-      image,
-      imageFit,
-      isVeg,
-      dietary,
-      deliveryTime,
-      description,
-      ingredients,
-      cuisine,
-      inStock,
-      caloriesPerServing,
-      proteinGrams,
-      carbsGrams,
-      fatGrams,
-      keyFeatures,
-      servingInfo,
-      hasPortions,
-      halfPrice,
-      quarterPrice,
-      originalPrice,
-    } = req.body;
-    
-    if (!name || !price || !image) {
-      return res.status(400).json({ message: "Name, price and image are required." });
-    }
+    const { name, price, image } = req.body;
+    if (!name || !price || !image) return res.status(400).json({ message: "Name, price and image are required." });
 
     const lastItem = await Recipe.findOne().sort({ id: -1 });
     const nextId = lastItem ? Number(lastItem.id) + 1 : 1;
+    const payload = parseDishPayload(req.body);
 
     const newFood = new Recipe({
-      id: nextId,
-      name,
-      category: category || "Fast Food",
-      price: Number(price),
-      caloriesPerServing: optionalNumber(caloriesPerServing),
-      proteinGrams: optionalNumber(proteinGrams),
-      carbsGrams: optionalNumber(carbsGrams),
-      fatGrams: optionalNumber(fatGrams),
-      servingInfo: servingInfo ? String(servingInfo).trim() : "",
-      hasPortions: Boolean(hasPortions),
-      halfPrice: halfPrice ? Number(halfPrice) : 0,
-      quarterPrice: quarterPrice ? Number(quarterPrice) : 0,
-      originalPrice: originalPrice ? Number(originalPrice) : 0,
-      image,
-      imageFit: imageFit || "cover",
-      isVeg: isVeg === undefined ? (dietary === "Non-Veg" ? false : true) : Boolean(isVeg),
-      dietary: dietary || (isVeg === false ? "Non-Veg" : "Veg"),
-      deliveryTime: deliveryTime || "25-30 mins",
-      cuisine: cuisine || "Indian",
-      rating: 4.8,
-      reviewCount: 15,
-      description: description || "Freshly made restaurant preparation.",
-      ingredients: Array.isArray(ingredients) ? ingredients : (ingredients ? ingredients.split(",").map(s => s.trim()) : ["Fresh Ingredients"]),
-      keyFeatures: normalizeList(keyFeatures),
+      id: nextId, rating: 4.8, reviewCount: 15,
       instructions: ["Prepared fresh on order", "Packed hygienically in spill-proof box", "Delivered hot to your doorstep"],
-      inStock: inStock !== undefined ? Boolean(inStock) : true,
+      ...payload
     });
 
     await newFood.save();
@@ -207,69 +132,10 @@ const addRecipe = async (req, res) => {
   }
 };
 
-// Admin: Update food item
 const updateRecipe = async (req, res) => {
   try {
-    const {
-      name,
-      category,
-      price,
-      image,
-      imageFit,
-      isVeg,
-      dietary,
-      deliveryTime,
-      description,
-      cuisine,
-      inStock,
-      ingredients,
-      caloriesPerServing,
-      proteinGrams,
-      carbsGrams,
-      fatGrams,
-      keyFeatures,
-      servingInfo,
-      hasPortions,
-      halfPrice,
-      quarterPrice,
-      originalPrice,
-    } = req.body;
-    
-    const updateData = {
-      name,
-      category,
-      price: Number(price),
-      image,
-      imageFit: imageFit || "cover",
-      isVeg: isVeg === undefined ? (dietary === "Non-Veg" ? false : true) : Boolean(isVeg),
-      dietary: dietary || (isVeg === false ? "Non-Veg" : "Veg"),
-      deliveryTime,
-      description,
-      cuisine
-    };
-
-    for (const [field, value] of Object.entries({ caloriesPerServing, proteinGrams, carbsGrams, fatGrams })) {
-      if (value !== undefined) updateData[field] = optionalNumber(value);
-    }
-    if (keyFeatures !== undefined) updateData.keyFeatures = normalizeList(keyFeatures);
-    if (servingInfo !== undefined) updateData.servingInfo = String(servingInfo).trim();
-    if (hasPortions !== undefined) updateData.hasPortions = Boolean(hasPortions);
-    if (halfPrice !== undefined) updateData.halfPrice = Number(halfPrice);
-    if (quarterPrice !== undefined) updateData.quarterPrice = Number(quarterPrice);
-    if (originalPrice !== undefined) updateData.originalPrice = Number(originalPrice);
-    if (ingredients !== undefined) {
-      updateData.ingredients = Array.isArray(ingredients) ? ingredients : ingredients.split(",").map(s => s.trim()).filter(Boolean);
-    }
-    if (inStock !== undefined) {
-      updateData.inStock = Boolean(inStock);
-    }
-
-    const updated = await Recipe.findOneAndUpdate(
-      { id: Number(req.params.id) },
-      { $set: updateData },
-      { new: true }
-    );
-
+    const updateData = parseDishPayload(req.body);
+    const updated = await Recipe.findOneAndUpdate({ id: Number(req.params.id) }, { $set: updateData }, { new: true });
     if (!updated) return res.status(404).json({ message: "Dish not found" });
     return res.status(200).json({ message: "Dish updated successfully!", food: updated });
   } catch (error) {
@@ -277,30 +143,29 @@ const updateRecipe = async (req, res) => {
   }
 };
 
-// Admin: Quick Stock Toggle (In Stock / Out of Stock)
 const updateRecipeStock = async (req, res) => {
   try {
-    const { inStock } = req.body;
-    const updated = await Recipe.findOneAndUpdate(
-      { id: Number(req.params.id) },
-      { $set: { inStock: Boolean(inStock) } },
-      { new: true }
-    );
-    if (!updated) return res.status(404).json({ message: "Dish not found." });
+    const dishId = Number(req.params.id);
+    const existing = await Recipe.findOne({ id: dishId });
+    if (!existing) return res.status(404).json({ message: "Dish not found" });
+
+    const nextStock = req.body.inStock !== undefined ? Boolean(req.body.inStock) : !existing.inStock;
+    existing.inStock = nextStock;
+    await existing.save();
+
     return res.status(200).json({
-      message: `Dish availability updated to ${Boolean(inStock) ? "In Stock" : "Out of Stock"}`,
-      food: updated,
+      message: `Dish is now ${nextStock ? "In Stock" : "Sold Out"}`,
+      dish: existing, food: existing
     });
   } catch (error) {
     return res.status(500).json({ message: "Failed to update stock status", error: error.message });
   }
 };
 
-// Admin: Delete food item
 const deleteRecipe = async (req, res) => {
   try {
     const deleted = await Recipe.findOneAndDelete({ id: Number(req.params.id) });
-    if (!deleted) return res.status(404).json({ message: "Dish not found." });
+    if (!deleted) return res.status(404).json({ message: "Dish not found" });
     return res.status(200).json({ message: "Dish deleted successfully!" });
   } catch (error) {
     return res.status(500).json({ message: "Failed to delete dish", error: error.message });

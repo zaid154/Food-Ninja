@@ -3,14 +3,10 @@ const User = require("../models/userModel");
 const Settings = require("../models/settingsModel");
 const { getStoreStatus } = require("./settingsController");
 
-// Get all orders (for Admin or user)
 const getOrders = async (req, res) => {
   try {
     const { email } = req.query;
-    let query = {};
-    if (email && email !== "all") {
-      query.userEmail = email;
-    }
+    const query = email && email !== "all" ? { userEmail: email } : {};
     const orders = await Order.find(query).sort({ createdAt: -1 });
     return res.status(200).json({ orders });
   } catch (error) {
@@ -18,14 +14,10 @@ const getOrders = async (req, res) => {
   }
 };
 
-// Get single order by ID
 const getOrderById = async (req, res) => {
   try {
     const rawId = req.params.id;
-    let query = { id: Number(rawId) };
-    if (isNaN(query.id)) {
-      query = { _id: rawId };
-    }
+    const query = isNaN(Number(rawId)) ? { _id: rawId } : { id: Number(rawId) };
     const order = await Order.findOne(query);
     if (!order) return res.status(404).json({ message: "Order not found." });
     return res.status(200).json({ order });
@@ -34,39 +26,16 @@ const getOrderById = async (req, res) => {
   }
 };
 
-// Create new customer order
 const createOrder = async (req, res) => {
   try {
-    const {
-      id,
-      userEmail,
-      customerName,
-      phone,
-      address,
-      payment,
-      paymentStatus,
-      razorpayOrderId,
-      razorpayPaymentId,
-      razorpaySignature,
-      items,
-      subtotal,
-      deliveryFee,
-      packagingFee,
-      taxes,
-      discount,
-      paymentMethod,
-      total,
-      estDelivery,
-      date,
-    } = req.body;
-
+    const { customerName, phone, address, items, total, userEmail, payment, paymentStatus, paymentMethod } = req.body;
     if (!customerName || !phone || !address || !items || !total) {
       return res.status(400).json({ message: "Missing required order details." });
     }
 
-    const normalizedUserEmail = typeof userEmail === "string" ? userEmail.trim().toLowerCase() : "";
-    if (normalizedUserEmail && normalizedUserEmail !== "guest") {
-      const customer = await User.findOne({ email: normalizedUserEmail }).select("isBlocked");
+    const email = typeof userEmail === "string" ? userEmail.trim().toLowerCase() : "";
+    if (email && email !== "guest") {
+      const customer = await User.findOne({ email }).select("isBlocked");
       if (customer?.isBlocked) {
         return res.status(403).json({ message: "This account is blocked and cannot place orders. Please contact the restaurant for help." });
       }
@@ -78,29 +47,25 @@ const createOrder = async (req, res) => {
       return res.status(403).json({ message: storeStatus.effectiveClosedReason });
     }
 
-    const orderId = id || Date.now();
+    const payMode = payment || "Cash on Delivery";
     const newOrder = new Order({
-      id: orderId,
-      userEmail: normalizedUserEmail || "guest",
-      customerName,
-      phone,
-      address,
-      payment: payment || "Cash on Delivery",
-      paymentStatus: paymentStatus || (payment === "Online Payment" ? "Paid" : "Pending"),
-      paymentMethod: paymentMethod || (payment === "Cash on Delivery" ? "Cash on Delivery" : ""),
-      razorpayOrderId: razorpayOrderId || "",
-      razorpayPaymentId: razorpayPaymentId || "",
-      razorpaySignature: razorpaySignature || "",
-      items,
-      subtotal: subtotal || 0,
-      deliveryFee: deliveryFee !== undefined ? deliveryFee : 30,
-      packagingFee: packagingFee !== undefined ? packagingFee : 0,
-      taxes: taxes || 0,
-      discount: discount !== undefined ? discount : 0,
-      total,
-      estDelivery: estDelivery || "30–40 mins",
+      id: req.body.id || Date.now(),
+      userEmail: email || "guest",
+      customerName, phone, address, items, total,
+      payment: payMode,
+      paymentStatus: paymentStatus || (payMode === "Online Payment" ? "Paid" : "Pending"),
+      paymentMethod: paymentMethod || (payMode === "Cash on Delivery" ? "Cash on Delivery" : ""),
+      razorpayOrderId: req.body.razorpayOrderId || "",
+      razorpayPaymentId: req.body.razorpayPaymentId || "",
+      razorpaySignature: req.body.razorpaySignature || "",
+      subtotal: req.body.subtotal || 0,
+      deliveryFee: req.body.deliveryFee !== undefined ? req.body.deliveryFee : 30,
+      packagingFee: req.body.packagingFee !== undefined ? req.body.packagingFee : 0,
+      taxes: req.body.taxes || 0,
+      discount: req.body.discount !== undefined ? req.body.discount : 0,
+      estDelivery: req.body.estDelivery || "30–40 mins",
       status: "Placed",
-      date: date || new Date().toLocaleString(),
+      date: req.body.date || new Date().toLocaleString(),
     });
 
     await newOrder.save();
@@ -110,15 +75,9 @@ const createOrder = async (req, res) => {
   }
 };
 
-// Admin: Update order status
 const updateOrderStatus = async (req, res) => {
   try {
-    const { status } = req.body;
-    const order = await Order.findOneAndUpdate(
-      { id: Number(req.params.id) },
-      { status },
-      { new: true }
-    );
+    const order = await Order.findOneAndUpdate({ id: Number(req.params.id) }, { status: req.body.status }, { new: true });
     if (!order) return res.status(404).json({ message: "Order not found." });
     return res.status(200).json({ message: "Order status updated!", order });
   } catch (error) {
