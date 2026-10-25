@@ -21,7 +21,7 @@ const LoginPage = () => {
         if (!isFromCheckout) return;
         const timer = setTimeout(() => {
             setShowCheckoutNotice(false);
-        }, 30000);
+        }, 5000); // 5 seconds    
         return () => clearTimeout(timer);
     }, [isFromCheckout]);
 
@@ -150,24 +150,6 @@ const LoginPage = () => {
                         </div>
                     )}
 
-                    {/* Quick Demo Customer Account Card */}
-                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-xl p-2.5">
-                        <div className="text-[11px] text-slate-500">
-                            <p className="font-semibold text-slate-700">Customer Demo Account</p>
-                            <p className="font-mono text-slate-500">zaid@foodninja.com / user123</p>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setEmail("zaid@foodninja.com");
-                                setPassword("user123");
-                                setError("");
-                            }}
-                            className="text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg px-2.5 py-1 text-[11px] font-bold transition cursor-pointer"
-                        >
-                            Auto-Fill
-                        </button>
-                    </div>
 
                     <button
                         type="submit"
