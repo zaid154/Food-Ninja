@@ -3,33 +3,33 @@ import ReactDOM from "react-dom/client";
 import "./App.css";
 
 import Header from "./Component/Header";
-import LandingPage from "./Component/LandingPage";
+import HomePage from "./Component/HomePage";
 import MenuPage from "./Component/MenuPage";
-import FoodMenu from "./Component/FoodMenu";
-import Cart from "./Component/Cart";
+import CartPage from "./Component/CartPage";
 import Footer from "./Component/Footer";
-import About from "./Component/About";
-import Contact from "./Component/Contact";
-import Terms from "./Component/Terms";
-import Privacy from "./Component/Privacy";
-import Error from "./Component/Error";
-import ProductView from "./Component/ProductView";
+import AboutPage from "./Component/AboutPage";
+import ContactPage from "./Component/ContactPage";
+import TermsPage from "./Component/TermsPage";
+import PrivacyPage from "./Component/PrivacyPage";
+import RouteErrorPage from "./Component/RouteErrorPage";
+import ProductPage from "./Component/ProductPage";
 import UseContext from "./Component/Usercontext";
-import Login from "./Component/Login";
-import Register from "./Component/Register";
-import Wishlist from "./Component/Wishlist";
-import Checkout from "./Component/Checkout";
-import Orders from "./Component/Orders";
-import OrderDetail from "./Component/OrderDetail";
+import LoginPage from "./Component/LoginPage";
+import RegisterPage from "./Component/RegisterPage";
+import WishlistPage from "./Component/WishlistPage";
+import CheckoutPage from "./Component/CheckoutPage";
+import OrderConfirmationPage from "./Component/OrderConfirmationPage";
+import OrdersPage from "./Component/OrdersPage";
+import OrderDetailsPage from "./Component/OrderDetailsPage";
 import ProtectedRoute from "./Component/ProtectedRoute";
-import Admin from "./Component/Admin";
-import AdminOverview from "./Component/admin/AdminOverview";
-import AdminOrders from "./Component/admin/AdminOrders";
-import AdminFoods from "./Component/admin/AdminFoods";
-import AdminInquiries from "./Component/admin/AdminInquiries";
-import AdminCategories from "./Component/admin/AdminCategories";
-import AdminCustomers from "./Component/admin/AdminCustomers";
-import AdminSettings from "./Component/admin/AdminSettings";
+import AdminLayout from "./Component/AdminLayout";
+import AdminOverviewPage from "./Component/admin/AdminOverviewPage";
+import AdminOrdersPage from "./Component/admin/AdminOrdersPage";
+import AdminFoodsPage from "./Component/admin/AdminFoodsPage";
+import AdminInquiriesPage from "./Component/admin/AdminInquiriesPage";
+import AdminCategoriesPage from "./Component/admin/AdminCategoriesPage";
+import AdminCustomersPage from "./Component/admin/AdminCustomersPage";
+import AdminSettingsPage from "./Component/admin/AdminSettingsPage";
 
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
@@ -69,47 +69,48 @@ const appRouter = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    errorElement: <Error />,
+    errorElement: <RouteErrorPage />,
     children: [
-      { path: "/", element: <LandingPage /> },
+      { path: "/", element: <HomePage /> },
       { path: "/menu", element: <MenuPage /> },
-      { path: "/about", element: <About /> },
-      { path: "/contact", element: <Contact /> },
-      { path: "/help", element: <Contact /> },
-      { path: "/terms", element: <Terms /> },
-      { path: "/privacy", element: <Privacy /> },
-      { path: "/login", element: <Login /> },
-      { path: "/register", element: <Register /> },
-      { path: "/wishlist", element: <Wishlist /> },
-      { path: "/cart", element: <Cart /> },
+      { path: "/about", element: <AboutPage /> },
+      { path: "/contact", element: <ContactPage /> },
+      { path: "/help", element: <ContactPage /> },
+      { path: "/terms", element: <TermsPage /> },
+      { path: "/privacy", element: <PrivacyPage /> },
+      { path: "/login", element: <LoginPage /> },
+      { path: "/register", element: <RegisterPage /> },
+      { path: "/wishlist", element: <WishlistPage /> },
+      { path: "/cart", element: <CartPage /> },
       {
         path: "/checkout",
         element: (
           <ProtectedRoute>
-            <Checkout />
+            <CheckoutPage />
           </ProtectedRoute>
         )
       },
-      { path: "/orders", element: <Orders /> },
-      { path: "/orders/:id", element: <OrderDetail /> },
-      { path: "/order/:id", element: <OrderDetail /> },
+      { path: "/orders", element: <OrdersPage /> },
+      { path: "/order-confirmation/:id", element: <OrderConfirmationPage /> },
+      { path: "/orders/:id", element: <OrderDetailsPage /> },
+      { path: "/order/:id", element: <OrderDetailsPage /> },
       {
         path: "/admin",
-        element: <Admin />,
+        element: <AdminLayout />,
         children: [
-          { index: true, element: <AdminOverview /> },
-          { path: "overview", element: <AdminOverview /> },
-          { path: "orders", element: <AdminOrders /> },
-          { path: "foods", element: <AdminFoods /> },
-          { path: "categories", element: <AdminCategories /> },
-          { path: "customers", element: <AdminCustomers /> },
-          { path: "settings", element: <AdminSettings /> },
-          { path: "inquiries", element: <AdminInquiries /> }
+          { index: true, element: <AdminOverviewPage /> },
+          { path: "overview", element: <AdminOverviewPage /> },
+          { path: "orders", element: <AdminOrdersPage /> },
+          { path: "foods", element: <AdminFoodsPage /> },
+          { path: "categories", element: <AdminCategoriesPage /> },
+          { path: "customers", element: <AdminCustomersPage /> },
+          { path: "settings", element: <AdminSettingsPage /> },
+          { path: "inquiries", element: <AdminInquiriesPage /> }
         ]
       },
-      { path: "/restaurant/:id", element: <ProductView /> },
-      { path: "/food/:id", element: <ProductView /> },
-      { path: "/dish/:id", element: <ProductView /> }
+      { path: "/restaurant/:id", element: <ProductPage /> },
+      { path: "/food/:id", element: <ProductPage /> },
+      { path: "/dish/:id", element: <ProductPage /> }
     ]
   }
 ]);

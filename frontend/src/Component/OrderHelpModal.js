@@ -139,7 +139,6 @@ const OrderHelpModal = ({ order, isOpen, onClose }) => {
         className="relative w-full max-w-xl rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-6 py-4">
           <div className="flex items-center gap-2.5">
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800">
@@ -170,7 +169,6 @@ const OrderHelpModal = ({ order, isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Order Context Strip */}
         <div className="flex flex-wrap items-center justify-between gap-3 bg-emerald-50/60 border-b border-emerald-100/70 px-6 py-2.5 text-xs">
           <div className="flex items-center gap-2 font-mono">
             <span className="font-extrabold text-emerald-950">Order #{order.id}</span>
@@ -242,7 +240,6 @@ const OrderHelpModal = ({ order, isOpen, onClose }) => {
               </div>
             )}
 
-            {/* Quick Issue Category Chips */}
             <div>
               <label className="block font-bold text-slate-700 mb-2">
                 What issue are you facing with this order? *
@@ -271,7 +268,6 @@ const OrderHelpModal = ({ order, isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Customer Contact Details */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Your Name *</label>
@@ -309,7 +305,6 @@ const OrderHelpModal = ({ order, isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Priority Selection */}
             <div>
               <label className="block font-bold text-slate-700 mb-1.5">Priority Level</label>
               <div className="flex gap-2">
@@ -340,7 +335,6 @@ const OrderHelpModal = ({ order, isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Message Description */}
             <div>
               <label className="block font-bold text-slate-700 mb-1">
                 Describe the Issue *
@@ -355,7 +349,6 @@ const OrderHelpModal = ({ order, isOpen, onClose }) => {
               />
             </div>
 
-            {/* Form Actions */}
             <div className="flex items-center justify-between pt-2 border-t border-slate-100">
               <a
                 href={`/contact?orderId=${encodeURIComponent(order.id)}`}

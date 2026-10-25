@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import AdminDropdown from "./AdminDropdown";
 const FoodDishModal = ({
   isOpen,
@@ -57,15 +57,12 @@ const FoodDishModal = ({
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto"
       onClick={onClose}
     >
-      {/* Modal Dialog (overflow-visible so dropdowns float cleanly without triggering scrollbars) */}
       <div
         className="relative w-full max-w-3xl rounded-2xl bg-white shadow-2xl border border-slate-200 my-auto animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/90 px-5 py-3 rounded-t-2xl">
           <div className="flex items-center gap-2.5">
-            {/* Elegant Food Cloche / Dining Icon */}
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 shrink-0">
               <svg
                 className="h-4.5 w-4.5"
@@ -103,7 +100,6 @@ const FoodDishModal = ({
             </div>
           </div>
 
-          {/* Clean ✕ Close Button */}
           <button
             type="button"
             onClick={onClose}
@@ -124,11 +120,9 @@ const FoodDishModal = ({
           </button>
         </div>
 
-        {/* Modal Form Body (overflow-visible: dropdowns float freely without any scrollbar jumping!) */}
         <form onSubmit={onSave} className="p-4 sm:p-5 space-y-3.5 text-xs overflow-visible">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             
-            {/* Left Column: Essential Dish Specifications & Ingredients */}
             <div className="space-y-3">
               <div>
                 <label className="block font-bold text-slate-700 mb-1 text-[11px]">Dish Name *</label>
@@ -137,12 +131,11 @@ const FoodDishModal = ({
                   required
                   value={foodForm.name}
                   onChange={(e) => setFoodForm({ ...foodForm, name: e.target.value })}
-                  placeholder="e.g. Hyderabadi Dum Biryani, Veg Club Burger"
+                  placeholder="Enter a dish name"
                   className="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition"
                 />
               </div>
 
-              {/* Category & Cuisine Dropdowns (Clean floating dropdowns with zero scrollbar trigger) */}
               <div className="grid grid-cols-2 gap-2.5">
                 <AdminDropdown variant="dish"
                   label="Category *"
@@ -204,7 +197,6 @@ const FoodDishModal = ({
                 </div>
               </div>
 
-              {/* Portion / Serving Info & Original MRP */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block font-bold text-slate-700 mb-1 text-[11px]">Portion / Serving Info (Optional)</label>
@@ -229,7 +221,6 @@ const FoodDishModal = ({
                 </div>
               </div>
 
-              {/* Half & Full Plate Option */}
               <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-2.5 space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -274,7 +265,6 @@ const FoodDishModal = ({
                 )}
               </div>
 
-              {/* Dietary / Food Type */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1 text-[11px]">Dietary / Food Classification *</label>
                 <div className="grid grid-cols-3 gap-2">
@@ -325,7 +315,6 @@ const FoodDishModal = ({
                 </div>
               </div>
 
-              {/* Key Ingredients */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1 text-[11px]">Key Ingredients (Comma Separated)</label>
                 <input
@@ -338,7 +327,6 @@ const FoodDishModal = ({
               </div>
             </div>
 
-            {/* Right Column: Visuals & Description */}
             <div className="space-y-3">
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -378,7 +366,6 @@ const FoodDishModal = ({
                   )}
                 </div>
 
-                {/* Compact 16:9 Food Card Preview */}
                 <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50/80 p-2 space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold text-slate-600 flex items-center gap-1">
@@ -389,7 +376,6 @@ const FoodDishModal = ({
                       <span>Card Preview</span>
                     </span>
 
-                    {/* Image Fit Mode Switcher */}
                     <div className="inline-flex items-center rounded-lg border border-slate-200 bg-white p-0.5 text-[10px] font-bold">
                       <button
                         type="button"
@@ -418,7 +404,6 @@ const FoodDishModal = ({
                     </div>
                   </div>
 
-                  {/* Proportional Box (Compact height ~90px) */}
                   <div className="relative h-24 w-full rounded-xl overflow-hidden bg-white border border-slate-200 shadow-2xs flex items-center justify-center">
                     {foodForm.image && !imageLoadError ? (
                       <img
@@ -442,14 +427,12 @@ const FoodDishModal = ({
                       </div>
                     )}
 
-                    {/* Veg / Non-Veg badge on preview */}
                     <div className="absolute left-2 top-2 rounded-md bg-white/95 p-1 shadow-xs border border-slate-100">
                       <div className={`flex items-center justify-center h-2.5 w-2.5 rounded-xs border ${foodForm.dietary === "Non-Veg" ? "border-red-600" : "border-green-600"} p-[1px]`}>
                         <div className={`h-1 w-1 rounded-full ${foodForm.dietary === "Non-Veg" ? "bg-red-600" : "bg-green-600"}`} />
                       </div>
                     </div>
 
-                    {/* Price pill on preview */}
                     {foodForm.price && (
                       <div className="absolute bottom-1.5 left-2 rounded-md bg-slate-900/90 backdrop-blur-xs text-white px-1.5 py-0.5 text-[9px] font-bold font-mono shadow-xs">
                         ₹{foodForm.price}
@@ -459,7 +442,6 @@ const FoodDishModal = ({
                 </div>
               </div>
 
-              {/* Description / Summary with compact 3 rows */}
               <div>
                 <label className="block font-bold text-slate-700 mb-1 text-[11px]">Description / Summary</label>
                 <textarea
@@ -474,7 +456,6 @@ const FoodDishModal = ({
 
           </div>
 
-          {/* Modal Footer Actions */}
           <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
             <button
               type="button"

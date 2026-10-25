@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Cart from "../Cart";
+import CartPage from "../CartPage";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import appStore from "../../utils/Store";
@@ -15,7 +15,7 @@ describe("Cart Component Tests", () => {
     render(
       <Provider store={appStore}>
         <MemoryRouter>
-          <Cart />
+          <CartPage />
         </MemoryRouter>
       </Provider>
     );
@@ -38,7 +38,7 @@ describe("Cart Component Tests", () => {
     render(
       <Provider store={appStore}>
         <MemoryRouter>
-          <Cart />
+          <CartPage />
         </MemoryRouter>
       </Provider>
     );

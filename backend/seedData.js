@@ -3,16 +3,15 @@ const dotenv = require("dotenv");
 const fs = require("fs");
 const path = require("path");
 
-const Recipe = require("./models/recipe");
-const User = require("./models/user");
-const Review = require("./models/review");
-const Order = require("./models/order");
-const Category = require("./models/category");
+const Recipe = require("./models/recipeModel");
+const User = require("./models/userModel");
+const Review = require("./models/reviewModel");
+const Order = require("./models/orderModel");
+const Category = require("./models/categoryModel");
 const seedDishes = require("./data/seedDishes");
 
 dotenv.config({ path: path.resolve(__dirname, ".env") });
 
-// 7 Core Food Categories
 const defaultCategories = [
   {
     name: "Biryani",
@@ -114,7 +113,6 @@ const realisticUsers = [
   }
 ];
 
-// Our 8 Signature Hand-Crafted Dishes
 const ourSignatureDishes = [
   {
     name: "Hyderabadi Dum Biryani",
@@ -342,7 +340,6 @@ const loadAllFoods = () => {
   return combined;
 };
 
-// Seed authentic customer reviews
 const realisticReviews = [
   {
     recipeId: 1,

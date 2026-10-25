@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "../../utils/Constants";
+import { getSavedOrderPricing } from "../../utils/orderPricing";
 
 /**
  * Kitchen Order Ticket (KOT) & Tax Invoice Slip Modal
@@ -31,16 +32,9 @@ const OrderInvoiceModal = ({ order, onClose }) => {
   const items = order.items || [];
 
   // Accurate math computed dynamically from items array (no fake fallback calculations)
-  const calculatedSubtotal = items.reduce((acc, it) => {
-    const price = Number(it.price || it.caloriesPerServing || 199);
-    const qty = Number(it.quantity || 1);
-    return acc + price * qty;
-  }, 0);
-
-  const subtotal = order.subtotal !== undefined ? order.subtotal : calculatedSubtotal;
-  const deliveryFee = order.deliveryFee !== undefined ? order.deliveryFee : 30;
-  const taxes = order.taxes !== undefined ? order.taxes : Math.max(0, (order.total || 0) - subtotal - deliveryFee);
-  const grandTotal = order.total || (subtotal + deliveryFee + taxes);
+  const pricing = getSavedOrderPricing(order);
+  const { subtotal, deliveryFee, packagingFee, taxes, discountAmount, grandTotal } = pricing;
+  const itemCount = items.reduce((count, item) => count + Number(item.quantity || 1), 0);
 
   // Check payment mode for Delivery Rider & Customer Cash Collection
   const isPaidOnline = Boolean(
@@ -53,6 +47,8 @@ const OrderInvoiceModal = ({ order, onClose }) => {
     )
   );
   const isCod = !isPaidOnline;
+  const isDemoPayment = String(order.paymentMethod || "").toLowerCase().includes("demo")
+    || String(order.razorpayPaymentId || "").startsWith("pay_demo_");
 
   // Isolated Thermal Printer (80mm) Print Engine
   const handlePrint = () => {
@@ -137,7 +133,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             <div class="row" style="margin-top: 3px; align-items: center;">
               <span>TYPE: HOME DELIVERY</span>
               <span style="border: 1.5px solid #000; padding: 1px 6px; font-weight: bold; font-size: 10px;">
-                ${isCod ? `COD: COLLECT ₹${grandTotal}` : "PAID ONLINE (₹0 DUE)"}
+                ${isCod ? `COD: COLLECT ₹${grandTotal}` : (isDemoPayment ? "DEMO / TEST PAYMENT" : "PAID ONLINE (₹0 DUE)")}
               </span>
             </div>
             <div class="divider"></div>
@@ -150,6 +146,12 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             <div style="margin: 2px 0;">
               <span class="font-bold">ADDRESS:</span> ${order.address}
             </div>
+            ${isPaidOnline ? `
+              <div style="margin: 2px 0;"><span class="font-bold">PAYMENT STATUS:</span> ${isDemoPayment ? "PAID (DEMO / TEST)" : (order.paymentStatus || "Paid")}</div>
+              <div style="margin: 2px 0;"><span class="font-bold">METHOD:</span> ${isDemoPayment ? "Demo / Test" : (order.paymentMethod || "Not provided")}</div>
+              <div style="margin: 2px 0; overflow-wrap: anywhere;"><span class="font-bold">PAYMENT ID:</span> ${order.razorpayPaymentId || "Not available"}</div>
+              <div style="margin: 2px 0; overflow-wrap: anywhere;"><span class="font-bold">GATEWAY ORDER ID:</span> ${order.razorpayOrderId || "Not available"}</div>
+            ` : ""}
           </div>
 
           <div class="divider"></div>
@@ -166,7 +168,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             </thead>
             <tbody>
               ${items.map(it => {
-                const itemPrice = Number(it.price || it.caloriesPerServing || 199);
+                const itemPrice = Number(it.price ?? it.caloriesPerServing ?? 0);
                 const itemQty = Number(it.quantity || 1);
                 return `
                   <tr>
@@ -185,17 +187,18 @@ const OrderInvoiceModal = ({ order, onClose }) => {
           <!-- Bill Summary -->
           <div style="font-size: 11px;">
             <div class="row">
-              <span>Item Subtotal (${items.length} items)</span>
+              <span>Item Subtotal (${itemCount} items)</span>
               <span>₹${subtotal}</span>
             </div>
             <div class="row">
               <span>Delivery Charges</span>
               <span>${deliveryFee === 0 ? "FREE" : "₹" + deliveryFee}</span>
             </div>
-            <div class="row">
-              <span>Restaurant Packaging & GST</span>
-              <span>₹${taxes}</span>
-            </div>
+            ${pricing.hasCompleteBreakdown ? `
+              <div class="row"><span>Packaging / Handling</span><span>₹${packagingFee}</span></div>
+              <div class="row"><span>GST</span><span>₹${taxes}</span></div>
+              <div class="row"><span>Discount</span><span>−₹${discountAmount}</span></div>
+            ` : `<div style="font-size: 9px; margin: 4px 0;">Fee breakdown was not saved for this older order.</div>`}
             <div class="double-divider"></div>
             <div class="row font-bold" style="font-size: 14px;">
               <span>NET PAYABLE</span>
@@ -207,7 +210,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
           <!-- Payment Info & Rider Collection Box -->
           <div style="border: 1.5px solid #000; padding: 5px 6px; margin: 6px 0; text-align: center;">
             <div style="font-size: 12px; font-weight: 900; letter-spacing: 0.5px;">
-              ${isCod ? `★ CASH TO COLLECT: ₹${grandTotal} ★` : "✓ PAID ONLINE — ₹0 TO COLLECT"}
+              ${isCod ? `★ CASH TO COLLECT: ₹${grandTotal} ★` : (isDemoPayment ? `✓ DEMO / TEST PAYMENT — ₹${grandTotal}` : "✓ PAID ONLINE — ₹0 TO COLLECT")}
             </div>
             <div style="font-size: 8.5px; font-weight: bold; margin-top: 2px;">
               ${isCod ? "RIDER: Collect exact cash from customer before food handover" : "RIDER: Order prepaid online. Do NOT collect cash from customer"}
@@ -244,13 +247,11 @@ const OrderInvoiceModal = ({ order, onClose }) => {
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-3 sm:p-4 backdrop-blur-xs overflow-hidden"
       onClick={onClose}
     >
-      {/* Compact receipt preview; the paper itself scrolls inside this fixed-height dialog. */}
       <div
         className="relative flex w-full max-w-[340px] flex-col overflow-hidden rounded-xl border border-slate-300 bg-white text-slate-900 shadow-2xl animate-in fade-in zoom-in-95 duration-200"
         style={{ maxHeight: "min(72dvh, 620px)" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Top Bar */}
         <div className="flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 py-2 text-xs">
           <span className="font-bold text-slate-700 flex items-center gap-1.5 text-[11px]">
             <svg className="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -268,10 +269,8 @@ const OrderInvoiceModal = ({ order, onClose }) => {
           </button>
         </div>
 
-        {/* Printable 80mm Receipt Content */}
         <div id="printable-thermal-slip" className="min-h-0 flex-1 overflow-y-auto bg-white p-3 font-mono text-slate-800 text-[11px] leading-tight">
           
-          {/* Receipt Brand Header */}
           <div className="text-center pb-2 border-b border-dashed border-slate-300">
             <h2 className="text-base font-black tracking-wider text-slate-900 uppercase">
               {settings.restaurantName || "FOOD NINJA"}
@@ -289,7 +288,6 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             )}
           </div>
 
-          {/* Balanced Metadata (Zero empty void) */}
           <div className="py-2.5 border-b border-dashed border-slate-300 space-y-1 text-[10.5px]">
             <div className="flex justify-between items-center">
               <span className="font-extrabold text-slate-900 text-xs">ORDER #{order.id}</span>
@@ -303,7 +301,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
                 </span>
               ) : (
                 <span className="rounded-sm bg-white text-black font-black px-2 py-0.5 border border-slate-500 text-[10px] tracking-wide">
-                  PAID ONLINE (₹0 DUE)
+                  {isDemoPayment ? "DEMO / TEST PAYMENT" : "PAID ONLINE (₹0 DUE)"}
                 </span>
               )}
             </div>
@@ -320,10 +318,17 @@ const OrderInvoiceModal = ({ order, onClose }) => {
                 <span className="font-bold text-slate-600">DELIVERY: </span>
                 {order.address}
               </div>
+              {isPaidOnline && (
+                <div className="mt-1 border-t border-slate-100 pt-1 text-[9px] leading-snug break-all">
+                  <div><span className="font-bold text-slate-600">PAYMENT STATUS: </span>{isDemoPayment ? "Paid (Demo / Test)" : (order.paymentStatus || "Paid")}</div>
+                  <div><span className="font-bold text-slate-600">METHOD: </span>{isDemoPayment ? "Demo / Test" : (order.paymentMethod || "Not provided")}</div>
+                  <div><span className="font-bold text-slate-600">PAYMENT ID: </span>{order.razorpayPaymentId || "Not available"}</div>
+                  <div><span className="font-bold text-slate-600">GATEWAY ORDER ID: </span>{order.razorpayOrderId || "Not available"}</div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Items Table */}
           <div className="py-2.5 border-b border-dashed border-slate-300">
             <table className="w-full text-[10.5px]">
               <thead>
@@ -336,7 +341,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
                 {items.map((it, idx) => {
-                  const itemPrice = Number(it.price || it.caloriesPerServing || 199);
+                  const itemPrice = Number(it.price ?? it.caloriesPerServing ?? 0);
                   const itemQty = Number(it.quantity || 1);
                   return (
                     <tr key={idx} className="py-1">
@@ -351,32 +356,35 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             </table>
           </div>
 
-          {/* Accurate Bill Calculation */}
           <div className="py-2 space-y-1 text-[10.5px] border-b border-dashed border-slate-300">
             <div className="flex justify-between text-slate-600">
-              <span>Item Subtotal ({items.length} items)</span>
+              <span>Item Subtotal ({itemCount} items)</span>
               <span>₹{subtotal}</span>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>Delivery Fee</span>
               <span>{deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}</span>
             </div>
-            <div className="flex justify-between text-slate-600">
-              <span>Restaurant Packaging & GST</span>
-              <span>₹{taxes}</span>
-            </div>
+            {pricing.hasCompleteBreakdown ? (
+              <>
+                <div className="flex justify-between text-slate-600"><span>Packaging / Handling</span><span>₹{packagingFee}</span></div>
+                <div className="flex justify-between text-slate-600"><span>GST</span><span>₹{taxes}</span></div>
+                <div className="flex justify-between text-emerald-700"><span>Discount</span><span>−₹{discountAmount}</span></div>
+              </>
+            ) : (
+              <p className="text-[9px] text-slate-500">Fee breakdown was not saved for this older order.</p>
+            )}
             <div className="flex justify-between pt-1.5 border-t border-slate-200 text-sm font-black text-slate-900">
               <span>GRAND TOTAL</span>
               <span className="text-black">₹{grandTotal}</span>
             </div>
           </div>
 
-          {/* Delivery Rider & Customer Cash Collection Highlight Box */}
           <div className={`mt-2.5 p-2 rounded-lg border-2 text-center ${
             "border-slate-800 bg-white text-black"
           }`}>
             <p className="text-xs font-black tracking-wide">
-              {isCod ? `★ CASH TO COLLECT: ₹${grandTotal} ★` : "✓ PAID ONLINE — ₹0 TO COLLECT"}
+              {isCod ? `★ CASH TO COLLECT: ₹${grandTotal} ★` : (isDemoPayment ? `✓ DEMO / TEST PAYMENT — ₹${grandTotal}` : "✓ PAID ONLINE — ₹0 TO COLLECT")}
             </p>
             <p className="text-[9.5px] font-semibold mt-0.5 text-slate-700">
               {isCod 
@@ -385,20 +393,17 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             </p>
           </div>
 
-          {/* Delivery Rider & Customer Handover Signature Line */}
           <div className="mt-2.5 pt-2 border-t border-dashed border-slate-200 flex justify-between text-[9px] text-slate-500 font-semibold">
             <span>Rider: ________________</span>
             <span>Customer Sign: ________________</span>
           </div>
 
-          {/* Receipt Footer Note */}
           <div className="mt-2.5 pt-2 border-t border-dashed border-slate-200 text-center text-[9px] text-slate-400">
             <p className="font-bold text-slate-600">*** CUSTOMER TAX INVOICE & DELIVERY BILL ***</p>
             <p className="mt-0.5">Thank you for ordering with {settings.restaurantName || "Food Ninja"}!</p>
           </div>
         </div>
 
-        {/* Modal Action Buttons (Always immediately visible without scrolling) */}
         <div className="flex shrink-0 items-center justify-between gap-2 border-t border-slate-200 bg-white p-3">
           <button
             type="button"

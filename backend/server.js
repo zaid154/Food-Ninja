@@ -16,15 +16,15 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api/recipes", require("./routes/recipe"));
-app.use("/api/foods", require("./routes/recipe"));
-app.use("/api/orders", require("./routes/order"));
-app.use("/api/users", require("./routes/user"));
-app.use("/api/contact", require("./routes/inquiry"));
-app.use("/api/reviews", require("./routes/review"));
-app.use("/api/categories", require("./routes/category"));
-app.use("/api/settings", require("./routes/settings"));
-app.use("/api/payment", require("./routes/payment"));
+app.use("/api/recipes", require("./routes/recipesRoutes"));
+app.use("/api/foods", require("./routes/recipesRoutes"));
+app.use("/api/orders", require("./routes/ordersRoutes"));
+app.use("/api/users", require("./routes/usersRoutes"));
+app.use("/api/contact", require("./routes/contactRoutes"));
+app.use("/api/reviews", require("./routes/reviewsRoutes"));
+app.use("/api/categories", require("./routes/categoriesRoutes"));
+app.use("/api/settings", require("./routes/settingsRoutes"));
+app.use("/api/payment", require("./routes/paymentRoutes"));
 
 // Health Check
 app.get("/", (req, res) => {

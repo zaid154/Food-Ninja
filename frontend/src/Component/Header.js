@@ -130,7 +130,6 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-100">
-      {/* Store Closed Alert or Announcement Banner */}
       {storeSettings && (storeSettings.isEffectiveOpen === false || storeSettings.restaurantOpen === false) ? (
         <div className="bg-rose-600 text-white text-[11px] font-bold py-1.5 px-4 text-center tracking-wide flex items-center justify-center gap-2 shadow-xs">
           <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
@@ -142,13 +141,11 @@ const Header = () => {
         </div>
       ) : null}
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 sm:px-10 py-3.5">
-        {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-2.5 group">
           <img src={LOGO} alt="Food Ninja" className="h-9 w-9 rounded-full object-cover shadow-2xs group-hover:scale-105 transition-transform" />
           <span className="font-black text-xl tracking-tight text-slate-900">Food<span className="text-emerald-600">Ninja</span></span>
         </Link>
 
-        {/* Center Nav Links */}
         <nav className="hidden md:flex items-center gap-10">
           <NavLink to="/" end className={navLinkClass}>
             Home
@@ -164,9 +161,7 @@ const Header = () => {
           </NavLink>
         </nav>
 
-        {/* Right Actions (Search, Cart with badge, User Avatar 'M') */}
         <div className="flex items-center gap-4 sm:gap-5">
-          {/* Search Bar / Icon */}
           <div ref={searchRef} className="relative">
             {searchOpen ? (
               <form onSubmit={handleSearchSubmit} className="flex items-center">
@@ -220,7 +215,6 @@ const Header = () => {
             )}
           </div>
 
-          {/* Cart Icon with Circular Green Badge */}
           <Link
             to="/cart"
             className="relative text-slate-700 hover:text-slate-950 transition p-1"
@@ -240,7 +234,6 @@ const Header = () => {
             )}
           </Link>
 
-          {/* User Profile Avatar with dropdown (Black circle with white 'M' and chevron) */}
           <div className="relative" ref={dropdownRef}>
             <button
               type="button"
@@ -310,7 +303,6 @@ const Header = () => {
             )}
           </div>
 
-          {/* Accessible Sign In Link for Test Suite & non-logged in users */}
           {!user && (
             <Link
               to="/login"
@@ -320,7 +312,6 @@ const Header = () => {
             </Link>
           )}
 
-          {/* Mobile Menu Hamburger */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -334,10 +325,8 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-100 bg-white px-6 py-4 space-y-3">
-          {/* Mobile Search Bar */}
           <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 pb-2">
             <input
               type="text"

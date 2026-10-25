@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import Contact from "../Contact";
+import ContactPage from "../ContactPage";
 import "@testing-library/jest-dom";
 
 // Mock fetch for GitHub profile fetch
@@ -17,7 +17,7 @@ global.fetch = jest.fn(() =>
 
 describe("Contact Component Tests", () => {
   test("renders contact form fields properly", () => {
-    render(<Contact />);
+    render(<ContactPage />);
 
     const nameInput = screen.getByPlaceholderText(/Mohd Zaid/i);
     expect(nameInput).toBeInTheDocument();
@@ -30,7 +30,7 @@ describe("Contact Component Tests", () => {
   });
 
   test("renders submit button with 'Send Message' text", () => {
-    render(<Contact />);
+    render(<ContactPage />);
 
     const submitBtn = screen.getByRole("button", { name: /Send Message/i });
     expect(submitBtn).toBeInTheDocument();

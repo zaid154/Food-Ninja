@@ -1,47 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import FoodCard from "./food/FoodCard";
-import Shimmer from "./Shimmer";
 import { API_BASE_URL } from "../utils/Constants";
-import { FALLBACK_RECIPES } from "../utils/fallbackDishes";
-
-const MENU_CATEGORIES = [
-  {
-    name: "Biryani",
-    bg: "bg-[#f4faee]",
-    img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=300&auto=format&fit=crop&q=80",
-  },
-  {
-    name: "Pizza",
-    bg: "bg-[#fff3eb]",
-    img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&auto=format&fit=crop&q=80",
-  },
-  {
-    name: "Burgers",
-    bg: "bg-[#fff8e7]",
-    img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&auto=format&fit=crop&q=80",
-  },
-  {
-    name: "Chinese",
-    bg: "bg-[#fef2f2]",
-    img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=300&auto=format&fit=crop&q=80",
-  },
-  {
-    name: "Indian",
-    bg: "bg-[#fef9c3]",
-    img: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300&auto=format&fit=crop&q=80",
-  },
-  {
-    name: "Italian",
-    bg: "bg-[#fdf2f8]",
-    img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=300&auto=format&fit=crop&q=80",
-  },
-  {
-    name: "Beverages",
-    bg: "bg-[#f0f9ff]",
-    img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300&auto=format&fit=crop&q=80",
-  },
-];
 
 const SORT_OPTIONS = [
   { value: "recommended", label: "Recommended" },
@@ -136,7 +96,8 @@ const MenuPage = () => {
 
   // Component state
   const [dishes, setDishes] = useState([]);
-  const [menuCategories, setMenuCategories] = useState(MENU_CATEGORIES);
+  const [menuCategories, setMenuCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     limit: 12,
@@ -154,18 +115,25 @@ const MenuPage = () => {
     }
   };
 
-  // Fetch dynamic categories created by Admin
   useEffect(() => {
-    if (typeof fetch !== "undefined") {
-      fetch(`${API_BASE_URL}/categories`)
-        .then((r) => r.json())
-        .then((data) => {
-          if (data && data.categories && data.categories.length > 0) {
-            setMenuCategories(data.categories.filter((c) => c.isActive !== false));
-          }
-        })
-        .catch(() => {});
-    }
+    let isMounted = true;
+    const loadCategories = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/categories`);
+        const data = response.ok ? await response.json() : null;
+        const categories = Array.isArray(data?.categories)
+          ? data.categories.filter((category) => category.isActive !== false)
+          : [];
+        if (isMounted) setMenuCategories(categories);
+      } catch {
+        if (isMounted) setMenuCategories([]);
+      } finally {
+        if (isMounted) setCategoriesLoading(false);
+      }
+    };
+
+    loadCategories();
+    return () => { isMounted = false; };
   }, []);
   const [error, setError] = useState(null);
 
@@ -241,54 +209,15 @@ const MenuPage = () => {
       } else {
         setDishes([]);
       }
-    } catch (err) {
-      // Fallback on network or server error
-      let filtered = [...FALLBACK_RECIPES];
-      if (currentCategory && currentCategory !== "All") {
-        const catLower = currentCategory.trim().toLowerCase();
-        if (catLower === "indian") {
-          const indianCuisines = [
-            "indian", "north indian", "south indian", "punjabi", "awadhi", "mughlai",
-            "rajasthani", "kashmiri", "himachali", "bihari", "gujarati", "maharashtrian",
-            "goan", "chettinad", "kerala", "hyderabadi", "andhra", "karnataka", "bengali",
-            "odisha", "assamese", "naga", "khasi / meghalaya", "kolkata street food", "indo-chinese"
-          ];
-          filtered = filtered.filter(
-            (d) =>
-              (d.category && /indian/i.test(d.category)) ||
-              (d.cuisine && indianCuisines.some((c) => c.toLowerCase() === d.cuisine.toLowerCase()))
-          );
-        } else {
-          filtered = filtered.filter(
-            (d) =>
-              (d.category && d.category.toLowerCase().includes(catLower)) ||
-              (d.cuisine && d.cuisine.toLowerCase().includes(catLower))
-          );
-        }
-      }
-      if (currentSearch && currentSearch.trim()) {
-        const q = currentSearch.toLowerCase();
-        filtered = filtered.filter((d) => d.name.toLowerCase().includes(q));
-      }
-      if (currentSort === "price_asc") {
-        filtered.sort((a, b) => a.price - b.price);
-      } else if (currentSort === "price_desc") {
-        filtered.sort((a, b) => b.price - a.price);
-      } else if (currentSort === "rating") {
-        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-      }
-
-      const totalItems = filtered.length;
-      const totalPages = Math.ceil(totalItems / 12) || 1;
-      const start = (currentPage - 1) * 12;
-      setDishes(filtered.slice(start, start + 12));
+    } catch (requestError) {
+      setDishes([]);
       setPagination({
         currentPage,
         limit: 12,
-        totalItems,
-        totalPages,
+        totalItems: 0,
+        totalPages: 1,
       });
-      setError(null);
+      setError(requestError.message || "Could not connect to the menu server.");
     } finally {
       setLoading(false);
     }
@@ -301,10 +230,6 @@ const MenuPage = () => {
   // Handlers
   const handleCategorySelect = (cat) => {
     updateQuery({ category: cat, page: 1 });
-  };
-
-  const handleSortChange = (e) => {
-    updateQuery({ sort: e.target.value, page: 1 });
   };
 
   const handlePageChange = (newPage) => {
@@ -347,9 +272,6 @@ const MenuPage = () => {
     <div className="bg-white min-h-[85vh] pt-2 sm:pt-4 pb-12" ref={menuTopRef}>
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         
-        {/* ========================================================
-            1. UNIFIED PAGE HEADER & CONTROLS (Compact & Above Fold)
-        ======================================================== */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 mb-4 sm:mb-5">
           <div>
             <div className="flex items-center gap-2.5">
@@ -365,9 +287,7 @@ const MenuPage = () => {
             </p>
           </div>
 
-          {/* Modern Themed Sort Dropdown & Quick Reset */}
           <div className="flex items-center gap-2.5 shrink-0">
-            {/* Custom Themed Sort Dropdown */}
             <div className="relative" ref={sortRef}>
               <button
                 type="button"
@@ -383,7 +303,6 @@ const MenuPage = () => {
                 aria-expanded={sortOpen}
                 title="Sort dishes"
               >
-                {/* Universal Sort Icon */}
                 <svg
                   className={`h-3.5 w-3.5 shrink-0 transition-colors ${
                     sortOpen || currentSort !== "recommended"
@@ -408,7 +327,6 @@ const MenuPage = () => {
                   {SORT_OPTIONS.find((o) => o.value === currentSort)?.label || "Recommended"}
                 </span>
 
-                {/* Rotating Chevron */}
                 <svg
                   className={`h-3 w-3 text-slate-400 transition-transform duration-200 shrink-0 ${
                     sortOpen ? "rotate-180 text-emerald-600" : "group-hover:text-slate-600"
@@ -424,7 +342,6 @@ const MenuPage = () => {
                 </svg>
               </button>
 
-              {/* Floating Popover Menu */}
               {sortOpen && (
                 <div className="absolute right-0 top-full mt-1.5 w-52 rounded-xl border border-slate-200 bg-white p-1 shadow-lg shadow-slate-900/10 z-50 overflow-hidden">
                   <div className="space-y-0.5" role="listbox">
@@ -472,7 +389,6 @@ const MenuPage = () => {
               )}
             </div>
 
-            {/* Quick Reset All Filters Button */}
             {(currentCategory !== "All" || currentSearch || currentSort !== "recommended") && (
               <button
                 type="button"
@@ -498,11 +414,10 @@ const MenuPage = () => {
           </div>
         </div>
 
-        {/* ========================================================
-            2. CATEGORY CAROUSEL (Scalable: Supports 8 to 90+ categories with Arrow Navigation)
-        ======================================================== */}
+        {categoriesLoading ? (
+          <p className="mb-4 py-6 text-center text-xs text-slate-400">Loading categories…</p>
+        ) : menuCategories.length > 0 ? (
         <div className="relative mb-4 sm:mb-5 group/carousel">
-          {/* Left Arrow Button */}
           <button
             type="button"
             onClick={() => scrollCategories("left")}
@@ -514,7 +429,6 @@ const MenuPage = () => {
             </svg>
           </button>
 
-          {/* Right Arrow Button */}
           <button
             type="button"
             onClick={() => scrollCategories("right")}
@@ -526,7 +440,6 @@ const MenuPage = () => {
             </svg>
           </button>
 
-          {/* Horizontal Scroll Track */}
           <div
             ref={categoryCarouselRef}
             className="flex gap-2.5 sm:gap-3.5 overflow-x-auto px-1 pt-2 pb-3 scrollbar-none scroll-smooth"
@@ -545,22 +458,25 @@ const MenuPage = () => {
                       : "border-transparent hover:border-slate-300/80 hover:shadow-md hover:-translate-y-0.5"
                   }`}
                 >
-                  {/* Circular Image */}
                   <div className="h-16 w-16 sm:h-18 sm:w-18 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-2.5 shrink-0">
-                    <img
-                      src={cat.img}
-                      alt={cat.name}
-                      className="h-full w-full object-cover rounded-full group-hover:scale-105 transition duration-300"
-                      onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&auto=format&fit=crop&q=80"; }}
-                    />
+                    {cat.img ? (
+                      <img
+                        src={cat.img}
+                        alt={cat.name}
+                        className="h-full w-full rounded-full object-cover transition duration-300 group-hover:scale-105"
+                        onError={(event) => { event.currentTarget.style.display = "none"; }}
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center rounded-full text-lg font-bold text-emerald-700">
+                        {cat.name?.charAt(0)}
+                      </span>
+                    )}
                   </div>
 
-                  {/* Category Name */}
                   <span className="text-xs font-extrabold text-slate-800 mb-1.5 tracking-tight truncate w-full px-1">
                     {cat.name}
                   </span>
 
-                  {/* Circular Indicator */}
                   <div
                     className={`flex h-5 w-5 items-center justify-center rounded-full shadow-xs transition duration-200 ${
                       isActive
@@ -599,10 +515,10 @@ const MenuPage = () => {
             })}
           </div>
         </div>
+        ) : (
+          <p className="mb-4 py-6 text-center text-xs text-slate-400">No categories are available right now.</p>
+        )}
 
-        {/* ========================================================
-            3. ACTIVE FILTERS STATUS BAR (Single, Clean, Not Duplicated)
-        ======================================================== */}
         {(currentSearch || currentCategory !== "All") && (
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-5 p-2 px-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
             <div className="flex flex-wrap items-center gap-2">
@@ -647,9 +563,6 @@ const MenuPage = () => {
           </div>
         )}
 
-        {/* ========================================================
-            4. DISHES GRID OR STATES
-        ======================================================== */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {Array.from({ length: 12 }).map((_, idx) => (
@@ -712,9 +625,6 @@ const MenuPage = () => {
               ))}
             </div>
 
-            {/* ========================================================
-                5. SERVER-SIDE PAGINATION BAR
-            ======================================================== */}
             <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-100 text-xs text-slate-600">
               <div>
                 Showing <span className="font-bold text-slate-900">{startItem}</span> to{" "}
@@ -724,7 +634,6 @@ const MenuPage = () => {
 
               {pagination.totalPages > 1 && (
                 <div className="flex items-center gap-1.5 flex-wrap justify-center">
-                  {/* Previous Button */}
                   <button
                     type="button"
                     onClick={() => handlePageChange(currentPage - 1)}
@@ -737,7 +646,6 @@ const MenuPage = () => {
                     <span>Prev</span>
                   </button>
 
-                  {/* Smart Truncated Page Numbers */}
                   {getPaginationItems().map((item, idx) => {
                     if (item === "...") {
                       return (
@@ -766,7 +674,6 @@ const MenuPage = () => {
                     );
                   })}
 
-                  {/* Next Button */}
                   <button
                     type="button"
                     onClick={() => handlePageChange(currentPage + 1)}
