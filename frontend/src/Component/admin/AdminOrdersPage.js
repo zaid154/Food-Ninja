@@ -48,6 +48,7 @@ const AdminOrdersPage = (props) => {
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [activeInvoiceOrder, setActiveInvoiceOrder] = useState(null);
+  const [activeInvoiceMode, setActiveInvoiceMode] = useState("kot");
 
   const today = new Date();
   const yesterday = new Date(today);
@@ -258,9 +259,9 @@ const AdminOrdersPage = (props) => {
                     <div className="flex justify-end">
                       <button
                         type="button"
-                        onClick={() => setActiveInvoiceOrder(o)}
+                        onClick={() => { setActiveInvoiceMode("bill"); setActiveInvoiceOrder(o); }}
                         className="w-full max-w-[140px] inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white hover:border-emerald-400 hover:bg-emerald-50/80 px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-emerald-800 shadow-2xs transition cursor-pointer group"
-                        title="View & Print Kitchen Order Ticket / Invoice Slip"
+                        title="View and print customer bill or kitchen order ticket (KOT)"
                       >
                         <svg
                           className="h-3.5 w-3.5 text-slate-400 group-hover:text-emerald-600 transition"
@@ -271,7 +272,7 @@ const AdminOrdersPage = (props) => {
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                         </svg>
-                        <span>Print KOT</span>
+                        <span>Bill / KOT</span>
                       </button>
                     </div>
                   </td>
@@ -317,6 +318,7 @@ const AdminOrdersPage = (props) => {
       {activeInvoiceOrder && (
         <OrderInvoiceModal
           order={activeInvoiceOrder}
+          initialMode={activeInvoiceMode}
           onClose={() => setActiveInvoiceOrder(null)}
         />
       )}
