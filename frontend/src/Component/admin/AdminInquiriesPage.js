@@ -256,15 +256,15 @@ const AdminInquiriesPage = (props) => {
           <p>{activeTab === "order_issues" ? "No order issues reported. When customers request help on /orders/:id, tickets appear here." : "No general customer inquiries found."}</p>
         </div>
       ) : activeTab === "order_issues" ? (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-2xs">
           <table className="w-full text-left text-xs min-w-[750px]">
             <thead>
-              <tr className="border-b border-slate-100 text-slate-400 font-semibold uppercase text-[10px]">
-                <th className="pb-3 min-w-[170px]">Order & Customer</th>
-                <th className="pb-3 min-w-[130px]">Issue & Priority</th>
-                <th className="pb-3 min-w-[260px]">Customer Message</th>
-                <th className="pb-3 min-w-[110px]">Resolution</th>
-                <th className="pb-3 text-right pr-2 min-w-[130px]">Actions</th>
+              <tr className="border-b border-slate-200/80 bg-slate-50/80 text-slate-500 font-bold uppercase text-[10px]">
+                <th className="py-3 pl-5 pr-3 min-w-[180px]">Order & Customer</th>
+                <th className="py-3 px-3 min-w-[140px]">Issue & Priority</th>
+                <th className="py-3 px-3 min-w-[270px]">Customer Message</th>
+                <th className="py-3 px-3 min-w-[120px]">Resolution</th>
+                <th className="py-3 pl-3 pr-5 text-right min-w-[140px]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -276,12 +276,12 @@ const AdminInquiriesPage = (props) => {
                 const currentStatus = liveOrder?.status || inq.orderStatus;
 
                 return (
-                  <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/50 text-slate-500" : "hover:bg-slate-50/70 text-slate-800"}`}>
-                    <td className="py-3.5 align-top">
+                  <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/60 text-slate-500" : "hover:bg-slate-50/70 text-slate-800"}`}>
+                    <td className="py-4 pl-5 pr-3 align-top">
                       <CustomerInfo name={inq.name} email={inq.email} phone={phone} orderId={inq.orderId} />
                     </td>
 
-                    <td className="py-3.5 align-top space-y-1.5">
+                    <td className="py-4 px-3 align-top space-y-1.5">
                       <span className="inline-block rounded-md bg-slate-100 border border-slate-200/80 px-2 py-0.5 text-[10px] font-bold text-slate-800">
                         {inq.issueCategory || inq.subject || "Order Issue"}
                       </span>
@@ -320,18 +320,18 @@ const AdminInquiriesPage = (props) => {
                       )}
                     </td>
 
-                    <td className="py-3.5 align-top max-w-sm">
+                    <td className="py-4 px-3 align-top max-w-sm">
                       <ExpandableMessage text={inq.message} time={timeStr} />
                     </td>
 
-                    <td className="py-3.5 align-top whitespace-nowrap">
+                    <td className="py-4 px-3 align-top whitespace-nowrap">
                       <ResolutionToggle
                         isResolved={inq.isResolved}
                         onClick={() => handleToggleResolve(inq._id || inq.id, inq.isResolved)}
                       />
                     </td>
 
-                    <td className="py-3.5 align-top text-right whitespace-nowrap">
+                    <td className="py-4 pl-3 pr-5 align-top text-right whitespace-nowrap">
                       <InquiryActions
                         email={inq.email}
                         phone={phone}
@@ -347,16 +347,16 @@ const AdminInquiriesPage = (props) => {
           </table>
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-2xs">
           <table className="w-full text-left text-xs min-w-[700px]">
             <thead>
-              <tr className="border-b border-slate-100 text-slate-400 font-semibold uppercase text-[10px]">
-                <th className="pb-3 min-w-[170px]">Customer</th>
-                <th className="pb-3 min-w-[120px]">Subject</th>
-                <th className="pb-3 min-w-[260px]">Customer Message</th>
-                <th className="pb-3 min-w-[110px]">Resolution</th>
-                <th className="pb-3 min-w-[80px]">Date</th>
-                <th className="pb-3 text-right pr-2 min-w-[130px]">Actions</th>
+              <tr className="border-b border-slate-200/80 bg-slate-50/80 text-slate-500 font-bold uppercase text-[10px]">
+                <th className="py-3 pl-5 pr-3 min-w-[180px]">Customer</th>
+                <th className="py-3 px-3 min-w-[130px]">Subject</th>
+                <th className="py-3 px-3 min-w-[270px]">Customer Message</th>
+                <th className="py-3 px-3 min-w-[120px]">Resolution</th>
+                <th className="py-3 px-3 min-w-[80px]">Date</th>
+                <th className="py-3 pl-3 pr-5 text-right min-w-[140px]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -365,28 +365,28 @@ const AdminInquiriesPage = (props) => {
                 const timeStr = inq.createdAt ? new Date(inq.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric" }) : "";
 
                 return (
-                  <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/50 text-slate-500" : "hover:bg-slate-50/60 text-slate-700"}`}>
-                    <td className="py-3.5 align-top">
+                  <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/60 text-slate-500" : "hover:bg-slate-50/60 text-slate-700"}`}>
+                    <td className="py-4 pl-5 pr-3 align-top">
                       <CustomerInfo name={inq.name} email={inq.email} phone={phone} />
                     </td>
-                    <td className="py-3.5 align-top">
+                    <td className="py-4 px-3 align-top">
                       <span className="inline-block rounded bg-slate-100 border border-slate-200/60 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
                         {inq.subject || "General"}
                       </span>
                     </td>
-                    <td className="py-3.5 align-top max-w-sm">
+                    <td className="py-4 px-3 align-top max-w-sm">
                       <ExpandableMessage text={inq.message} />
                     </td>
-                    <td className="py-3.5 align-top whitespace-nowrap">
+                    <td className="py-4 px-3 align-top whitespace-nowrap">
                       <ResolutionToggle
                         isResolved={inq.isResolved}
                         onClick={() => handleToggleResolve(inq._id || inq.id, inq.isResolved)}
                       />
                     </td>
-                    <td className="py-3.5 align-top text-[11px] text-slate-400 whitespace-nowrap">
+                    <td className="py-4 px-3 align-top text-[11px] text-slate-400 whitespace-nowrap">
                       {timeStr || "Recent"}
                     </td>
-                    <td className="py-3.5 align-top text-right whitespace-nowrap">
+                    <td className="py-4 pl-3 pr-5 align-top text-right whitespace-nowrap">
                       <InquiryActions
                         email={inq.email}
                         phone={phone}
