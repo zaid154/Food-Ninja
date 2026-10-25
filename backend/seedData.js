@@ -9,6 +9,7 @@ const Review = require("./models/reviewModel");
 const Order = require("./models/orderModel");
 const Category = require("./models/categoryModel");
 const seedDishes = require("./data/seedDishes");
+const { realisticReviews, realisticOrders } = require("./data/seedOrdersAndReviews");
 
 dotenv.config({ path: path.resolve(__dirname, ".env") });
 
@@ -29,7 +30,9 @@ const defaultCategories = [
 const realisticUsers = [
   { name: "Store Administrator", email: "admin@foodninja.com", password: "admin123", role: "admin", phone: "9988776655", address: "Food Ninja HQ, Connaught Place, New Delhi - 110001" },
   { name: "Mohd Zaid", email: "zaid@foodninja.com", password: "password123", role: "user", phone: "9999201255", address: "B-13/2, Street No-07, Delhi NCR - 110094" },
-  { name: "Sara Khan", email: "sara@foodninja.com", password: "password123", role: "user", phone: "9876543210", address: "Flat 204, Lotus Heights, Indirapuram, Ghaziabad - 201014" }
+  { name: "Sara Khan", email: "sara@foodninja.com", password: "password123", role: "user", phone: "9876543210", address: "Flat 204, Lotus Heights, Indirapuram, Ghaziabad - 201014" },
+  { name: "Aarav Sharma", email: "aarav@gmail.com", password: "password123", role: "user", phone: "9811223344", address: "House 42, Block C, Green Park, New Delhi - 110016" },
+  { name: "Priya Verma", email: "priya.verma@gmail.com", password: "password123", role: "user", phone: "9871100223", address: "Tower B-502, Ace City, Sector 1, Greater Noida West - 201306" }
 ];
 
 const ourSignatureDishes = [
@@ -99,140 +102,61 @@ const ourSignatureDishes = [
   }
 ];
 
-const portionDishNames = new Set([
-  "Hyderabadi Dum Biryani", "Paneer Butter Masala", "Butter Chicken (Murgh Makhani)", "Murgh Makhani (Butter Chicken)",
-  "Dal Makhani Charcoal Simmered", "Kadai Paneer", "Chicken Tikka Masala", "Shahi Malai Kofta", "Purani Dilli Nihari Gosht",
-  "Awadhi Dum Murgh Biryani", "Royal Rajasthani Laal Maas", "Govind Gatta Curry", "Kashmiri Mutton Rogan Josh",
-  "Kashmiri Dum Aloo", "Kashmiri Gushtaba (Wazwan Special)", "Kolhapuri Mutton Sukka", "Goan Chicken Xacuti",
-  "Chettinad Pepper Chicken", "Andhra Gongura Mutton Curry", "Alleppey Fish Curry with Coconut Milk", "Bengali Macher Jhol (Rohu Fish Curry)"
+const noPortionNames = new Set([
+  "Chocolate Belgian Thick Shake", "Kashmiri Shahi Kehwa with Almonds", "Madurai Special Jigarthanda",
+  "South Indian Filter Coffee (2 Cups)", "Crispy Chicken Zinger Burger", "Classic Mumbai Vada Pav (2 Pcs)",
+  "Double Smash Cheeseburger with Brioche", "Mathura Ke Pede (250g)", "Rajasthani Malai Ghevar",
+  "Silao Ka Khaja (250g)", "Bihari Traditional Thekua (250g)", "Crispy Fafda Jalebi Combo",
+  "Maharashtrian Puran Poli (2 Pcs)", "Steamed Ukadiche Modak (4 Pcs)", "Traditional Goan Bebinca (2 Slices)",
+  "Traditional Mysore Pak (250g)", "Kolkata Sponge Rosogolla (4 Pcs)", "Baked Mishti Doi (Clay Pot)",
+  "Odisha Chhena Poda", "Classic Italian Tiramisu", "Thai Mango Sticky Rice with Coconut Cream",
+  "New York Style Baked Cheesecake", "Steamed Chicken Momos (8 Pcs)", "Steamed Crystal Prawn Dim Sum (6 Pcs)",
+  "Salmon Avocado California Sushi Roll (8 Pcs)", "Gujarati Nylon Khaman Dhokla", "Gujarati Khandvi Rolls",
+  "Kanda Batata Poha", "Jodhpur Pyaaz Ki Kachori (2 Pcs)", "Maddur Vada Crispy Snack (4 Pcs)",
+  "Steamed Idli & Medu Vada Combo"
 ]);
 
 const addSeedPortionPrices = (dish) => {
-  if (!portionDishNames.has(dish.name)) return dish;
+  if (dish.category === "Beverages" || dish.category === "Burgers" || noPortionNames.has(dish.name)) {
+    return { ...dish, hasPortions: false };
+  }
+
   const fullPrice = Number(dish.price) || 0;
   const roundToTen = (amt) => Math.max(10, Math.round(amt / 10) * 10);
-  return { ...dish, hasPortions: true, halfPrice: roundToTen(fullPrice * 0.7), quarterPrice: roundToTen(fullPrice * 0.4) };
+  const halfPrice = roundToTen(fullPrice * 0.65);
+  const quarterPrice = roundToTen(fullPrice * 0.40);
+
+  let servingInfo = "Full Plate: Standard · Half Plate: Regular · Quarter: Small";
+  if (dish.category === "Biryani") {
+    servingInfo = "Full: 750g (Serves 2–3) · Half: 450g (Serves 1–2) · Quarter: 250g (Serves 1)";
+  } else if (dish.category === "North Indian" || dish.category === "Indian") {
+    servingInfo = "Full: 650ml (Serves 2–3) · Half: 400ml (Serves 1–2) · Quarter: 220ml (Serves 1)";
+  } else if (dish.category === "Chinese" || dish.category === "Asian") {
+    servingInfo = "Full: 500g (Serves 2) · Half: 320g (Serves 1) · Quarter: 200g (Quick Bite)";
+  } else if (dish.category === "Rolls") {
+    servingInfo = "Full (Double Roll) · Half (Single Roll) · Quarter (Tasting Wrap)";
+  } else if (dish.category === "Street Food") {
+    servingInfo = "Full Plate (Double) · Half Plate (Single) · Quarter (Quick Taste)";
+  }
+
+  return {
+    ...dish,
+    hasPortions: true,
+    halfPrice,
+    quarterPrice,
+    servingInfo
+  };
 };
 
 const loadAllFoods = () => {
-  const possiblePaths = [
-    path.resolve(__dirname, "../../recipes.txt"),
-    path.resolve(__dirname, "../recipes.txt"),
-    path.resolve(__dirname, "recipes.txt")
-  ];
-
-  let rawRecipes = [];
-  for (const p of possiblePaths) {
-    if (fs.existsSync(p)) {
-      try {
-        const rawData = fs.readFileSync(p, "utf8");
-        const parsed = JSON.parse(rawData);
-        rawRecipes = parsed.recipes || [];
-        break;
-      } catch {}
-    }
-  }
-
-  const categoryMap = (item) => {
-    const n = item.name.toLowerCase();
-    const tags = (item.tags || []).map((t) => t.toLowerCase());
-    if (n.includes("biryani") || tags.includes("biryani")) return "Biryani";
-    if (n.includes("pizza") || tags.includes("pizza")) return "Pizza";
-    if (n.includes("burger") || tags.includes("burger")) return "Burgers";
-    if (n.includes("noodles") || n.includes("ramen") || n.includes("stir-fry") || n.includes("momo")) return "Chinese";
-    if (n.includes("pasta") || n.includes("alfredo") || n.includes("bruschetta")) return "Italian";
-    if (n.includes("keema") || n.includes("karahi") || n.includes("saag") || n.includes("paneer")) return "North Indian";
-    if (n.includes("kebab") || n.includes("roll")) return "Rolls";
-    if (n.includes("cookie") || n.includes("cake") || n.includes("dessert") || tags.includes("dessert")) return "Desserts";
-    if (n.includes("shake") || n.includes("smoothie") || n.includes("drink")) return "Beverages";
-    return item.cuisine || "Specialty";
-  };
-
-  const isItemVeg = (ingredients) => {
-    const nonVegKeywords = ["chicken", "beef", "shrimp", "mutton", "pork", "fish", "meat", "lamb", "egg", "bacon", "salmon"];
-    const ingText = ingredients.join(" ").toLowerCase();
-    return !nonVegKeywords.some((kw) => ingText.includes(kw));
-  };
-
   let idCounter = 1;
   const combined = [];
 
   ourSignatureDishes.forEach((d) => combined.push({ ...d, id: idCounter++ }));
-
-  rawRecipes.forEach((r) => {
-    const isVeg = isItemVeg(r.ingredients || []);
-    const base = 140 + (r.id * 7) % 180;
-    const price = Math.round(base / 10) * 10;
-    combined.push({
-      id: idCounter++, name: r.name, category: categoryMap(r), price,
-      caloriesPerServing: r.caloriesPerServing || price, image: r.image, isVeg, dietary: isVeg ? "Veg" : "Non-Veg",
-      rating: r.rating || 4.7, reviewCount: r.reviewCount || 75,
-      deliveryTime: `${(r.prepTimeMinutes || 15) + 10}-${(r.prepTimeMinutes || 15) + 20} mins`,
-      cuisine: r.cuisine || "Continental",
-      description: `Delicious ${r.cuisine || "chef-crafted"} style ${r.name}, prepared fresh with aromatic herbs and premium quality ingredients.`,
-      ingredients: r.ingredients || [], instructions: r.instructions || []
-    });
-  });
-
   seedDishes.forEach((d) => combined.push({ ...d, id: idCounter++ }));
+
   return combined.map(addSeedPortionPrices);
 };
-
-const realisticReviews = [
-  { recipeId: 1, userName: "Mohd Zaid", userEmail: "zaid@foodninja.com", rating: 5, comment: "The Hyderabadi Dum Biryani is absolutely top tier! The aroma of saffron and tender chicken melted in every bite. Highly recommended!" },
-  { recipeId: 1, userName: "Sara Khan", userEmail: "sara@foodninja.com", rating: 5, comment: "Piping hot delivery and authentic royal spices. The portion size easily serves two. Will definitely order again!" },
-  { recipeId: 2, userName: "Mohd Zaid", userEmail: "zaid@foodninja.com", rating: 5, comment: "Best Paneer Butter Masala in town! Silky, velvety gravy with fresh soft paneer cubes that melt instantly." },
-  { recipeId: 2, userName: "Aarav Sharma", userEmail: "aarav@gmail.com", rating: 4, comment: "Creamy and rich tomato-cashew sauce with great flavor balance. Pairs amazingly well with butter naan." },
-  { recipeId: 3, userName: "Sara Khan", userEmail: "sara@foodninja.com", rating: 5, comment: "Cheese burst crust actually oozes with cheese! Much better quality and fresher crust than big commercial chains." },
-  { recipeId: 4, userName: "Rohan Kapoor", userEmail: "rohan@gmail.com", rating: 5, comment: "Super crunchy chicken zinger! Lettuce was fresh and the mayo spice blend was spot on." },
-  { recipeId: 39, userName: "Mohd Zaid", userEmail: "zaid@foodninja.com", rating: 5, comment: "Authentic Amritsari taste! The dark pindi chole had that genuine anardana tang, and bhature were fluffy and non-greasy." },
-  { recipeId: 39, userName: "Sara Khan", userEmail: "sara@foodninja.com", rating: 5, comment: "Sunday brunch perfection. Came with delicious pickled onions and green chili chutney." },
-  { recipeId: 40, userName: "Mohd Zaid", userEmail: "zaid@foodninja.com", rating: 5, comment: "Rich, authentic old Delhi style butter chicken. Charcoal-smoked tandoori chicken chunks in pure buttery gravy!" },
-  { recipeId: 41, userName: "Sara Khan", userEmail: "sara@foodninja.com", rating: 5, comment: "Slow cooked charcoal aroma is unmistakable. Pure white butter richness with creamy black lentils." },
-  { recipeId: 58, userName: "Mohd Zaid", userEmail: "zaid@foodninja.com", rating: 5, comment: "Royal feast! Desi ghee fragrance filled the room. The churma was sweet and nutty, and dal had authentic marwari tadka." },
-  { recipeId: 75, userName: "Sara Khan", userEmail: "sara@foodninja.com", rating: 5, comment: "Tastes straight out of Chowpatty! Buttery, spiced bhaji and soft butter-toasted pav buns." },
-  { recipeId: 89, userName: "Mohd Zaid", userEmail: "zaid@foodninja.com", rating: 5, comment: "Paper thin golden crisp dosa with fragrant potato masala and authentic coconut chutney. 10/10!" }
-];
-
-const realisticOrders = [
-  {
-    id: 1001, userEmail: "zaid@foodninja.com", customerName: "Mohd Zaid", phone: "9999201255", address: "B-13/2, Street No-07, Delhi NCR - 110094", payment: "UPI / Online Payment",
-    items: [
-      { id: 1, name: "Hyderabadi Dum Biryani", price: 260, quantity: 1, isVeg: false, image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=80" },
-      { id: 2, name: "Paneer Butter Masala", price: 220, quantity: 1, isVeg: true, image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&auto=format&fit=crop&q=80" }
-    ],
-    subtotal: 480, deliveryFee: 30, taxes: 24, total: 534, estDelivery: "Delivered", status: "Delivered",
-    date: new Date(Date.now() - 24 * 60 * 60 * 1000).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
-  },
-  {
-    id: 1002, userEmail: "zaid@foodninja.com", customerName: "Mohd Zaid", phone: "9999201255", address: "B-13/2, Street No-07, Delhi NCR - 110094", payment: "Cash on Delivery",
-    items: [
-      { id: 39, name: "Amritsari Chole Bhature", price: 160, quantity: 2, isVeg: true, image: "https://images.unsplash.com/photo-1626132647523-66f5bf380027?w=800&auto=format&fit=crop&q=80" },
-      { id: 40, name: "Murgh Makhani (Butter Chicken)", price: 340, quantity: 1, isVeg: false, image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&auto=format&fit=crop&q=80" },
-      { id: 89, name: "Crispy Masala Dosa", price: 140, quantity: 1, isVeg: true, image: "https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=800&auto=format&fit=crop&q=80" }
-    ],
-    subtotal: 800, deliveryFee: 0, taxes: 40, total: 840, estDelivery: "Delivered", status: "Delivered",
-    date: new Date(Date.now() - 48 * 60 * 60 * 1000).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
-  },
-  {
-    id: 1003, userEmail: "sara@foodninja.com", customerName: "Sara Khan", phone: "9876543210", address: "Flat 204, Lotus Heights, Indirapuram, Ghaziabad - 201014", payment: "Credit Card",
-    items: [
-      { id: 1, name: "Hyderabadi Dum Biryani", price: 260, quantity: 1, isVeg: false, image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=80" },
-      { id: 3, name: "Farmhouse Cheese Burst Pizza", price: 320, quantity: 1, isVeg: true, image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80" },
-      { id: 41, name: "Dal Makhani Charcoal Simmered", price: 240, quantity: 1, isVeg: true, image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&auto=format&fit=crop&q=80" }
-    ],
-    subtotal: 820, deliveryFee: 30, taxes: 41, total: 891, estDelivery: "Delivered", status: "Delivered",
-    date: new Date(Date.now() - 12 * 60 * 60 * 1000).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
-  },
-  {
-    id: 1004, userEmail: "zaid@foodninja.com", customerName: "Mohd Zaid", phone: "9999201255", address: "B-13/2, Street No-07, Delhi NCR - 110094", payment: "UPI / Online Payment",
-    items: [
-      { id: 75, name: "Mumbai Butter Pav Bhaji", price: 170, quantity: 2, isVeg: true, image: "https://images.unsplash.com/photo-1606471191009-63994c53433b?w=800&auto=format&fit=crop&q=80" }
-    ],
-    subtotal: 340, deliveryFee: 30, taxes: 17, total: 387, estDelivery: "Delivered", status: "Delivered",
-    date: new Date(Date.now() - 3 * 60 * 60 * 1000).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
-  }
-];
 
 const seed = async () => {
   try {
@@ -243,18 +167,46 @@ const seed = async () => {
     await mongoose.connect(mongoUri);
 
     const allFoods = loadAllFoods();
+
+    // 1. Users
     await User.deleteMany({});
     await User.insertMany(realisticUsers);
+
+    // 2. Categories
     await Category.deleteMany({});
     await Category.insertMany(defaultCategories);
+
+    // 3. Recipes / Dishes
     await Recipe.deleteMany({});
     await Recipe.insertMany(allFoods);
+
+    // 4. Reviews (55+ authentic reviews)
     await Review.deleteMany({});
     await Review.insertMany(realisticReviews);
+
+    // Update real review averages and counts in Recipes
+    const reviewStats = await Review.aggregate([
+      { $group: { _id: "$recipeId", count: { $sum: 1 }, avgRating: { $avg: "$rating" } } }
+    ]);
+    for (const stat of reviewStats) {
+      await Recipe.findOneAndUpdate(
+        { id: stat._id },
+        { rating: Number(stat.avgRating.toFixed(1)), reviewCount: stat.count }
+      );
+    }
+
+    // 5. Orders (18 realistic orders with portions)
     await Order.deleteMany({});
     await Order.insertMany(realisticOrders);
 
-    console.log(`Seeded: ${allFoods.length} dishes, ${defaultCategories.length} categories, ${realisticUsers.length} users, ${realisticReviews.length} reviews, ${realisticOrders.length} orders.`);
+    console.log(`=======================================================`);
+    console.log(`DATABASE SEEDED SUCCESSFULLY!`);
+    console.log(`- Dishes: ${allFoods.length} (${allFoods.filter(f => f.hasPortions).length} with Full/Half/Quarter Portions)`);
+    console.log(`- Categories: ${defaultCategories.length}`);
+    console.log(`- Users: ${realisticUsers.length}`);
+    console.log(`- Reviews: ${realisticReviews.length} Authentic Customer Reviews across products`);
+    console.log(`- Orders: ${realisticOrders.length} Realistic Orders in Order History`);
+    console.log(`=======================================================`);
     process.exit(0);
   } catch (error) {
     console.error("Error seeding database:", error);
