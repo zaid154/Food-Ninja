@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL, LOGO } from "../utils/Constants";
+import { useAppDialog } from "./AppDialog";
 
 const RegisterPage = () => {
     const [name, setName] = useState("");
@@ -12,6 +13,7 @@ const RegisterPage = () => {
     const [submitting, setSubmitting] = useState(false);
 
     const navigate = useNavigate();
+    const { alert: showDialog } = useAppDialog();
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -44,7 +46,11 @@ const RegisterPage = () => {
             const data = await res.json();
 
             if (res.ok) {
-                alert("Account created successfully! Please login with your credentials.");
+                await showDialog("Your account is ready. Sign in with your new credentials.", {
+                    title: "Account created",
+                    variant: "success",
+                    confirmLabel: "Go to Sign In",
+                });
                 navigate("/login");
             } else {
                 setError(data.message || "Registration failed. Please try a different email.");

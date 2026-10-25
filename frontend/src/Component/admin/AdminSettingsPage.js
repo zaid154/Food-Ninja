@@ -3,10 +3,44 @@ import { useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
 import { getKitchenHoursClosedNotice, getStoreCurrentMinutes } from "../../utils/storeNotices";
 import { calculateOrderPricing } from "../../utils/orderPricing";
+import AdminDropdown from "./AdminDropdown";
+import { useAppDialog } from "../AppDialog";
+
+const TIME_HOUR_OPTIONS = Array.from({ length: 24 }, (_, hour) => String(hour).padStart(2, "0"));
+const TIME_MINUTE_OPTIONS = Array.from({ length: 60 }, (_, minute) => String(minute).padStart(2, "0"));
+
+const OperatingTimePicker = ({ label, value = "06:00", onChange }) => {
+  const [hour = "06", minute = "00"] = value.split(":");
+  const triggerClassName = "!rounded-lg !border-0 !bg-transparent !px-2 !py-2.5 font-mono text-xs";
+
+  return (
+    <div>
+      <span className="block text-[10px] text-slate-500 font-semibold mb-1">{label}</span>
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center rounded-xl border border-slate-200 bg-slate-50/50 px-1 focus-within:border-emerald-500">
+        <AdminDropdown
+          value={hour}
+          options={TIME_HOUR_OPTIONS}
+          onChange={(nextHour) => onChange(`${nextHour}:${minute}`)}
+          compact
+          triggerClassName={triggerClassName}
+        />
+        <span className="font-mono text-xs text-slate-700">:</span>
+        <AdminDropdown
+          value={minute}
+          options={TIME_MINUTE_OPTIONS}
+          onChange={(nextMinute) => onChange(`${hour}:${nextMinute}`)}
+          compact
+          triggerClassName={triggerClassName}
+        />
+      </div>
+    </div>
+  );
+};
 
 const AdminSettingsPage = (props) => {
   const context = useOutletContext() || {};
-  const showToast = props.showToast || context.showToast || alert;
+  const { alert: showDialog } = useAppDialog();
+  const showToast = props.showToast || context.showToast || showDialog;
 
   const [settings, setSettings] = useState({
     restaurantName: "Food Ninja",
@@ -30,6 +64,8 @@ const AdminSettingsPage = (props) => {
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [billPreviewMode, setBillPreviewMode] = useState("customer");
+  const [isBillPreviewOpen, setIsBillPreviewOpen] = useState(false);
 
   const fetchSettings = async () => {
     try {
@@ -82,10 +118,10 @@ const AdminSettingsPage = (props) => {
       if (res.ok) {
         showToast("All settings & legal details saved successfully!");
       } else {
-        alert(data.message || "Failed to save settings.");
+        showDialog(data.message || "Failed to save settings.", { title: "Could not save settings", variant: "error" });
       }
     } catch {
-      alert("Error connecting to server.");
+      showDialog("Could not connect to the server. Please try again.", { title: "Connection error", variant: "error" });
     } finally {
       setSaving(false);
     }
@@ -113,8 +149,21 @@ const AdminSettingsPage = (props) => {
     }));
   };
 
-  // Live computed preview values
-  const previewSubtotal = 1490;
+  // Sample bill used to preview how the saved settings print on a two-item order.
+  const previewItems = [
+    { name: "Butter Chicken", portionSize: "Full Plate", quantity: 1, price: 850 },
+    { name: "Paneer Tikka Masala", portionSize: "Half Plate", quantity: 2, price: 320 },
+  ];
+  const previewQuantity = previewItems.reduce((sum, item) => sum + item.quantity, 0);
+  const previewDate = new Date().toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const previewSubtotal = previewItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
   const previewPricing = calculateOrderPricing({ subtotal: previewSubtotal, settings });
   const { taxes: previewTax, packagingFee: previewPackagingFee, deliveryFee: previewDelivery, grandTotal: previewGrandTotal } = previewPricing;
 
@@ -130,6 +179,7 @@ const AdminSettingsPage = (props) => {
       ? currentMinutes >= openingMinutes && currentMinutes < closingMinutes
       : currentMinutes >= openingMinutes || currentMinutes < closingMinutes;
   const isPreviewOpen = settings.restaurantOpen !== false && (settings.autoScheduleEnabled === false || isWithinHours);
+  const showClosedNoticeEditor = !isPreviewOpen;
   const previewBannerText = settings.closedNoticeMessage?.trim()
     || (!isWithinHours
       ? getKitchenHoursClosedNotice(settings.operatingHoursText)
@@ -148,6 +198,14 @@ const AdminSettingsPage = (props) => {
         </div>
 
         <div className="flex items-center gap-3 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setIsBillPreviewOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-xs transition hover:border-emerald-300 hover:text-emerald-800"
+          >
+            <svg className="h-3.5 w-3.5 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 3h16v18l-3-2-3 2-3-2-3 2-4-2z" /><path d="M8 8h8M8 12h8M8 16h4" /></svg>
+            Bill Preview
+          </button>
           <span
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold border ${
               isPreviewOpen
@@ -179,8 +237,8 @@ const AdminSettingsPage = (props) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <form onSubmit={handleSave} className="lg:col-span-7 space-y-5">
+      <div className="space-y-6">
+        <form onSubmit={handleSave} className="space-y-5">
           <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
             <div className="border-b border-slate-100 pb-3">
               <h2 className="font-bold text-slate-900 text-sm">Restaurant Brand & Compliance</h2>
@@ -331,7 +389,7 @@ const AdminSettingsPage = (props) => {
 
             <div className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1.5">Live Store Status</label>
+                <label className="block font-bold text-slate-700 mb-1.5">Manual Store Status</label>
                 <div className="grid grid-cols-2 gap-3 max-w-md">
                   <button
                     type="button"
@@ -358,9 +416,12 @@ const AdminSettingsPage = (props) => {
                     <span>Closed (Pause)</span>
                   </button>
                 </div>
+                <p className="mt-2 max-w-md text-[10px] text-slate-400">
+                  Open clears the manual pause. If auto-close is enabled, orders still stop outside kitchen hours.
+                </p>
               </div>
 
-              {!settings.restaurantOpen && (
+              {showClosedNoticeEditor && (
                 <div className="max-w-md space-y-2">
                   <label className="block font-bold text-slate-700">Custom Pause / Closed Notice <span className="text-slate-400 font-normal">(Optional)</span></label>
                   <textarea
@@ -386,7 +447,7 @@ const AdminSettingsPage = (props) => {
                       </button>
                     ))}
                   </div>
-                  <span className="text-[10px] text-slate-400 block">Shown on the storefront header, cart, and checkout when store is paused</span>
+                  <span className="text-[10px] text-slate-400 block">Shown on the storefront header, cart, and checkout whenever the store is closed</span>
                   <button
                     type="button"
                     onClick={handleSave}
@@ -407,24 +468,16 @@ const AdminSettingsPage = (props) => {
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <span className="block text-[10px] text-slate-500 font-semibold mb-1">Opening Time</span>
-                    <input
-                      type="time"
-                      value={settings.openingTime || "06:00"}
-                      onChange={(e) => updateHours(e.target.value, undefined)}
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono text-xs bg-slate-50/50"
-                    />
-                  </div>
-                  <div>
-                    <span className="block text-[10px] text-slate-500 font-semibold mb-1">Closing Time</span>
-                    <input
-                      type="time"
-                      value={settings.closingTime || "20:00"}
-                      onChange={(e) => updateHours(undefined, e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono text-xs bg-slate-50/50"
-                    />
-                  </div>
+                  <OperatingTimePicker
+                    label="Opening Time"
+                    value={settings.openingTime || "06:00"}
+                    onChange={(value) => updateHours(value, undefined)}
+                  />
+                  <OperatingTimePicker
+                    label="Closing Time"
+                    value={settings.closingTime || "20:00"}
+                    onChange={(value) => updateHours(undefined, value)}
+                  />
                 </div>
                 <span className="text-[10px] text-slate-400 mt-1 block">
                   Displayed to customers on the header and during closed hours. Schedule uses India Standard Time (IST).
@@ -493,95 +546,120 @@ const AdminSettingsPage = (props) => {
           </div>
         </form>
 
-        <aside className="lg:col-span-5 sticky top-20 space-y-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+        {isBillPreviewOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-3" onClick={() => setIsBillPreviewOpen(false)}>
+          <div role="dialog" aria-modal="true" aria-label="Live POS KOT and bill preview" className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="space-y-2.5 pb-2.5 border-b border-slate-100">
+              <div className="flex items-center justify-between gap-2 text-xs font-bold text-slate-800">
+                <div className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
                 <span>Live POS KOT & Bill Preview</span>
-              </span>
-              <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">
-                80mm Thermal
-              </span>
-            </div>
-
-            <div className="mt-3 p-3.5 bg-slate-50/70 rounded-xl border border-dashed border-slate-300 font-mono text-slate-800 text-[11px] leading-tight space-y-2">
-              <div className="text-center pb-2 border-b border-dashed border-slate-300">
-                <h3 className="text-sm font-black tracking-wider text-slate-900 uppercase">
-                  {settings.restaurantName || "FOOD NINJA"}
-                </h3>
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
-                  Tax Invoice & Delivery Bill
-                </p>
-                <p className="text-[9px] text-slate-600 mt-1 font-semibold">
-                  FSSAI: {settings.fssaiNumber || "10020011000123"}
-                </p>
-                <p className="text-[9px] text-slate-600 font-semibold">
-                  GSTIN: {settings.gstinNumber || "07AAAAF1234A1Z5"}
-                </p>
-                {settings.storeAddress && (
-                  <p className="text-[8.5px] text-slate-400 mt-1 truncate">
-                    {settings.storeAddress}
-                  </p>
-                )}
-                {settings.storePhone && (
-                  <p className="text-[8.5px] text-slate-400">
-                    Phone: {settings.storePhone}
-                  </p>
-                )}
+                </div>
+                <button type="button" onClick={() => setIsBillPreviewOpen(false)} aria-label="Close bill preview" className="rounded-md px-2 py-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700">✕</button>
               </div>
-
-              <div className="py-1 text-[10px] space-y-0.5 border-b border-dashed border-slate-300">
-                <div className="flex justify-between">
-                  <span className="font-bold">ORDER #LIVE-PREVIEW</span>
-                  <span className="text-slate-400">Today</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>CUSTOMER: Mohd Zaid</span>
-                  <span className="rounded bg-amber-100 text-amber-950 font-black px-1.5 py-0.5 border border-amber-300 text-[9px]">
-                    COD: COLLECT ₹{previewGrandTotal}
-                  </span>
-                </div>
-              </div>
-
-              <div className="py-1 text-[10.5px] space-y-1">
-                <div className="flex justify-between text-slate-600">
-                  <span>Item Subtotal</span>
-                  <span>₹{previewSubtotal}</span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Delivery Fee</span>
-                  <span>{previewDelivery === 0 ? "FREE" : `₹${previewDelivery}`}</span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Packaging / Handling</span>
-                  <span>₹{previewPackagingFee}</span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>GST ({settings.taxRate ?? 5}%)</span>
-                  <span>₹{previewTax}</span>
-                </div>
-                <div className="flex justify-between text-emerald-700">
-                  <span>Discount</span>
-                  <span>−₹{previewPricing.discountAmount}</span>
-                </div>
-                <div className="flex justify-between pt-1 border-t border-slate-300 text-xs font-black text-slate-900">
-                  <span>GRAND TOTAL</span>
-                  <span className="text-emerald-700">₹{previewGrandTotal}</span>
-                </div>
-              </div>
-
-              <div className="p-1.5 rounded-lg border border-amber-300 bg-amber-50 text-center text-[9px] text-amber-950">
-                <span className="font-black block">★ CASH TO COLLECT: ₹{previewGrandTotal} ★</span>
-                <span className="text-[8px] text-slate-600">Rider Note: Collect cash before handover</span>
-              </div>
-
-              <div className="pt-2 border-t border-dashed border-slate-300 text-center text-[9px] text-slate-400">
-                <p className="font-bold text-slate-600">*** CUSTOMER BILL & DELIVERY CHALLAN ***</p>
-                <p className="mt-0.5">Edits above update on printed slips immediately</p>
+              <div className="grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1 text-[10px] font-bold" aria-label="Preview type">
+                {[['kot', 'KOT'], ['customer', 'Bill']].map(([mode, label]) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setBillPreviewMode(mode)}
+                    aria-pressed={billPreviewMode === mode}
+                    className={`rounded-lg px-1.5 py-2 transition ${billPreviewMode === mode ? "bg-white text-emerald-800 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
+                  >
+                    <span className="block">{label}</span>
+                    <span className="mt-0.5 block text-[8px] font-medium opacity-70">{mode === "kot" ? "Kitchen copy" : "Customer copy"}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
+            <div className="mt-2.5 rounded-xl border border-dashed border-slate-300 bg-slate-50/70 p-2.5 font-mono text-[10px] leading-tight text-slate-800 space-y-1.5">
+              <div className="max-h-[62vh] overflow-y-auto pr-1">
+                <div className="border-b border-dashed border-slate-300 pb-1.5 text-center">
+                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-900">{settings.restaurantName || "FOOD NINJA"}</h3>
+                  {billPreviewMode !== "kot" && <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-500">Tax Invoice & Delivery Bill</p>}
+                  {billPreviewMode === "customer" && (
+                  <>
+                    <p className="mt-1 text-[9px] font-semibold text-slate-600">FSSAI: {settings.fssaiNumber || "10020011000123"}</p>
+                    <p className="text-[9px] font-semibold text-slate-600">GSTIN: {settings.gstinNumber || "07AAAAF1234A1Z5"}</p>
+                    {settings.storeAddress && <p className="mt-1 truncate text-[8.5px] text-slate-400">{settings.storeAddress}</p>}
+                    {settings.storePhone && <p className="text-[8.5px] text-slate-400">Phone: {settings.storePhone}</p>}
+                  </>
+                  )}
+                </div>
+
+                <div className="space-y-1 border-b border-dashed border-slate-300 py-1.5 text-[10px]">
+                  <div className="flex justify-between gap-2"><span className="font-bold">{billPreviewMode === "kot" ? "KOT #LIVE-PREVIEW" : "ORDER #LIVE-PREVIEW"}</span><span className="shrink-0 text-slate-400">{previewDate}</span></div>
+                  <div className="flex justify-between gap-2"><span className="font-bold text-slate-600">TYPE</span><span>Home Delivery</span></div>
+                  <div><span className="font-bold text-slate-600">CUSTOMER: </span><span className="font-bold">Mohd Zaid</span></div>
+                  <div><span className="font-bold text-slate-600">PHONE: </span>+91 98765 43210</div>
+                  <div className="break-words"><span className="font-bold text-slate-600">ADDRESS: </span>Flat 402, Sunshine Heights, Sector 62, Noida</div>
+                  {billPreviewMode === "kot" ? (
+                    <>
+                      <div className="flex justify-between gap-2"><span className="font-bold text-slate-600">STATUS</span><span>New order</span></div>
+                      <div className="rounded-md bg-amber-50 px-2 py-1"><span className="font-bold">KITCHEN NOTE:</span> No special instructions</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-between gap-2"><span className="font-bold text-slate-600">PAYMENT MODE</span><span className="font-bold">Cash on Delivery</span></div>
+                      <div className="flex justify-between gap-2"><span className="font-bold text-slate-600">PAYMENT STATUS</span><span className="font-bold text-amber-800">Pending · Collect ₹{previewGrandTotal}</span></div>
+                    </>
+                  )}
+                </div>
+
+                <table className="w-full border-b border-dashed border-slate-300 text-[9px]">
+                  <thead>
+                    <tr className="border-b border-dashed border-slate-200 text-[8px] font-bold text-slate-500">
+                      <th className="py-1 text-left">ITEM</th>
+                      <th className="w-7 py-1 text-center">QTY</th>
+                      {billPreviewMode !== "kot" && <><th className="w-10 py-1 text-right">RATE</th><th className="w-12 py-1 text-right">TOTAL</th></>}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {previewItems.map((item) => (
+                      <tr key={item.name}>
+                        <td className="py-1.5 pr-1 font-semibold text-slate-800">{item.name}<span className="block text-[8px] font-normal text-slate-500">{item.portionSize}</span></td>
+                        <td className="py-1.5 text-center font-bold">{item.quantity}</td>
+                        {billPreviewMode !== "kot" && <><td className="py-1.5 text-right">₹{item.price}</td><td className="py-1.5 text-right font-bold">₹{item.quantity * item.price}</td></>}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {billPreviewMode !== "kot" && (
+                  <div>
+                    <div className="space-y-1 py-1 text-[10px]">
+                      <div className="flex justify-between text-slate-600"><span>Item Subtotal ({previewItems.length} items · {previewQuantity} qty)</span><span>₹{previewSubtotal}</span></div>
+                      <div className="flex justify-between text-slate-600"><span>Delivery Fee</span><span>{previewDelivery === 0 ? "FREE" : `₹${previewDelivery}`}</span></div>
+                      {billPreviewMode === "customer" && (
+                        <>
+                          <div className="flex justify-between text-slate-600"><span>Packaging / Handling</span><span>₹{previewPackagingFee}</span></div>
+                          <div className="flex justify-between text-slate-600"><span>GST ({settings.taxRate ?? 5}%)</span><span>₹{previewTax}</span></div>
+                          <div className="flex justify-between text-emerald-700"><span>Discount</span><span>−₹{previewPricing.discountAmount}</span></div>
+                        </>
+                      )}
+                      <div className="flex justify-between border-t border-slate-300 pt-1 text-xs font-black text-slate-900">
+                        <span>GRAND TOTAL</span><span className="text-emerald-700">₹{previewGrandTotal}</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-1 rounded-lg border border-amber-300 bg-amber-50 p-1.5 text-center text-[9px] text-amber-950">
+                      <span className="block font-black">★ CASH TO COLLECT: ₹{previewGrandTotal} ★</span>
+                      <span className="text-[8px] text-slate-600">Rider: collect exact cash on handover</span>
+                    </div>
+                    {billPreviewMode === "customer" && (
+                      <>
+                        <div className="flex justify-between border-t border-dashed border-slate-300 pt-1.5 text-[8px] text-slate-500"><span>Rider: ______________</span><span>Customer: ______________</span></div>
+                        <div className="border-t border-dashed border-slate-300 pt-1.5 text-center text-[8px] text-slate-500">
+                          <p className="font-bold">CUSTOMER TAX INVOICE & DELIVERY BILL</p>
+                          <p>Thank you for ordering with {settings.restaurantName || "Food Ninja"}!</p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
             {!isPreviewOpen ? (
               <div className="mt-3 p-3 rounded-xl bg-rose-50/90 border border-rose-300 text-xs text-rose-950">
                 <span className="text-[10px] font-black text-rose-700 uppercase tracking-wider block mb-1">
@@ -602,7 +680,8 @@ const AdminSettingsPage = (props) => {
               </div>
             ) : null}
           </div>
-        </aside>
+        </div>
+        )}
       </div>
     </div>
   );

@@ -250,6 +250,7 @@ const CheckoutOrderSummary = ({ items, pricing, settings, submitting }) => {
                                 <img src={item.image || imageFallback} alt={item.name || item.title} className="h-12 w-12 shrink-0 rounded-xl border border-slate-100 bg-slate-50 object-cover" onError={(event) => { event.currentTarget.src = imageFallback; }} />
                                 <span className="min-w-0 flex-1">
                                     <strong className="block truncate leading-snug text-slate-900">{item.name || item.title}</strong>
+                                    {item.portionSize && <span className="mt-0.5 block text-[11px] text-emerald-700">{item.portionSize} Plate</span>}
                                     <span className="mt-0.5 block text-[11px] text-slate-400">Qty: {item.quantity || 1}</span>
                                 </span>
                             </span>
@@ -530,7 +531,7 @@ const CheckoutPage = () => {
             const orderRes = await fetch(`${API_BASE_URL}/payment/create-order`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: grandTotal }),
+                body: JSON.stringify({ amount: grandTotal, userEmail: baseOrder.userEmail }),
             });
             const data = await orderRes.json();
 

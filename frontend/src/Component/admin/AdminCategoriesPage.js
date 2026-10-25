@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
+import { useAppDialog } from "../AppDialog";
 
 const COLOR_PRESETS = [
   { label: "Emerald Pastel", bg: "bg-[#f4faee]", border: "border-[#d8ecd0]" },
@@ -15,9 +16,10 @@ const COLOR_PRESETS = [
 
 const AdminCategoriesPage = (props) => {
   const context = useOutletContext() || {};
+  const { confirm, alert: showDialog } = useAppDialog();
   const categories = props.categories || context.categories || [];
   const onRefresh = props.onRefresh || context.fetchData;
-  const showToast = props.showToast || context.showToast || alert;
+  const showToast = props.showToast || context.showToast || showDialog;
 
   const initialCategory = {
     name: "",
@@ -56,10 +58,10 @@ const AdminCategoriesPage = (props) => {
         setEditingId(null);
         if (onRefresh) onRefresh();
       } else {
-        alert(data.message || "Failed to save category.");
+        showDialog(data.message || "Failed to save category.", { title: "Could not save category", variant: "error" });
       }
     } catch {
-      alert("Error connecting to server.");
+      showDialog("Could not connect to the server. Please try again.", { title: "Connection error", variant: "error" });
     } finally {
       setSaving(false);
     }
@@ -79,7 +81,11 @@ const AdminCategoriesPage = (props) => {
   };
 
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`Are you sure you want to delete category "${name}"? Dishes in this category will remain safe.`)) return;
+    if (!await confirm(`Delete category "${name}"? Dishes in this category will remain safe.`, {
+      title: "Delete category?",
+      variant: "danger",
+      confirmLabel: "Delete Category",
+    })) return;
 
     try {
       const res = await fetch(`${API_BASE_URL}/categories/${id}`, { method: "DELETE" });
@@ -87,10 +93,10 @@ const AdminCategoriesPage = (props) => {
         showToast(`Category "${name}" deleted.`);
         if (onRefresh) onRefresh();
       } else {
-        alert("Failed to delete category.");
+        showDialog("Failed to delete category.", { title: "Could not delete category", variant: "error" });
       }
     } catch {
-      alert("Error connecting to server.");
+      showDialog("Could not connect to the server. Please try again.", { title: "Connection error", variant: "error" });
     }
   };
 
@@ -106,7 +112,7 @@ const AdminCategoriesPage = (props) => {
         if (onRefresh) onRefresh();
       }
     } catch {
-      alert("Failed to update status.");
+      showDialog("Failed to update category status.", { title: "Update failed", variant: "error" });
     }
   };
 
@@ -123,7 +129,7 @@ const AdminCategoriesPage = (props) => {
         if (onRefresh) onRefresh();
       }
     } catch {
-      alert("Failed to update featured showcase status.");
+      showDialog("Failed to update featured showcase status.", { title: "Update failed", variant: "error" });
     }
   };
 

@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { cancelOrder } from "../utils/ordersSlice";
 import UserContext from "./Usercontext";
 import { API_BASE_URL } from "../utils/Constants";
+import { useAppDialog } from "./AppDialog";
 
 // Clean, realistic status configuration (No random AI rainbow colors)
 const getStatusConfig = (status) => {
@@ -49,6 +50,7 @@ const OrdersPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { user } = useContext(UserContext);
+    const { confirm } = useAppDialog();
 
     const fetchOrders = async () => {
         try {
@@ -74,7 +76,11 @@ const OrdersPage = () => {
 
     const handleCancel = async (e, id) => {
         e.stopPropagation();
-        if (!window.confirm("Are you sure you want to cancel this order?")) return;
+        if (!await confirm("This order will be marked as cancelled.", {
+            title: "Cancel this order?",
+            variant: "warning",
+            confirmLabel: "Cancel Order",
+        })) return;
         try {
             await fetch(`${API_BASE_URL}/orders/${id}/status`, {
                 method: "PUT",

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const User = require("../models/userModel");
 
 // Check if valid keys are provided
 const getKeyId = () => process.env.RAZORPAY_KEY_ID || "";
@@ -26,10 +27,18 @@ router.get("/key", (req, res) => {
 // 2. Create Razorpay Order
 router.post("/create-order", async (req, res) => {
   try {
-    const { amount, currency = "INR", notes = {} } = req.body;
+    const { amount, currency = "INR", notes = {}, userEmail = "" } = req.body;
 
     if (!amount || amount <= 0) {
       return res.status(400).json({ success: false, message: "Invalid order amount" });
+    }
+
+    const normalizedEmail = typeof userEmail === "string" ? userEmail.trim().toLowerCase() : "";
+    if (normalizedEmail) {
+      const customer = await User.findOne({ email: normalizedEmail }).select("isBlocked");
+      if (customer?.isBlocked) {
+        return res.status(403).json({ success: false, message: "This account is blocked and cannot place orders. Please contact the restaurant for help." });
+      }
     }
 
     const amountInPaise = Math.round(Number(amount) * 100);

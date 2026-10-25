@@ -51,6 +51,10 @@ Razorpay keys are optional in local demo mode. Start the API with `npm run dev` 
 - A non-empty `closedNoticeMessage` is shown whenever the store is closed. Without one, the API supplies a default pause or kitchen-hours notice.
 - `POST /api/orders` checks the effective store status on the server and rejects order creation with HTTP `403` while closed.
 
+## Customer account blocking
+
+`PATCH /api/users/:id/block` accepts `{ "isBlocked": true }` to block a customer or `false` to unblock them. Admin accounts cannot be blocked. Blocked customers cannot log in, create orders, or start a payment checkout. Existing orders are left unchanged.
+
 ## API routes
 
 | Method | Endpoint | Purpose |
@@ -66,6 +70,7 @@ Razorpay keys are optional in local demo mode. Start the API with `npm run dev` 
 | `PUT` | `/api/orders/:id/status` | Update order status |
 | `POST` | `/api/users/register`, `/api/users/login` | Register or log in |
 | `GET` | `/api/users` | List users |
+| `PATCH` | `/api/users/:id/block` | Block or unblock a customer account |
 | `GET`, `POST` | `/api/categories` | List or create categories |
 | `PUT`, `DELETE` | `/api/categories/:id` | Update or delete a category |
 | `GET`, `POST` | `/api/contact` | List or create inquiries |

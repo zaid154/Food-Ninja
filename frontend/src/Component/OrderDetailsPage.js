@@ -6,6 +6,7 @@ import { API_BASE_URL } from "../utils/Constants";
 import UserContext from "./Usercontext";
 import OrderHelpModal from "./OrderHelpModal";
 import { getSavedOrderPricing } from "../utils/orderPricing";
+import { useAppDialog } from "./AppDialog";
 
 const TIMELINE_STEPS = [
     { key: "Placed", title: "Placed", desc: "Received by kitchen" },
@@ -84,6 +85,7 @@ const OrderDetailsPage = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { user } = useContext(UserContext);
+    const { confirm } = useAppDialog();
 
     const localOrders = useSelector((store) => store.orders.list);
     const [order, setOrder] = useState(() => {
@@ -155,7 +157,11 @@ const OrderDetailsPage = () => {
 
     const handleCancel = async () => {
         if (!order || order.status !== "Placed") return;
-        if (!window.confirm("Are you sure you want to cancel this order?")) return;
+        if (!await confirm("This order will be marked as cancelled.", {
+            title: "Cancel this order?",
+            variant: "warning",
+            confirmLabel: "Cancel Order",
+        })) return;
 
         try {
             setCancelling(true);
@@ -372,6 +378,7 @@ const OrderDetailsPage = () => {
                                                         <p className="text-xs text-slate-400">
                                                             {itemQty} × ₹{itemPrice}
                                                         </p>
+                                                        {it.portionSize && <span className="text-xs text-emerald-700">{it.portionSize} Plate</span>}
                                                         {order.status === "Delivered" && (
                                                             <Link
                                                                 to={`/restaurant/${it.id || it._id}#customer-reviews`}

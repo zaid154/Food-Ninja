@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
+import { useAppDialog } from "../AppDialog";
 
 const AdminInquiriesPage = (props) => {
   const context = useOutletContext() || {};
+  const { alert: showDialog } = useAppDialog();
   const inquiries = props.inquiries || context.inquiries || [];
   const onRefresh = props.onRefresh || context.fetchData;
   const onDeleteInquiry = props.onDeleteInquiry || context.handleDeleteInquiry;
-  const showToast = props.showToast || context.showToast || alert;
+  const showToast = props.showToast || context.showToast || showDialog;
 
   const [activeTab, setActiveTab] = useState("order_issues"); // "order_issues" | "general"
   const [filterState, setFilterState] = useState("all"); // "all" | "open" | "resolved"
@@ -34,10 +36,10 @@ const AdminInquiriesPage = (props) => {
         showToast(`Ticket marked as ${!currentResolved ? "Resolved" : "Open"}`);
         if (onRefresh) onRefresh();
       } else {
-        alert(data.message || "Failed to update ticket status.");
+        showDialog(data.message || "Failed to update ticket status.", { title: "Update failed", variant: "error" });
       }
     } catch {
-      alert("Error connecting to server.");
+      showDialog("Could not connect to the server. Please try again.", { title: "Connection error", variant: "error" });
     }
   };
 

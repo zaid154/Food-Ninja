@@ -27,7 +27,7 @@ Food Ninja is a full-stack food ordering platform built using the MERN stack (Mo
 ### Admin Dashboard (`/admin`)
 - **Menu Management:** Add new dishes, edit pricing and descriptions, or remove items.
 - **Order Management:** Search orders, filter by date and status, distinguish today's and older orders, and update delivery status.
-- **Categories & Customers:** Manage menu categories and view customer records from the admin dashboard.
+- **Categories & Customers:** Manage menu categories, review customer records, and block or unblock customer accounts. Blocked accounts cannot sign in or place new orders.
 - **Store Settings:** Pause or reopen orders, enter a custom closed notice, set opening/closing times, and enable automatic closure outside those hours. The admin preview uses the backend schedule.
 - **Inquiry Management:** Review customer contact messages with direct one-click email and phone call actions.
 
@@ -158,6 +158,7 @@ npm test
 | `POST` | `/api/users/register` | Register new user account |
 | `POST` | `/api/users/login` | Login user |
 | `GET` | `/api/users` | List users |
+| `PATCH` | `/api/users/:id/block` | Block or unblock a customer account |
 | `GET` | `/api/contact` | Get all customer inquiries (Admin) |
 | `POST` | `/api/contact` | Submit contact form inquiry |
 | `PUT` | `/api/contact/:id/reply` | Record reply to customer inquiry |

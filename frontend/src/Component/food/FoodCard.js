@@ -7,24 +7,33 @@ const FoodCard = ({ data }) => {
   const { id, name, image, price, rating, isVeg, description, inStock } = data;
   const dispatch = useDispatch();
   const isAvailable = inStock !== false;
+  const portionPrices = [price, data.halfPrice, data.quarterPrice]
+    .map(Number)
+    .filter((amount) => amount > 0);
+  const cardPrice = data.hasPortions && portionPrices.length
+    ? Math.min(...portionPrices)
+    : price;
 
   const wishlistItems = useSelector((store) => store.wishlist.item);
   const isLiked = wishlistItems.some((i) => i.id === id);
 
   const cartItems = useSelector((store) => store.cart.item);
-  const inCart = cartItems.find((i) => i.id === id);
+  const inCart = cartItems.find((i) =>
+    String(i.id) === String(id) &&
+    (i.portionSize || (i.hasPortions ? "Full" : "")) === (data.hasPortions ? "Full" : "")
+  );
   const cartQty = inCart ? inCart.quantity : 0;
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(addCart({ ...data, caloriesPerServing: price }));
+    dispatch(addCart({ ...data, price, portionSize: data.hasPortions ? "Full" : "", caloriesPerServing: data.caloriesPerServing }));
   };
 
   const handleRemoveFromCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(removeCart(id));
+    dispatch(removeCart({ id, portionSize: data.hasPortions ? "Full" : "", hasPortions: Boolean(data.hasPortions) }));
   };
 
   const handleLike = (e) => {
@@ -107,13 +116,21 @@ const FoodCard = ({ data }) => {
         {/* Price & Action Row */}
         <div className="mt-4 flex items-center justify-between pt-1">
           <div className="text-base font-extrabold text-slate-900">
-            ₹{price}
+            {data.hasPortions ? `From ₹${cardPrice}` : `₹${price}`}
           </div>
 
           {!isAvailable ? (
             <span className="rounded-lg bg-slate-100 border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-400">
               Unavailable
             </span>
+          ) : data.hasPortions ? (
+            <Link
+              to={`/restaurant/${id}`}
+              state={{ product: data }}
+              className="inline-flex items-center justify-center rounded-lg bg-emerald-700 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-emerald-800 transition"
+            >
+              Choose Size
+            </Link>
           ) : cartQty > 0 ? (
             <div className="flex items-center gap-2 rounded-lg border border-emerald-600 bg-emerald-50/80 px-2.5 py-1">
               <button

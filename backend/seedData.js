@@ -244,6 +244,43 @@ const ourSignatureDishes = [
   }
 ];
 
+const portionDishNames = new Set([
+  "Hyderabadi Dum Biryani",
+  "Paneer Butter Masala",
+  "Butter Chicken (Murgh Makhani)",
+  "Murgh Makhani (Butter Chicken)",
+  "Dal Makhani Charcoal Simmered",
+  "Kadai Paneer",
+  "Chicken Tikka Masala",
+  "Shahi Malai Kofta",
+  "Purani Dilli Nihari Gosht",
+  "Awadhi Dum Murgh Biryani",
+  "Royal Rajasthani Laal Maas",
+  "Govind Gatta Curry",
+  "Kashmiri Mutton Rogan Josh",
+  "Kashmiri Dum Aloo",
+  "Kashmiri Gushtaba (Wazwan Special)",
+  "Kolhapuri Mutton Sukka",
+  "Goan Chicken Xacuti",
+  "Chettinad Pepper Chicken",
+  "Andhra Gongura Mutton Curry",
+  "Alleppey Fish Curry with Coconut Milk",
+  "Bengali Macher Jhol (Rohu Fish Curry)",
+]);
+
+const addSeedPortionPrices = (dish) => {
+  if (!portionDishNames.has(dish.name)) return dish;
+  const fullPrice = Number(dish.price) || 0;
+  const roundToTen = (amount) => Math.max(10, Math.round(amount / 10) * 10);
+
+  return {
+    ...dish,
+    hasPortions: true,
+    halfPrice: roundToTen(fullPrice * 0.7),
+    quarterPrice: roundToTen(fullPrice * 0.4),
+  };
+};
+
 const loadAllFoods = () => {
   const possiblePaths = [
     "C:\\Users\\user\\Desktop\\All-Pojects\\recipes.txt",
@@ -337,7 +374,7 @@ const loadAllFoods = () => {
     });
   });
 
-  return combined;
+  return combined.map(addSeedPortionPrices);
 };
 
 const realisticReviews = [

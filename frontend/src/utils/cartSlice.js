@@ -15,6 +15,7 @@ const saveCart = (items) => {
 };
 
 const MAX_QUANTITY_PER_ITEM = 10;
+const getPortionKey = (item) => item.portionSize || (item.hasPortions ? "Full" : "");
 
 const cartSlice = createSlice({
     name: "cart",
@@ -26,7 +27,8 @@ const cartSlice = createSlice({
     reducers: {
         addCart: (state, action) => {
             const existingItem = state.item.find(
-                (item) => item.id === action.payload.id
+                (item) => String(item.id) === String(action.payload.id) &&
+                    getPortionKey(item) === getPortionKey(action.payload)
             );
 
             if (existingItem) {
@@ -40,16 +42,18 @@ const cartSlice = createSlice({
         },
 
         removeCart: (state, action) => {
+            const target = typeof action.payload === "object" ? action.payload : { id: action.payload };
             const existingItem = state.item.find(
-                (item) => item.id === action.payload
+                (item) => String(item.id) === String(target.id) &&
+                    (target.portionSize === undefined
+                        ? true
+                        : getPortionKey(item) === getPortionKey(target))
             );
 
             if (existingItem && existingItem.quantity > 1) {
                 existingItem.quantity -= 1;
             } else {
-                state.item = state.item.filter(
-                    (item) => item.id !== action.payload
-                );
+                state.item = state.item.filter((item) => item !== existingItem);
             }
             saveCart(state.item);
         },

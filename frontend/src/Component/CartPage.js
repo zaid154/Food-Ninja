@@ -148,6 +148,11 @@ const CartPage = () => {
                 const itemPrice = item.price ?? item.caloriesPerServing ?? 0;
                 const itemTotal = itemPrice * (item.quantity || 1);
                 const isVeg = item.dietary === "Non-Veg" || item.isVeg === false ? false : true;
+                const cartItemRef = {
+                  id: item.id,
+                  portionSize: item.portionSize || (item.hasPortions ? "Full" : ""),
+                  hasPortions: Boolean(item.hasPortions),
+                };
 
                 return (
                   <div
@@ -187,6 +192,12 @@ const CartPage = () => {
 
                         <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500">
                           <span>₹{itemPrice} per unit</span>
+                          {item.portionSize && (
+                            <>
+                              <span className="text-slate-300">•</span>
+                              <span>{item.portionSize} Plate</span>
+                            </>
+                          )}
                           {(item.cuisine || item.category) && (
                             <>
                               <span className="text-slate-300">•</span>
@@ -201,7 +212,7 @@ const CartPage = () => {
                       <div className="flex items-center justify-between rounded-lg border border-emerald-600 bg-emerald-50/70 px-2 py-1 w-20 text-xs font-bold text-emerald-900 shadow-2xs">
                         <button
                           type="button"
-                          onClick={() => dispatch(removeCart(item.id))}
+                          onClick={() => dispatch(removeCart(cartItemRef))}
                           className="h-5 w-5 flex items-center justify-center text-emerald-800 hover:text-emerald-950 hover:bg-emerald-100 rounded transition cursor-pointer text-sm"
                           title="Decrease"
                         >

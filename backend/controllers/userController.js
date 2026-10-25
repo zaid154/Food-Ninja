@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const mongoose = require("mongoose");
 
 // Register new user
 const register = async (req, res) => {
@@ -49,6 +50,9 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password." });
     }
+    if (user.isBlocked) {
+      return res.status(403).json({ message: "This account is blocked. Please contact the restaurant for help." });
+    }
 
     return res.status(200).json({
       message: "Login successful!",
@@ -74,4 +78,35 @@ const getUsers = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getUsers };
+// Admin: block or unblock a customer account.
+const updateUserBlockStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isBlocked } = req.body || {};
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid customer ID." });
+    }
+    if (typeof isBlocked !== "boolean") {
+      return res.status(400).json({ message: "isBlocked must be true or false." });
+    }
+
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "Customer not found." });
+    if (user.role === "admin") {
+      return res.status(403).json({ message: "Admin accounts cannot be blocked." });
+    }
+
+    user.isBlocked = isBlocked;
+    await user.save();
+    const safeUser = user.toObject();
+    delete safeUser.password;
+    return res.status(200).json({
+      message: isBlocked ? "Customer blocked successfully." : "Customer unblocked successfully.",
+      user: safeUser,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to update customer status", error: error.message });
+  }
+};
+
+module.exports = { register, login, getUsers, updateUserBlockStatus };

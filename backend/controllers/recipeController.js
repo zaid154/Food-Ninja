@@ -1,4 +1,8 @@
 const Recipe = require("../models/recipeModel");
+const optionalNumber = (value) => value === "" || value === null || value === undefined ? null : Number(value);
+const normalizeList = (value) => Array.isArray(value)
+  ? value.map((item) => String(item).trim()).filter(Boolean)
+  : String(value || "").split(/[\n,]/).map((item) => item.trim()).filter(Boolean);
 
 // Get food items with server-side pagination, search, category filtering, and sorting
 const getRecipes = async (req, res) => {
@@ -149,9 +153,14 @@ const addRecipe = async (req, res) => {
       cuisine,
       inStock,
       caloriesPerServing,
+      proteinGrams,
+      carbsGrams,
+      fatGrams,
+      keyFeatures,
       servingInfo,
       hasPortions,
       halfPrice,
+      quarterPrice,
       originalPrice,
     } = req.body;
     
@@ -167,10 +176,14 @@ const addRecipe = async (req, res) => {
       name,
       category: category || "Fast Food",
       price: Number(price),
-      caloriesPerServing: caloriesPerServing ? Number(caloriesPerServing) : 350,
+      caloriesPerServing: optionalNumber(caloriesPerServing),
+      proteinGrams: optionalNumber(proteinGrams),
+      carbsGrams: optionalNumber(carbsGrams),
+      fatGrams: optionalNumber(fatGrams),
       servingInfo: servingInfo ? String(servingInfo).trim() : "",
       hasPortions: Boolean(hasPortions),
       halfPrice: halfPrice ? Number(halfPrice) : 0,
+      quarterPrice: quarterPrice ? Number(quarterPrice) : 0,
       originalPrice: originalPrice ? Number(originalPrice) : 0,
       image,
       imageFit: imageFit || "cover",
@@ -182,6 +195,7 @@ const addRecipe = async (req, res) => {
       reviewCount: 15,
       description: description || "Freshly made restaurant preparation.",
       ingredients: Array.isArray(ingredients) ? ingredients : (ingredients ? ingredients.split(",").map(s => s.trim()) : ["Fresh Ingredients"]),
+      keyFeatures: normalizeList(keyFeatures),
       instructions: ["Prepared fresh on order", "Packed hygienically in spill-proof box", "Delivered hot to your doorstep"],
       inStock: inStock !== undefined ? Boolean(inStock) : true,
     });
@@ -210,9 +224,14 @@ const updateRecipe = async (req, res) => {
       inStock,
       ingredients,
       caloriesPerServing,
+      proteinGrams,
+      carbsGrams,
+      fatGrams,
+      keyFeatures,
       servingInfo,
       hasPortions,
       halfPrice,
+      quarterPrice,
       originalPrice,
     } = req.body;
     
@@ -220,7 +239,6 @@ const updateRecipe = async (req, res) => {
       name,
       category,
       price: Number(price),
-      caloriesPerServing: caloriesPerServing !== undefined ? Number(caloriesPerServing) : 350,
       image,
       imageFit: imageFit || "cover",
       isVeg: isVeg === undefined ? (dietary === "Non-Veg" ? false : true) : Boolean(isVeg),
@@ -230,9 +248,14 @@ const updateRecipe = async (req, res) => {
       cuisine
     };
 
+    for (const [field, value] of Object.entries({ caloriesPerServing, proteinGrams, carbsGrams, fatGrams })) {
+      if (value !== undefined) updateData[field] = optionalNumber(value);
+    }
+    if (keyFeatures !== undefined) updateData.keyFeatures = normalizeList(keyFeatures);
     if (servingInfo !== undefined) updateData.servingInfo = String(servingInfo).trim();
     if (hasPortions !== undefined) updateData.hasPortions = Boolean(hasPortions);
     if (halfPrice !== undefined) updateData.halfPrice = Number(halfPrice);
+    if (quarterPrice !== undefined) updateData.quarterPrice = Number(quarterPrice);
     if (originalPrice !== undefined) updateData.originalPrice = Number(originalPrice);
     if (ingredients !== undefined) {
       updateData.ingredients = Array.isArray(ingredients) ? ingredients : ingredients.split(",").map(s => s.trim()).filter(Boolean);

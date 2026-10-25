@@ -7,9 +7,7 @@ import { getSavedOrderPricing } from "../../utils/orderPricing";
  * Formatted strictly according to standard 80mm Thermal Printer Paper Size (POS Receipt).
  * Isolated printing via hidden IFrame ensures ONLY the thermal slip is printed.
  */
-const OrderInvoiceModal = ({ order, onClose }) => {
-  if (!order) return null;
-
+const OrderInvoiceModal = ({ order, onClose, initialMode = "kot" }) => {
   const [settings, setSettings] = useState({
     restaurantName: "Food Ninja",
     fssaiNumber: "10020011000123",
@@ -17,6 +15,9 @@ const OrderInvoiceModal = ({ order, onClose }) => {
     storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
     storePhone: "+91 98765 43210",
   });
+  const [printMode, setPrintMode] = useState(initialMode);
+
+  useEffect(() => setPrintMode(initialMode), [initialMode, order?.id]);
 
   useEffect(() => {
     if (typeof fetch !== "undefined") {
@@ -28,6 +29,8 @@ const OrderInvoiceModal = ({ order, onClose }) => {
         .catch(() => {});
     }
   }, []);
+
+  if (!order) return null;
 
   const items = order.items || [];
 
@@ -50,8 +53,41 @@ const OrderInvoiceModal = ({ order, onClose }) => {
   const isDemoPayment = String(order.paymentMethod || "").toLowerCase().includes("demo")
     || String(order.razorpayPaymentId || "").startsWith("pay_demo_");
 
+  const handlePrintKot = () => {
+    const iframe = document.createElement("iframe");
+    iframe.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
+    document.body.appendChild(iframe);
+    const doc = iframe.contentWindow.document;
+    const kotItems = items.map((item) => {
+      const quantity = Number(item.quantity || 1);
+      return `<tr><td>${item.name || item.title}${item.portionSize ? `<br><small>${item.portionSize} Plate</small>` : ""}</td><td class="qty">${quantity}</td></tr>`;
+    }).join("");
+    doc.open();
+    doc.write(`<!doctype html><html><head><meta charset="utf-8"><title>KOT_${order.id}</title><style>
+      @page{size:80mm auto;margin:0}body{width:74mm;margin:0 auto;padding:4mm 2mm;font:12px/1.4 'Courier New',monospace;color:#000}
+      h2,p{margin:0}.center{text-align:center}.row{display:flex;justify-content:space-between;margin:4px 0}.line{border-top:1px dashed #000;margin:7px 0}
+      table{width:100%;border-collapse:collapse;margin-top:6px}th,td{padding:5px 2px;border-bottom:1px dashed #aaa;text-align:left}th{font-size:10px}.qty{text-align:right;font-size:15px;font-weight:bold;width:30px}
+      small{font-size:10px}
+    </style></head><body>
+      <div class="center"><h2>${(settings.restaurantName || "FOOD NINJA").toUpperCase()}</h2><p><b>KITCHEN ORDER TICKET</b></p></div><div class="line"></div>
+      <div class="row"><b>ORDER #${order.id}</b><span>${order.date || "Today"}</span></div>
+      <div class="row"><b>STATUS</b><span>${order.status || "Placed"}</span></div>
+      <p><b>TYPE:</b> HOME DELIVERY</p><p><b>CUSTOMER:</b> ${order.customerName || "Customer"}</p>
+      <p><b>PHONE:</b> +91 ${order.phone || ""}</p><p><b>DELIVERY:</b> ${order.address || ""}</p>
+      <div class="line"></div><table><thead><tr><th>ITEM</th><th class="qty">QTY</th></tr></thead><tbody>${kotItems}</tbody></table>
+      <div class="line"></div><p><b>NOTE:</b> ${order.specialInstructions || order.notes || "No special instructions"}</p>
+    </body></html>`);
+    doc.close();
+    iframe.contentWindow.focus();
+    setTimeout(() => {
+      iframe.contentWindow.print();
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    }, 250);
+  };
+
   // Isolated Thermal Printer (80mm) Print Engine
   const handlePrint = () => {
+    if (printMode === "kot") return handlePrintKot();
     const printContent = document.getElementById("printable-thermal-slip");
     if (!printContent) return;
 
@@ -172,7 +208,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
                 const itemQty = Number(it.quantity || 1);
                 return `
                   <tr>
-                    <td class="text-left font-bold">${it.name || it.title}</td>
+                    <td class="text-left font-bold">${it.name || it.title}${it.portionSize ? `<br><span style="font-size:9px;font-weight:normal">${it.portionSize} Plate</span>` : ""}</td>
                     <td class="text-center">${itemQty}</td>
                     <td class="text-right">₹${itemPrice}</td>
                     <td class="text-right font-bold">₹${itemPrice * itemQty}</td>
@@ -257,7 +293,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             <svg className="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
-            <span>80mm POS Thermal Slip</span>
+            <span>{printMode === "kot" ? "80mm Kitchen Slip" : "80mm Customer Bill"}</span>
           </span>
           <button
             type="button"
@@ -269,6 +305,15 @@ const OrderInvoiceModal = ({ order, onClose }) => {
           </button>
         </div>
 
+        <div className="grid grid-cols-2 gap-1 border-b border-slate-200 bg-slate-50 p-2 text-[10px] font-bold">
+          {[["kot", "KOT · Kitchen"], ["bill", "Bill · Customer"]].map(([mode, label]) => (
+            <button key={mode} type="button" onClick={() => setPrintMode(mode)} aria-pressed={printMode === mode}
+              className={`rounded-lg px-2 py-2 transition ${printMode === mode ? "bg-white text-emerald-800 shadow-sm" : "text-slate-500 hover:bg-white"}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+
         <div id="printable-thermal-slip" className="min-h-0 flex-1 overflow-y-auto bg-white p-3 font-mono text-slate-800 text-[11px] leading-tight">
           
           <div className="text-center pb-2 border-b border-dashed border-slate-300">
@@ -276,11 +321,11 @@ const OrderInvoiceModal = ({ order, onClose }) => {
               {settings.restaurantName || "FOOD NINJA"}
             </h2>
             <p className="text-[9.5px] font-bold text-slate-600 uppercase tracking-widest mt-0.5">
-              Tax Invoice & Delivery Bill
+              {printMode === "kot" ? "Kitchen Order Ticket" : "Tax Invoice & Delivery Bill"}
             </p>
-            <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
+            {printMode === "bill" && <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
               FSSAI: {settings.fssaiNumber || "10020011000123"} • GST: {settings.gstinNumber || "07AAAAF1234A1Z5"}
-            </p>
+            </p>}
             {settings.storeAddress && (
               <p className="text-[8.5px] text-slate-400 mt-0.5 truncate">
                 {settings.storeAddress}
@@ -295,7 +340,9 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             </div>
             <div className="flex justify-between items-center text-[10px]">
               <span className="text-slate-500 font-bold">TYPE: HOME DELIVERY</span>
-              {isCod ? (
+              {printMode === "kot" ? (
+                <span className="rounded-sm bg-white text-black font-black px-2 py-0.5 border border-slate-500 text-[10px] tracking-wide">KITCHEN COPY</span>
+              ) : isCod ? (
                 <span className="rounded-sm bg-white text-black font-black px-2 py-0.5 border border-slate-500 text-[10px] tracking-wide">
                   COD: COLLECT ₹{grandTotal}
                 </span>
@@ -318,7 +365,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
                 <span className="font-bold text-slate-600">DELIVERY: </span>
                 {order.address}
               </div>
-              {isPaidOnline && (
+              {printMode === "bill" && isPaidOnline && (
                 <div className="mt-1 border-t border-slate-100 pt-1 text-[9px] leading-snug break-all">
                   <div><span className="font-bold text-slate-600">PAYMENT STATUS: </span>{isDemoPayment ? "Paid (Demo / Test)" : (order.paymentStatus || "Paid")}</div>
                   <div><span className="font-bold text-slate-600">METHOD: </span>{isDemoPayment ? "Demo / Test" : (order.paymentMethod || "Not provided")}</div>
@@ -335,8 +382,10 @@ const OrderInvoiceModal = ({ order, onClose }) => {
                 <tr className="border-b border-dashed border-slate-200 text-slate-400 text-[9px] uppercase font-bold">
                   <th className="text-left pb-1">ITEM</th>
                   <th className="text-center pb-1 w-8">QTY</th>
-                  <th className="text-right pb-1 w-10">RATE</th>
-                  <th className="text-right pb-1 w-12">TOTAL</th>
+                  {printMode === "bill" && <>
+                    <th className="text-right pb-1 w-10">RATE</th>
+                    <th className="text-right pb-1 w-12">TOTAL</th>
+                  </>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
@@ -345,10 +394,15 @@ const OrderInvoiceModal = ({ order, onClose }) => {
                   const itemQty = Number(it.quantity || 1);
                   return (
                     <tr key={idx} className="py-1">
-                      <td className="py-1 text-slate-900 pr-1 font-bold leading-tight">{it.name || it.title}</td>
+                      <td className="py-1 text-slate-900 pr-1 font-bold leading-tight">
+                        {it.name || it.title}
+                        {it.portionSize && <span className="block text-[9px] font-medium text-slate-500">{it.portionSize} Plate</span>}
+                      </td>
                       <td className="py-1 text-center text-slate-600">{itemQty}</td>
-                      <td className="py-1 text-right text-slate-600">₹{itemPrice}</td>
-                      <td className="py-1 text-right font-extrabold text-slate-900">₹{itemPrice * itemQty}</td>
+                      {printMode === "bill" && <>
+                        <td className="py-1 text-right text-slate-600">₹{itemPrice}</td>
+                        <td className="py-1 text-right font-extrabold text-slate-900">₹{itemPrice * itemQty}</td>
+                      </>}
                     </tr>
                   );
                 })}
@@ -356,7 +410,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             </table>
           </div>
 
-          <div className="py-2 space-y-1 text-[10.5px] border-b border-dashed border-slate-300">
+          {printMode === "bill" && <div className="py-2 space-y-1 text-[10.5px] border-b border-dashed border-slate-300">
             <div className="flex justify-between text-slate-600">
               <span>Item Subtotal ({itemCount} items)</span>
               <span>₹{subtotal}</span>
@@ -378,9 +432,9 @@ const OrderInvoiceModal = ({ order, onClose }) => {
               <span>GRAND TOTAL</span>
               <span className="text-black">₹{grandTotal}</span>
             </div>
-          </div>
+          </div>}
 
-          <div className={`mt-2.5 p-2 rounded-lg border-2 text-center ${
+          {printMode === "bill" && <><div className={`mt-2.5 p-2 rounded-lg border-2 text-center ${
             "border-slate-800 bg-white text-black"
           }`}>
             <p className="text-xs font-black tracking-wide">
@@ -402,6 +456,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             <p className="font-bold text-slate-600">*** CUSTOMER TAX INVOICE & DELIVERY BILL ***</p>
             <p className="mt-0.5">Thank you for ordering with {settings.restaurantName || "Food Ninja"}!</p>
           </div>
+          </>}
         </div>
 
         <div className="flex shrink-0 items-center justify-between gap-2 border-t border-slate-200 bg-white p-3">
@@ -420,7 +475,7 @@ const OrderInvoiceModal = ({ order, onClose }) => {
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
-            <span>Print Slip (80mm)</span>
+            <span>Print {printMode === "kot" ? "KOT" : "Bill"} (80mm)</span>
           </button>
         </div>
       </div>

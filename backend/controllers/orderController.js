@@ -1,4 +1,5 @@
 const Order = require("../models/orderModel");
+const User = require("../models/userModel");
 const Settings = require("../models/settingsModel");
 const { getStoreStatus } = require("./settingsController");
 
@@ -63,6 +64,14 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ message: "Missing required order details." });
     }
 
+    const normalizedUserEmail = typeof userEmail === "string" ? userEmail.trim().toLowerCase() : "";
+    if (normalizedUserEmail && normalizedUserEmail !== "guest") {
+      const customer = await User.findOne({ email: normalizedUserEmail }).select("isBlocked");
+      if (customer?.isBlocked) {
+        return res.status(403).json({ message: "This account is blocked and cannot place orders. Please contact the restaurant for help." });
+      }
+    }
+
     const settings = (await Settings.findOne({ key: "store_settings" })) || new Settings();
     const storeStatus = getStoreStatus(settings);
     if (!storeStatus.isEffectiveOpen) {
@@ -72,7 +81,7 @@ const createOrder = async (req, res) => {
     const orderId = id || Date.now();
     const newOrder = new Order({
       id: orderId,
-      userEmail: userEmail || "guest",
+      userEmail: normalizedUserEmail || "guest",
       customerName,
       phone,
       address,
