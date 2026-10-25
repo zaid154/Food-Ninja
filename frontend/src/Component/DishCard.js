@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addCart, removeCart } from "../../utils/cartSlice";
-import { addWishlist, removeWishlist } from "../../utils/wishlistSlice";
+import { addCart, removeCart } from "../utils/cartSlice";
+import { addWishlist, removeWishlist } from "../utils/wishlistSlice";
 
-const FoodCard = ({ data }) => {
+const DishCard = ({ data }) => {
   const { id, name, image, price, rating, isVeg, description, inStock } = data;
   const dispatch = useDispatch();
   const isAvailable = inStock !== false;
@@ -168,4 +168,4 @@ const FoodCard = ({ data }) => {
   );
 };
 
-export default FoodCard;
+export default DishCard;

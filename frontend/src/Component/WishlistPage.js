@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearWishlist } from "../utils/wishlistSlice";
-import FoodCard from "./food/FoodCard";
+import DishCard from "./DishCard";
 
 const WishlistPage = () => {
     const wishlistItems = useSelector((store) => store.wishlist.item);
@@ -59,10 +59,10 @@ const WishlistPage = () => {
                     </button>
                 </div>
 
-                {/* Uniform Responsive Dishes Grid reusing standard FoodCard */}
+                {/* Uniform Responsive Dishes Grid reusing standard DishCard */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {wishlistItems.map((item) => (
-                        <FoodCard key={item.id} data={item} />
+                        <DishCard key={item.id} data={item} />
                     ))}
                 </div>
             </div>

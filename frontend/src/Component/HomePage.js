@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import FoodCard from "./food/FoodCard";
+import DishCard from "./DishCard";
 import { API_BASE_URL } from "../utils/Constants";
 
 const HomePage = () => {
@@ -253,7 +253,7 @@ const HomePage = () => {
           ) : popularDishes.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {popularDishes.map((item) => (
-                <FoodCard key={item.id} data={item} />
+                <DishCard key={item.id} data={item} />
               ))}
             </div>
           ) : (

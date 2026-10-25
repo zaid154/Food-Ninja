@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import FoodCard from "./food/FoodCard";
+import DishCard from "./DishCard";
 import { API_BASE_URL } from "../utils/Constants";
 
 const SORT_OPTIONS = [
@@ -311,7 +311,7 @@ const MenuPage = () => {
           <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {dishes.map((dish) => (
-                <FoodCard key={dish.id} data={dish} />
+                <DishCard key={dish.id} data={dish} />
               ))}
             </div>
 

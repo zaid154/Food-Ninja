@@ -32,7 +32,7 @@ frontend/
 │   │   │   ├── AdminInquiriesPage.js  # Customer tickets & inquiry resolution desk
 │   │   │   ├── OrderInvoiceModal.js   # 80mm thermal receipt & KOT print modal
 │   │   │   └── AdminDropdown.js       # Reusable searchable dropdown with add-option
-│   │   ├── food/              # FoodCard presentation component
+│   │   ├── DishCard.js        # Reusable dish presentation card component
 │   │   └── __tests__/         # Jest & React Testing Library test suite
 │   ├── utils/                 # Redux state, API constants, and store notice helpers
 │   ├── App.js                 # Routes and application layout
