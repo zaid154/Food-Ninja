@@ -1,39 +1,26 @@
-import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useParams, useOutletContext } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import AdminDropdown from "./AdminDropdown";
 import { API_BASE_URL } from "../../utils/Constants";
 import { useAppDialog } from "../AppDialog";
 import { FOOD_CUISINES } from "./AdminDishesPage";
 
-const optionalNumber = (value) => (value === "" || value == null ? null : Number(value));
-const parseList = (value) =>
-  Array.isArray(value)
-    ? value.map((item) => String(item).trim()).filter(Boolean)
-    : String(value || "").split(/[\n,]/).map((item) => item.trim()).filter(Boolean);
+const optionalNumber = (val) => (val === "" || val == null ? null : Number(val));
+const parseList = (val) => Array.isArray(val) ? val.map((i) => String(i).trim()).filter(Boolean) : String(val || "").split(/[\n,]/).map((i) => i.trim()).filter(Boolean);
 
 const initialFood = {
-  name: "",
-  category: "",
-  cuisine: "Indian",
-  imageFit: "cover",
-  price: "",
-  originalPrice: "",
-  servingInfo: "",
-  hasPortions: false,
-  halfPrice: "",
-  quarterPrice: "",
-  caloriesPerServing: "",
-  proteinGrams: "",
-  carbsGrams: "",
-  fatGrams: "",
-  deliveryTime: "25-30 mins",
-  dietary: "Veg",
-  isVeg: true,
-  image: "",
-  description: "",
-  ingredients: "",
-  keyFeatures: "",
+  name: "", category: "", cuisine: "Indian", imageFit: "cover",
+  price: "", originalPrice: "", servingInfo: "", hasPortions: false,
+  halfPrice: "", quarterPrice: "", caloriesPerServing: "",
+  proteinGrams: "", carbsGrams: "", fatGrams: "", deliveryTime: "25-30 mins",
+  dietary: "Veg", isVeg: true, image: "", description: "", ingredients: "", keyFeatures: "",
 };
+
+const DIETARY_OPTIONS = [
+  { id: "Veg", label: "Veg", isVeg: true, color: "green", border: "border-green-600", activeBg: "bg-green-50 text-green-700 ring-2 ring-green-600/20" },
+  { id: "Non-Veg", label: "Non-Veg", isVeg: false, color: "red", border: "border-red-600", activeBg: "bg-red-50 text-red-700 ring-2 ring-red-600/20" },
+  { id: "Vegan", label: "Vegan", isVeg: true, color: "emerald", border: "border-emerald-600", activeBg: "bg-emerald-50 text-emerald-800 ring-2 ring-emerald-600/20" },
+];
 
 const AdminDishFormPage = () => {
   const { id } = useParams();
@@ -46,7 +33,6 @@ const AdminDishFormPage = () => {
   const categories = context.categories || [];
   const onRefresh = context.fetchData;
   const showToast = context.showToast || showDialog;
-
   const availableCategories = categories.map((c) => c.name).filter(Boolean);
 
   const [foodForm, setFoodForm] = useState(initialFood);
@@ -59,22 +45,15 @@ const AdminDishFormPage = () => {
 
   const hasUnsavedChanges = JSON.stringify(foodForm) !== JSON.stringify(savedFoodForm);
 
-  // Sync cuisines
   useEffect(() => {
-    if (foods && foods.length > 0) {
-      setLocalCuisines((prev) =>
-        Array.from(new Set([...prev, ...foods.map((f) => f.cuisine).filter(Boolean)]))
-      );
+    if (foods?.length > 0) {
+      setLocalCuisines((prev) => Array.from(new Set([...prev, ...foods.map((f) => f.cuisine).filter(Boolean)])));
     }
   }, [foods]);
 
-  // Load food data when editing
   useEffect(() => {
     if (!isEditing) {
-      const blank = {
-        ...initialFood,
-        category: availableCategories[0] || "",
-      };
+      const blank = { ...initialFood, category: availableCategories[0] || "" };
       setFoodForm(blank);
       setSavedFoodForm(blank);
       setLoading(false);
@@ -82,7 +61,6 @@ const AdminDishFormPage = () => {
     }
 
     const loadFood = async () => {
-      // First try to find in context foods
       let existing = foods.find((f) => String(f.id) === String(id) || String(f._id) === String(id));
       if (!existing) {
         try {
@@ -98,38 +76,32 @@ const AdminDishFormPage = () => {
       }
 
       if (existing) {
-        const foodDietary = existing.dietary || (existing.isVeg !== false ? "Veg" : "Non-Veg");
-        const loadedForm = {
+        const dietVal = existing.dietary || (existing.isVeg !== false ? "Veg" : "Non-Veg");
+        const loaded = {
           name: existing.name || "",
-          category: existing.category || "",
+          category: existing.category || availableCategories[0] || "",
           cuisine: existing.cuisine || "Indian",
           imageFit: existing.imageFit || "cover",
-          price: existing.price || existing.caloriesPerServing || 199,
-          originalPrice: existing.originalPrice || "",
+          price: existing.price ?? "",
+          originalPrice: existing.originalPrice ?? "",
           servingInfo: existing.servingInfo || "",
           hasPortions: Boolean(existing.hasPortions),
-          halfPrice: existing.halfPrice || "",
-          quarterPrice: existing.quarterPrice || "",
+          halfPrice: existing.halfPrice ?? "",
+          quarterPrice: existing.quarterPrice ?? "",
           caloriesPerServing: existing.caloriesPerServing ?? "",
           proteinGrams: existing.proteinGrams ?? "",
           carbsGrams: existing.carbsGrams ?? "",
           fatGrams: existing.fatGrams ?? "",
           deliveryTime: existing.deliveryTime || "25-30 mins",
-          dietary: foodDietary,
-          isVeg: foodDietary !== "Non-Veg",
+          dietary: dietVal,
+          isVeg: existing.isVeg !== false && dietVal !== "Non-Veg",
           image: existing.image || "",
           description: existing.description || "",
-          ingredients: Array.isArray(existing.ingredients)
-            ? existing.ingredients.join(", ")
-            : existing.ingredients || "",
-          keyFeatures: Array.isArray(existing.keyFeatures)
-            ? existing.keyFeatures.join(", ")
-            : existing.keyFeatures || "",
+          ingredients: Array.isArray(existing.ingredients) ? existing.ingredients.join(", ") : (existing.ingredients || ""),
+          keyFeatures: Array.isArray(existing.keyFeatures) ? existing.keyFeatures.join(", ") : (existing.keyFeatures || ""),
         };
-        setFoodForm(loadedForm);
-        setSavedFoodForm(loadedForm);
-      } else {
-        setSaveError("Dish not found or could not be loaded.");
+        setFoodForm(loaded);
+        setSavedFoodForm(loaded);
       }
       setLoading(false);
     };
@@ -138,51 +110,26 @@ const AdminDishFormPage = () => {
   }, [id, isEditing]);
 
   const handleBack = async () => {
-    if (saving) return;
     if (hasUnsavedChanges) {
-      const shouldDiscard = await confirm(
-        `Your edits${foodForm.name ? ` to ${foodForm.name}` : ""} haven’t been saved. Keep editing or discard them?`,
-        {
-          title: "Discard unsaved changes?",
-          variant: "warning",
-          confirmLabel: "Discard Changes",
-          cancelLabel: "Keep Editing",
-        }
-      );
-      if (!shouldDiscard) return;
+      const discard = await confirm("You have unsaved changes. Discard and return to dish list?", {
+        title: "Discard changes?",
+        variant: "warning",
+        confirmLabel: "Discard Changes",
+      });
+      if (!discard) return;
     }
     navigate("/admin/foods");
   };
 
-  const handleAddCustomCuisine = (newCuisine) => {
-    setLocalCuisines((prev) => Array.from(new Set([newCuisine, ...prev])));
-  };
-
   const handleSave = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     if (!hasUnsavedChanges && isEditing) return;
+    if (!foodForm.name.trim()) return setSaveError("Please enter a dish name.");
+    if (!foodForm.category) return setSaveError("Please select a category.");
+    if (!foodForm.price || Number(foodForm.price) <= 0) return setSaveError("Please enter a valid price.");
+    if (!foodForm.image.trim()) return setSaveError("Please provide an image URL for the dish.");
 
-    if (!foodForm.name.trim()) {
-      setSaveError("Please enter a dish name.");
-      return;
-    }
-    if (!foodForm.category) {
-      setSaveError("Please select a category.");
-      return;
-    }
-    if (!foodForm.price || Number(foodForm.price) <= 0) {
-      setSaveError("Please enter a valid price.");
-      return;
-    }
-    if (!foodForm.image.trim()) {
-      setSaveError("Please provide an image URL for the dish.");
-      return;
-    }
-
-    const ingArray = typeof foodForm.ingredients === "string"
-      ? foodForm.ingredients.split(",").map((i) => i.trim()).filter(Boolean)
-      : foodForm.ingredients;
-
+    const ingArray = typeof foodForm.ingredients === "string" ? foodForm.ingredients.split(",").map((i) => i.trim()).filter(Boolean) : foodForm.ingredients;
     const isVegVal = foodForm.dietary === "Non-Veg" ? false : true;
 
     const payload = {
@@ -221,11 +168,7 @@ const AdminDishFormPage = () => {
       });
 
       if (res.ok) {
-        showToast(
-          isEditing
-            ? `${payload.name} saved successfully. Changes are live!`
-            : `${payload.name} added successfully to menu!`
-        );
+        showToast(isEditing ? `${payload.name} saved successfully!` : `${payload.name} added successfully!`);
         if (onRefresh) onRefresh();
         navigate("/admin/foods");
       } else {
@@ -254,7 +197,6 @@ const AdminDishFormPage = () => {
 
   return (
     <div className="w-full space-y-5">
-      {/* Top Navigation & Status Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
           <button
@@ -267,71 +209,37 @@ const AdminDishFormPage = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-black tracking-tight text-slate-900">
-                {isEditing ? `Edit: ${foodForm.name || "Dish"}` : "Add New Food Dish"}
-              </h1>
-              {isEditing && (
-                <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-mono font-bold text-slate-600">
-                  ID: {id}
-                </span>
-              )}
-              <span
-                className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
-                  hasUnsavedChanges
-                    ? "border-amber-200 bg-amber-50 text-amber-700"
-                    : "border-emerald-200 bg-emerald-50 text-emerald-700"
-                }`}
-              >
+              <h1 className="text-lg font-black tracking-tight text-slate-900">{isEditing ? `Edit: ${foodForm.name || "Dish"}` : "Add New Food Dish"}</h1>
+              {isEditing && <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-mono font-bold text-slate-600">ID: {id}</span>}
+              <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${hasUnsavedChanges ? "border-amber-200 bg-amber-50 text-amber-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}>
                 {hasUnsavedChanges ? "Unsaved changes" : isEditing ? "All changes saved" : "New entry"}
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              {isEditing
-                ? "Update pricing, description, portions, image and dietary details"
-                : "Create a new authentic recipe entry for your live customer menu"}
+              {isEditing ? "Update pricing, description, portions, image and dietary details" : "Create a new authentic recipe entry for your live customer menu"}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
-          <button
-            type="button"
-            onClick={handleBack}
-            disabled={saving}
-            className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
-          >
+          <button type="button" onClick={handleBack} disabled={saving} className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer disabled:opacity-50">
             Cancel
           </button>
-
           <button
             type="button"
             onClick={handleSave}
             disabled={saving || (!hasUnsavedChanges && isEditing)}
             className="rounded-xl bg-emerald-700 hover:bg-emerald-800 px-5 py-2 text-xs font-bold text-white shadow-xs transition cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
           >
-            {saving ? (
-              <span>Saving...</span>
-            ) : (
-              <>
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>{isEditing ? "Save Changes" : "Publish Dish"}</span>
-              </>
-            )}
+            {saving ? <span>Saving...</span> : <span>{isEditing ? "Save Changes" : "Publish Dish"}</span>}
           </button>
         </div>
       </div>
 
       {saveError && (
         <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-800">
-          <svg className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="10" cy="10" r="7" />
-            <path d="M10 6.5v4.5m0 2.5h.01" strokeLinecap="round" />
-          </svg>
           <div className="flex-1">
             <p className="font-bold">Cannot Save Dish</p>
             <p className="text-[11px] text-rose-700 mt-0.5">{saveError}</p>
@@ -339,11 +247,9 @@ const AdminDishFormPage = () => {
         </div>
       )}
 
-      {/* Main 2-Column Responsive Form Card */}
       <form onSubmit={handleSave} className="rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs space-y-5">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
-          {/* Left Column (7 cols): Dish Attributes & Ingredients */}
+          {/* Left Column (7 cols): Dish Specifications */}
           <div className="lg:col-span-7 space-y-4 text-xs">
             <div className="border-b border-slate-100 pb-2">
               <h2 className="font-bold text-slate-900 text-sm">Dish Specifications & Pricing</h2>
@@ -358,7 +264,7 @@ const AdminDishFormPage = () => {
                 value={foodForm.name}
                 onChange={(e) => setFoodForm({ ...foodForm, name: e.target.value })}
                 placeholder="e.g. Hyderabadi Dum Biryani"
-                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition"
+                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold outline-none focus:border-emerald-500"
               />
             </div>
 
@@ -381,7 +287,7 @@ const AdminDishFormPage = () => {
                 options={localCuisines}
                 onChange={(c) => setFoodForm({ ...foodForm, cuisine: c })}
                 allowAdd={true}
-                onAddOption={handleAddCustomCuisine}
+                onAddOption={(newCuisine) => setLocalCuisines((prev) => Array.from(new Set([newCuisine, ...prev])))}
                 addLabel="Add New Cuisine"
                 addPlaceholder="Type cuisine (e.g. Awadhi, Japanese)"
                 placeholder="Select Cuisine"
@@ -390,9 +296,7 @@ const AdminDishFormPage = () => {
 
             <div className="grid grid-cols-3 gap-2.5">
               <div>
-                <label className="block font-bold text-slate-700 mb-1 text-[11px]">
-                  {foodForm.hasPortions ? "Full Plate Price (₹) *" : "Price (₹) *"}
-                </label>
+                <label className="block font-bold text-slate-700 mb-1 text-[11px]">{foodForm.hasPortions ? "Full Plate Price (₹) *" : "Price (₹) *"}</label>
                 <input
                   type="number"
                   required
@@ -403,7 +307,6 @@ const AdminDishFormPage = () => {
                   className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold outline-none focus:border-emerald-500"
                 />
               </div>
-
               <div>
                 <label className="block font-bold text-slate-700 mb-1 text-[11px]">Energy (kcal)</label>
                 <input
@@ -414,7 +317,6 @@ const AdminDishFormPage = () => {
                   className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500"
                 />
               </div>
-
               <div>
                 <label className="block font-bold text-slate-700 mb-1 text-[11px]">Delivery Time</label>
                 <input
@@ -466,7 +368,7 @@ const AdminDishFormPage = () => {
                   min="0"
                   value={foodForm.originalPrice || ""}
                   onChange={(e) => setFoodForm({ ...foodForm, originalPrice: e.target.value })}
-                  placeholder="e.g. 300 (strike-through discount)"
+                  placeholder="e.g. 300 (strike discount)"
                   className="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs outline-none focus:border-emerald-500"
                 />
               </div>
@@ -475,50 +377,25 @@ const AdminDishFormPage = () => {
             <div>
               <label className="block font-bold text-slate-700 mb-1.5 text-[11px]">Dietary / Food Classification *</label>
               <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setFoodForm({ ...foodForm, dietary: "Veg", isVeg: true })}
-                  className={`flex items-center justify-center gap-1.5 rounded-xl border py-2 px-2 text-xs font-bold transition cursor-pointer ${
-                    (foodForm.dietary || (foodForm.isVeg ? "Veg" : "Non-Veg")) === "Veg"
-                      ? "border-green-600 bg-green-50 text-green-700 ring-2 ring-green-600/20"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  <span className="flex h-3 w-3 items-center justify-center rounded-xs border border-green-600 p-[1px]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
-                  </span>
-                  <span>Veg</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setFoodForm({ ...foodForm, dietary: "Non-Veg", isVeg: false })}
-                  className={`flex items-center justify-center gap-1.5 rounded-xl border py-2 px-2 text-xs font-bold transition cursor-pointer ${
-                    (foodForm.dietary || (foodForm.isVeg ? "Veg" : "Non-Veg")) === "Non-Veg"
-                      ? "border-red-600 bg-red-50 text-red-700 ring-2 ring-red-600/20"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  <span className="flex h-3 w-3 items-center justify-center rounded-xs border border-red-600 p-[1px]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-red-600" />
-                  </span>
-                  <span>Non-Veg</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setFoodForm({ ...foodForm, dietary: "Vegan", isVeg: true })}
-                  className={`flex items-center justify-center gap-1.5 rounded-xl border py-2 px-2 text-xs font-bold transition cursor-pointer ${
-                    foodForm.dietary === "Vegan"
-                      ? "border-emerald-600 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-600/20"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  <svg className="h-3.5 w-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z" />
-                  </svg>
-                  <span>Vegan</span>
-                </button>
+                {DIETARY_OPTIONS.map((opt) => {
+                  const currentDiet = foodForm.dietary || (foodForm.isVeg ? "Veg" : "Non-Veg");
+                  const isSelected = currentDiet === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setFoodForm({ ...foodForm, dietary: opt.id, isVeg: opt.isVeg })}
+                      className={`flex items-center justify-center gap-1.5 rounded-xl border py-2 px-2 text-xs font-bold transition cursor-pointer ${
+                        isSelected ? opt.activeBg : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                      }`}
+                    >
+                      <span className={`flex h-3 w-3 items-center justify-center rounded-xs border ${opt.border} p-[1px]`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? (opt.id === "Non-Veg" ? "bg-red-600" : "bg-green-600") : "bg-slate-400"}`} />
+                      </span>
+                      <span>{opt.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -546,7 +423,7 @@ const AdminDishFormPage = () => {
             </div>
           </div>
 
-          {/* Right Column (5 cols): Media, Card Preview, Description & Portions */}
+          {/* Right Column (5 cols): Media & Portions */}
           <div className="lg:col-span-5 space-y-4 text-xs">
             <div className="border-b border-slate-100 pb-2">
               <h2 className="font-bold text-slate-900 text-sm">Media, Preview & Portions</h2>
@@ -557,11 +434,7 @@ const AdminDishFormPage = () => {
               <div className="flex items-center justify-between mb-1">
                 <label className="block font-bold text-slate-700 text-[11px]">Image URL (Direct Link) *</label>
                 {foodForm.image && (
-                  <button
-                    type="button"
-                    onClick={() => setFoodForm({ ...foodForm, image: "" })}
-                    className="text-[10px] font-bold text-slate-400 hover:text-rose-600 transition cursor-pointer"
-                  >
+                  <button type="button" onClick={() => setFoodForm({ ...foodForm, image: "" })} className="text-[10px] font-bold text-slate-400 hover:text-rose-600 transition cursor-pointer">
                     Clear URL
                   </button>
                 )}
@@ -572,19 +445,12 @@ const AdminDishFormPage = () => {
                   type="url"
                   required
                   value={foodForm.image}
-                  onChange={(e) => {
-                    setImageLoadError(false);
-                    setFoodForm({ ...foodForm, image: e.target.value });
-                  }}
+                  onChange={(e) => { setImageLoadError(false); setFoodForm({ ...foodForm, image: e.target.value }); }}
                   placeholder="https://images.unsplash.com/photo-..."
                   className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs outline-none focus:border-emerald-500 pr-7"
                 />
                 {foodForm.image && (
-                  <button
-                    type="button"
-                    onClick={() => setFoodForm({ ...foodForm, image: "" })}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-xs font-bold cursor-pointer"
-                  >
+                  <button type="button" onClick={() => setFoodForm({ ...foodForm, image: "" })} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-xs font-bold cursor-pointer">
                     ✕
                   </button>
                 )}
@@ -593,37 +459,20 @@ const AdminDishFormPage = () => {
               {/* Preview Card */}
               <div className="mt-2.5 rounded-xl border border-slate-200 bg-slate-50/80 p-2.5 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-slate-600 flex items-center gap-1">
-                    <svg className="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <span>Live Card Preview</span>
-                  </span>
-
+                  <span className="text-[10px] font-bold text-slate-600">Live Card Preview</span>
                   <div className="inline-flex items-center rounded-lg border border-slate-200 bg-white p-0.5 text-[10px] font-bold">
-                    <button
-                      type="button"
-                      onClick={() => setFoodForm({ ...foodForm, imageFit: "contain" })}
-                      className={`px-2 py-0.5 rounded-md transition cursor-pointer ${
-                        imageFitMode === "contain"
-                          ? "bg-emerald-700 text-white shadow-2xs"
-                          : "text-slate-500 hover:text-slate-800"
-                      }`}
-                    >
-                      Contain
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFoodForm({ ...foodForm, imageFit: "cover" })}
-                      className={`px-2 py-0.5 rounded-md transition cursor-pointer ${
-                        imageFitMode === "cover"
-                          ? "bg-emerald-700 text-white shadow-2xs"
-                          : "text-slate-500 hover:text-slate-800"
-                      }`}
-                    >
-                      Cover
-                    </button>
+                    {["contain", "cover"].map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setFoodForm({ ...foodForm, imageFit: mode })}
+                        className={`px-2 py-0.5 rounded-md transition cursor-pointer capitalize ${
+                          imageFitMode === mode ? "bg-emerald-700 text-white shadow-2xs" : "text-slate-500 hover:text-slate-800"
+                        }`}
+                      >
+                        {mode}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -632,21 +481,12 @@ const AdminDishFormPage = () => {
                     <img
                       src={foodForm.image}
                       alt={foodForm.name || "Preview"}
-                      className={`h-full w-full ${
-                        imageFitMode === "contain" ? "object-contain p-2" : "object-cover"
-                      }`}
+                      className={`h-full w-full ${imageFitMode === "contain" ? "object-contain p-2" : "object-cover"}`}
                       onError={() => setImageLoadError(true)}
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center p-2 text-center text-slate-400">
-                      <svg className="h-6 w-6 text-slate-300 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span className="text-[10px]">
-                        {imageLoadError
-                          ? "⚠️ Image failed to load. Use direct URL"
-                          : "Paste image link to preview"}
-                      </span>
+                      <span className="text-[10px]">{imageLoadError ? "⚠️ Image failed to load" : "Paste image link to preview"}</span>
                     </div>
                   )}
 
@@ -720,35 +560,19 @@ const AdminDishFormPage = () => {
               )}
             </div>
           </div>
-
         </div>
 
         {/* Bottom Actions */}
         <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-          <button
-            type="button"
-            onClick={handleBack}
-            disabled={saving}
-            className="rounded-xl border border-slate-300 px-5 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer disabled:opacity-50"
-          >
+          <button type="button" onClick={handleBack} disabled={saving} className="rounded-xl border border-slate-300 px-5 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer disabled:opacity-50">
             Cancel
           </button>
-
           <button
             type="submit"
             disabled={saving || (!hasUnsavedChanges && isEditing)}
             className="rounded-xl bg-emerald-700 hover:bg-emerald-800 px-6 py-2.5 text-xs font-bold text-white shadow-xs transition cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
           >
-            {saving ? (
-              <span>Saving...</span>
-            ) : (
-              <>
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>{isEditing ? "Save Changes" : "Publish Dish to Menu"}</span>
-              </>
-            )}
+            {saving ? <span>Saving...</span> : <span>{isEditing ? "Save Changes" : "Publish Dish to Menu"}</span>}
           </button>
         </div>
       </form>

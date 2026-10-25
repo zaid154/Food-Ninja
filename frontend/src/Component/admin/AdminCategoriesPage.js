@@ -4,15 +4,24 @@ import { API_BASE_URL } from "../../utils/Constants";
 import { useAppDialog } from "../AppDialog";
 
 const COLOR_PRESETS = [
-  { label: "Emerald Pastel", bg: "bg-[#f4faee]", border: "border-[#d8ecd0]" },
-  { label: "Warm Orange", bg: "bg-[#fff3eb]", border: "border-[#fed7aa]" },
-  { label: "Golden Yellow", bg: "bg-[#fff8e7]", border: "border-[#fef08a]" },
-  { label: "Soft Rose", bg: "bg-[#fef2f2]", border: "border-[#fecaca]" },
-  { label: "Lemon Yellow", bg: "bg-[#fef9c3]", border: "border-[#fde047]" },
-  { label: "Pastel Pink", bg: "bg-[#fdf2f8]", border: "border-[#fbcfe8]" },
-  { label: "Sky Blue", bg: "bg-[#f0f9ff]", border: "border-[#bae6fd]" },
-  { label: "Soft Violet", bg: "bg-[#f5f3ff]", border: "border-[#ddd6fe]" },
+  { label: "Emerald Pastel", bg: "bg-[#f4faee]" },
+  { label: "Warm Orange", bg: "bg-[#fff3eb]" },
+  { label: "Golden Yellow", bg: "bg-[#fff8e7]" },
+  { label: "Soft Rose", bg: "bg-[#fef2f2]" },
+  { label: "Lemon Yellow", bg: "bg-[#fef9c3]" },
+  { label: "Pastel Pink", bg: "bg-[#fdf2f8]" },
+  { label: "Sky Blue", bg: "bg-[#f0f9ff]" },
+  { label: "Soft Violet", bg: "bg-[#f5f3ff]" },
 ];
+
+const initialCategory = {
+  name: "",
+  img: "",
+  bg: "bg-[#f4faee]",
+  description: "",
+  displayOrder: 1,
+  isFeatured: false,
+};
 
 const AdminCategoriesPage = (props) => {
   const context = useOutletContext() || {};
@@ -21,36 +30,23 @@ const AdminCategoriesPage = (props) => {
   const onRefresh = props.onRefresh || context.fetchData;
   const showToast = props.showToast || context.showToast || showDialog;
 
-  const initialCategory = {
-    name: "",
-    img: "",
-    bg: "bg-[#f4faee]",
-    description: "",
-    displayOrder: 1,
-    isFeatured: false,
-  };
-
   const [form, setForm] = useState(initialCategory);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState("all"); // "all" | "featured" | "active" | "hidden"
+  const [filterType, setFilterType] = useState("all");
 
   const handleSave = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) return;
-
     try {
       setSaving(true);
       const url = editingId ? `${API_BASE_URL}/categories/${editingId}` : `${API_BASE_URL}/categories`;
-      const method = editingId ? "PUT" : "POST";
-
       const res = await fetch(url, {
-        method,
+        method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-
       const data = await res.json();
       if (res.ok) {
         showToast(editingId ? "Category updated successfully!" : "New category created successfully!");
@@ -100,53 +96,30 @@ const AdminCategoriesPage = (props) => {
     }
   };
 
-  const handleToggleStatus = async (cat) => {
+  const handleToggle = async (cat, field, labelTrue, labelFalse) => {
     try {
+      const newVal = !cat[field];
       const res = await fetch(`${API_BASE_URL}/categories/${cat._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: !cat.isActive }),
+        body: JSON.stringify({ [field]: newVal }),
       });
       if (res.ok) {
-        showToast(`Category "${cat.name}" is now ${!cat.isActive ? "Active" : "Hidden"}.`);
+        showToast(`Category "${cat.name}" is now ${newVal ? labelTrue : labelFalse}.`);
         if (onRefresh) onRefresh();
       }
     } catch {
-      showDialog("Failed to update category status.", { title: "Update failed", variant: "error" });
+      showDialog("Failed to update status.", { title: "Update failed", variant: "error" });
     }
   };
 
-  const handleToggleFeatured = async (cat) => {
-    try {
-      const newFeatured = !cat.isFeatured;
-      const res = await fetch(`${API_BASE_URL}/categories/${cat._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isFeatured: newFeatured }),
-      });
-      if (res.ok) {
-        showToast(`Category "${cat.name}" ${newFeatured ? "added to Homepage Showcase" : "removed from Homepage Showcase"}.`);
-        if (onRefresh) onRefresh();
-      }
-    } catch {
-      showDialog("Failed to update featured showcase status.", { title: "Update failed", variant: "error" });
-    }
-  };
-
-  // Filter categories
   const filteredCategories = categories.filter((cat) => {
     const q = search.trim().toLowerCase();
-    const matchesSearch =
-      !q ||
-      (cat.name && cat.name.toLowerCase().includes(q)) ||
-      (cat.description && cat.description.toLowerCase().includes(q));
-
-    let matchesFilter = true;
-    if (filterType === "featured") matchesFilter = Boolean(cat.isFeatured);
-    else if (filterType === "active") matchesFilter = cat.isActive !== false;
-    else if (filterType === "hidden") matchesFilter = cat.isActive === false;
-
-    return matchesSearch && matchesFilter;
+    const matchesSearch = !q || (cat.name && cat.name.toLowerCase().includes(q)) || (cat.description && cat.description.toLowerCase().includes(q));
+    if (filterType === "featured") return matchesSearch && Boolean(cat.isFeatured);
+    if (filterType === "active") return matchesSearch && cat.isActive !== false;
+    if (filterType === "hidden") return matchesSearch && cat.isActive === false;
+    return matchesSearch;
   });
 
   const featuredCount = categories.filter((c) => Boolean(c.isFeatured)).length;
@@ -155,12 +128,8 @@ const AdminCategoriesPage = (props) => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 bg-white p-5 rounded-xl shadow-2xs">
         <div>
-          <h2 className="text-sm font-bold text-slate-900">
-            Admin Categories ({categories.length} Total)
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Manage categories shown in the menu and homepage.
-          </p>
+          <h2 className="text-sm font-bold text-slate-900">Admin Categories ({categories.length} Total)</h2>
+          <p className="text-xs text-slate-400 mt-0.5">Manage categories shown in the menu and homepage.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 text-xs font-bold">
@@ -175,14 +144,8 @@ const AdminCategoriesPage = (props) => {
       <div className="grid gap-6 lg:grid-cols-[380px_minmax(0,1fr)] min-w-0">
         <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-2xs h-fit">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-            <h3 className="font-bold text-slate-900 text-sm">
-              {editingId ? "Edit Category" : "Create New Category"}
-            </h3>
-            {editingId && (
-              <span className="rounded bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5">
-                Editing
-              </span>
-            )}
+            <h3 className="font-bold text-slate-900 text-sm">{editingId ? "Edit Category" : "Create New Category"}</h3>
+            {editingId && <span className="rounded bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5">Editing</span>}
           </div>
 
           <form onSubmit={handleSave} className="space-y-3.5 text-xs">
@@ -212,12 +175,7 @@ const AdminCategoriesPage = (props) => {
                 <div className="mt-2 flex items-center gap-2.5 rounded-lg border border-slate-100 bg-slate-50 p-2">
                   <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-white text-sm font-bold text-emerald-700 shadow-2xs">
                     <span>{form.name.trim().charAt(0) || "?"}</span>
-                    <img
-                      src={form.img}
-                      alt="Preview"
-                      className="absolute inset-0 h-full w-full rounded-full object-cover"
-                      onError={(event) => { event.currentTarget.style.display = "none"; }}
-                    />
+                    <img src={form.img} alt="Preview" className="absolute inset-0 h-full w-full rounded-full object-cover" onError={(e) => { e.currentTarget.style.display = "none"; }} />
                   </div>
                   <div className="min-w-0 text-[11px] text-slate-500">
                     <p className="font-semibold text-slate-700">Image Preview</p>
@@ -283,9 +241,7 @@ const AdminCategoriesPage = (props) => {
                   type="button"
                   onClick={() => setForm({ ...form, isFeatured: !form.isFeatured })}
                   className={`flex w-full items-center justify-center gap-1.5 rounded-lg border py-2 px-2 text-xs font-bold transition cursor-pointer ${
-                    form.isFeatured
-                      ? "border-amber-400 bg-amber-50 text-amber-900"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    form.isFeatured ? "border-amber-400 bg-amber-50 text-amber-900" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                   }`}
                 >
                   <svg className={`h-3.5 w-3.5 ${form.isFeatured ? "text-amber-600" : "text-slate-400"}`} fill={form.isFeatured ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -324,9 +280,7 @@ const AdminCategoriesPage = (props) => {
               <h3 className="font-bold text-slate-900 text-sm">
                 Category Inventory & Home Showcase ({filteredCategories.length} of {categories.length})
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Toggle home showcase or active menu status
-              </p>
+              <p className="text-xs text-slate-400 mt-0.5">Toggle home showcase or active menu status</p>
             </div>
 
             <div className="relative w-full sm:w-60">
@@ -357,24 +311,18 @@ const AdminCategoriesPage = (props) => {
                   type="button"
                   onClick={() => setFilterType(f.id)}
                   className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
-                    isActive
-                      ? "bg-slate-900 text-white shadow-2xs"
-                      : "bg-slate-50 text-slate-600 border border-slate-200/70 hover:bg-slate-100"
+                    isActive ? "bg-slate-900 text-white shadow-2xs" : "bg-slate-50 text-slate-600 border border-slate-200/70 hover:bg-slate-100"
                   }`}
                 >
                   <span>{f.label}</span>
-                  <span className={`ml-1.5 text-[10px] font-bold ${isActive ? "text-slate-300" : "text-slate-400"}`}>
-                    {f.count}
-                  </span>
+                  <span className={`ml-1.5 text-[10px] font-bold ${isActive ? "text-slate-300" : "text-slate-400"}`}>{f.count}</span>
                 </button>
               );
             })}
           </div>
 
           {filteredCategories.length === 0 ? (
-            <div className="py-12 text-center text-xs text-slate-400">
-              No categories match your search or filter.
-            </div>
+            <div className="py-12 text-center text-xs text-slate-400">No categories match your search or filter.</div>
           ) : (
             <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-3 max-h-[640px] overflow-y-auto pr-1">
               {filteredCategories.map((cat) => (
@@ -388,15 +336,12 @@ const AdminCategoriesPage = (props) => {
                     <span className="rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold text-slate-700 border border-slate-200/60 shadow-2xs">
                       Order #{cat.displayOrder || 1}
                     </span>
-
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
-                        onClick={() => handleToggleFeatured(cat)}
+                        onClick={() => handleToggle(cat, "isFeatured", "added to Homepage Showcase", "removed from Homepage Showcase")}
                         className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition cursor-pointer flex items-center gap-1 border ${
-                          cat.isFeatured
-                            ? "bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200"
-                            : "bg-white/80 text-slate-500 border-slate-200 hover:bg-slate-100"
+                          cat.isFeatured ? "bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200" : "bg-white/80 text-slate-500 border-slate-200 hover:bg-slate-100"
                         }`}
                         title="Click to toggle Homepage Showcase"
                       >
@@ -408,11 +353,9 @@ const AdminCategoriesPage = (props) => {
 
                       <button
                         type="button"
-                        onClick={() => handleToggleStatus(cat)}
+                        onClick={() => handleToggle(cat, "isActive", "Active", "Hidden")}
                         className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition cursor-pointer ${
-                          cat.isActive !== false
-                            ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-                            : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                          cat.isActive !== false ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200" : "bg-slate-200 text-slate-700 hover:bg-slate-300"
                         }`}
                         title="Click to toggle active status"
                       >
@@ -425,21 +368,12 @@ const AdminCategoriesPage = (props) => {
                     <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-1 text-sm font-bold text-emerald-700 shadow-xs">
                       <span>{cat.name?.charAt(0)}</span>
                       {cat.img && (
-                        <img
-                          src={cat.img}
-                          alt={cat.name}
-                          className="absolute inset-1 h-[calc(100%-0.5rem)] w-[calc(100%-0.5rem)] rounded-full object-cover"
-                          onError={(event) => { event.currentTarget.style.display = "none"; }}
-                        />
+                        <img src={cat.img} alt={cat.name} className="absolute inset-1 h-[calc(100%-0.5rem)] w-[calc(100%-0.5rem)] rounded-full object-cover" onError={(e) => { e.currentTarget.style.display = "none"; }} />
                       )}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-extrabold text-slate-900 text-sm tracking-tight truncate">
-                        {cat.name}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
-                        {cat.description}
-                      </p>
+                      <h4 className="font-extrabold text-slate-900 text-sm tracking-tight truncate">{cat.name}</h4>
+                      <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{cat.description}</p>
                       <p className="text-[10px] font-semibold text-emerald-700 mt-1">
                         {cat.dishCount !== undefined ? `${cat.dishCount} Dishes` : "Catalog active"}
                       </p>
@@ -447,18 +381,10 @@ const AdminCategoriesPage = (props) => {
                   </div>
 
                   <div className="flex items-center justify-end gap-1.5 border-t border-slate-200/60 pt-2.5">
-                    <button
-                      type="button"
-                      onClick={() => handleEdit(cat)}
-                      className="rounded-lg bg-white/90 border border-slate-200/90 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-white shadow-2xs cursor-pointer"
-                    >
+                    <button type="button" onClick={() => handleEdit(cat)} className="rounded-lg bg-white/90 border border-slate-200/90 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-white shadow-2xs cursor-pointer">
                       Edit
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(cat._id, cat.name)}
-                      className="rounded-lg bg-rose-50 border border-rose-200/80 px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100 cursor-pointer"
-                    >
+                    <button type="button" onClick={() => handleDelete(cat._id, cat.name)} className="rounded-lg bg-rose-50 border border-rose-200/80 px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100 cursor-pointer">
                       Delete
                     </button>
                   </div>
