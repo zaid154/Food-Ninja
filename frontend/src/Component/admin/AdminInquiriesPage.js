@@ -112,9 +112,22 @@ const AdminInquiriesPage = (props) => {
   const context = useOutletContext() || {};
   const { alert: showDialog } = useAppDialog();
   const inquiries = props.inquiries || context.inquiries || [];
+  const contextOrders = props.orders || context.orders || [];
   const onRefresh = props.onRefresh || context.fetchData;
   const onDeleteInquiry = props.onDeleteInquiry || context.handleDeleteInquiry;
   const showToast = props.showToast || context.showToast || showDialog;
+
+  const [orders, setOrders] = useState(contextOrders);
+  useEffect(() => {
+    if (contextOrders && contextOrders.length > 0) {
+      setOrders(contextOrders);
+    } else {
+      try {
+        const local = JSON.parse(localStorage.getItem("orders") || "[]");
+        if (local.length > 0) setOrders(local);
+      } catch {}
+    }
+  }, [contextOrders]);
 
   const [localInquiries, setLocalInquiries] = useState(inquiries);
   useEffect(() => {
@@ -259,6 +272,8 @@ const AdminInquiriesPage = (props) => {
                 const phone = inq.phone?.trim() || "";
                 const isUrgent = inq.priority === "urgent" || inq.priority === "high";
                 const timeStr = inq.createdAt ? new Date(inq.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "";
+                const liveOrder = orders.find((o) => String(o.id) === String(inq.orderId));
+                const currentStatus = liveOrder?.status || inq.orderStatus;
 
                 return (
                   <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/50 text-slate-500" : "hover:bg-slate-50/70 text-slate-800"}`}>
@@ -278,8 +293,30 @@ const AdminInquiriesPage = (props) => {
                           <span>{inq.priority || "NORMAL"}</span>
                         </span>
                       </div>
-                      {inq.orderStatus && (
-                        <p className="text-[10px] text-slate-400">At stage: <span className="font-semibold text-slate-600">{inq.orderStatus}</span></p>
+                      {currentStatus && (
+                        <div className="text-[10px] space-y-0.5">
+                          <p className="text-slate-500 flex items-center gap-1">
+                            <span className="text-slate-400">Live Stage:</span>
+                            <span className={`font-bold px-1.5 py-0.2 rounded text-[10px] ${
+                              currentStatus === "Preparing"
+                                ? "bg-amber-50 text-amber-800 border border-amber-200"
+                                : currentStatus === "Delivered"
+                                ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                                : currentStatus === "Out for Delivery"
+                                ? "bg-sky-50 text-sky-800 border border-sky-200"
+                                : currentStatus === "Cancelled"
+                                ? "bg-rose-50 text-rose-800 border border-rose-200"
+                                : "bg-purple-50 text-purple-800 border border-purple-200"
+                            }`}>
+                              {currentStatus}
+                            </span>
+                          </p>
+                          {inq.orderStatus && liveOrder?.status && inq.orderStatus !== liveOrder.status && (
+                            <p className="text-[9px] text-slate-400">
+                              (Filed when: <span className="font-medium text-slate-500">{inq.orderStatus}</span>)
+                            </p>
+                          )}
+                        </div>
                       )}
                     </td>
 
