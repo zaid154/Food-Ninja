@@ -52,15 +52,21 @@ const ContactPage = () => {
     storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
     storePhone: "+91 98765 43210",
     storeEmail: "support@foodninja.com",
+    operatingHoursText: "6:00 AM – 8:00 PM",
   });
 
   useEffect(() => {
-    if (typeof fetch !== "undefined") {
-      fetch(`${API_BASE_URL}/settings`)
-        .then((r) => r.json())
-        .then((d) => { if (d?.settings) setStoreSettings(d.settings); })
-        .catch(() => {});
-    }
+    const loadSettings = () => {
+      if (typeof fetch !== "undefined") {
+        fetch(`${API_BASE_URL}/settings`)
+          .then((r) => r.json())
+          .then((d) => { if (d?.settings) setStoreSettings((prev) => ({ ...prev, ...d.settings })); })
+          .catch(() => {});
+      }
+    };
+    loadSettings();
+    window.addEventListener("store_settings_updated", loadSettings);
+    return () => window.removeEventListener("store_settings_updated", loadSettings);
   }, []);
 
   useEffect(() => {
@@ -228,7 +234,9 @@ const ContactPage = () => {
                   <a href={`tel:${(storeSettings.storePhone || "+919876543210").replace(/\s/g, "")}`} className="text-emerald-700 font-semibold hover:underline">
                     {storeSettings.storePhone || "+91 98765 43210"}
                   </a>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Kitchen Hours: Mon–Sun, 9:00 AM – 11:30 PM</span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">
+                    Kitchen Hours: {storeSettings.operatingHoursText ? `Mon–Sun, ${storeSettings.operatingHoursText}` : "Mon–Sun, 9:00 AM – 11:30 PM"}
+                  </span>
                 </div>
                 <div>
                   <strong className="text-slate-900 block font-bold">Priority Customer Support:</strong>

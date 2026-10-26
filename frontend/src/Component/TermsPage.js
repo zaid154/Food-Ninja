@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../utils/Constants";
 
 const TERMS_SECTIONS = [
   {
@@ -72,8 +73,26 @@ const TERMS_SECTIONS = [
 ];
 
 const TermsPage = () => {
+  const [settings, setSettings] = useState({
+    restaurantName: "Food Ninja",
+    storeEmail: "support@foodninja.com",
+    storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    const loadSettings = () => {
+      if (typeof fetch === "undefined") return;
+      fetch(`${API_BASE_URL}/settings`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d?.settings) setSettings((prev) => ({ ...prev, ...d.settings }));
+        })
+        .catch(() => {});
+    };
+    loadSettings();
+    window.addEventListener("store_settings_updated", loadSettings);
+    return () => window.removeEventListener("store_settings_updated", loadSettings);
   }, []);
 
   return (
@@ -127,9 +146,9 @@ const TermsPage = () => {
               <p>In compliance with the Consumer Protection (E-Commerce) Rules, 2020:</p>
               <div className="mt-3 rounded-xl bg-white p-4 border border-emerald-200 text-xs space-y-1 text-slate-700">
                 <p><strong>Desk:</strong> Customer Care & Grievance Redressal Officer</p>
-                <p><strong>Restaurant Entity:</strong> FoodNinja Restaurant & Kitchen</p>
-                <p><strong>Official Email:</strong> <a href="mailto:foodninja@gmail.com" className="text-emerald-700 font-bold hover:underline">foodninja@gmail.com</a></p>
-                <p><strong>Kitchen Hub:</strong> FoodNinja Central Kitchen, Connaught Place, New Delhi 110001, India</p>
+                <p><strong>Restaurant Entity:</strong> {settings.restaurantName || "Food Ninja"}</p>
+                <p><strong>Official Email:</strong> <a href={`mailto:${settings.storeEmail || "support@foodninja.com"}`} className="text-emerald-700 font-bold hover:underline">{settings.storeEmail || "support@foodninja.com"}</a></p>
+                <p><strong>Kitchen Hub:</strong> {settings.storeAddress || "Food Ninja Central Kitchen, Delhi NCR, India"}</p>
                 <p><strong>Turnaround:</strong> Acknowledgment within 24–48 hours; prompt resolution within 7 working days.</p>
               </div>
             </div>

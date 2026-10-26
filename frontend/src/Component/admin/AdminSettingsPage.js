@@ -117,6 +117,9 @@ const AdminSettingsPage = (props) => {
       const data = await res.json();
       if (res.ok) {
         showToast("All settings & legal details saved successfully!");
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("store_settings_updated", { detail: data.settings }));
+        }
       } else {
         showDialog(data.message || "Failed to save settings.", { title: "Could not save settings", variant: "error" });
       }

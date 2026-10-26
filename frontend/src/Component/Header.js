@@ -47,7 +47,11 @@ const Header = () => {
     };
     refreshSettings();
     const interval = setInterval(refreshSettings, 60_000);
-    return () => clearInterval(interval);
+    window.addEventListener("store_settings_updated", refreshSettings);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("store_settings_updated", refreshSettings);
+    };
   }, [location.pathname]);
 
   useEffect(() => {
@@ -142,8 +146,24 @@ const Header = () => {
       ) : null}
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 sm:px-10 py-3.5">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <img src={LOGO} alt="Food Ninja" className="h-9 w-9 rounded-full object-cover shadow-2xs group-hover:scale-105 transition-transform" />
-          <span className="font-black text-xl tracking-tight text-slate-900">Food<span className="text-emerald-600">Ninja</span></span>
+          <img src={LOGO} alt={storeSettings?.restaurantName || "Food Ninja"} className="h-9 w-9 rounded-full object-cover shadow-2xs group-hover:scale-105 transition-transform" />
+          <span className="font-black text-xl tracking-tight text-slate-900">
+            {storeSettings?.restaurantName ? (
+              (() => {
+                const parts = storeSettings.restaurantName.trim().split(/\s+/);
+                if (parts.length > 1) {
+                  return (
+                    <>
+                      {parts[0]} <span className="text-emerald-600">{parts.slice(1).join(" ")}</span>
+                    </>
+                  );
+                }
+                return storeSettings.restaurantName;
+              })()
+            ) : (
+              <>Food<span className="text-emerald-600">Ninja</span></>
+            )}
+          </span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-10">

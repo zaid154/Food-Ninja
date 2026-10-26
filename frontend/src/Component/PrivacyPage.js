@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../utils/Constants";
 
 const PRIVACY_SECTIONS = [
   {
@@ -76,8 +77,26 @@ const PRIVACY_SECTIONS = [
 ];
 
 const PrivacyPage = () => {
+  const [settings, setSettings] = useState({
+    restaurantName: "Food Ninja",
+    storeEmail: "support@foodninja.com",
+    storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    const loadSettings = () => {
+      if (typeof fetch === "undefined") return;
+      fetch(`${API_BASE_URL}/settings`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d?.settings) setSettings((prev) => ({ ...prev, ...d.settings }));
+        })
+        .catch(() => {});
+    };
+    loadSettings();
+    window.addEventListener("store_settings_updated", loadSettings);
+    return () => window.removeEventListener("store_settings_updated", loadSettings);
   }, []);
 
   return (
@@ -137,9 +156,9 @@ const PrivacyPage = () => {
               <p>For questions, concerns, or formal grievances regarding this Privacy Policy or our data handling practices:</p>
               <div className="mt-3 rounded-xl bg-white p-4 border border-emerald-200 text-xs space-y-1 text-slate-700">
                 <p><strong>Designation:</strong> Data Protection & Grievance Redressal Officer</p>
-                <p><strong>Entity:</strong> FoodNinja Technologies</p>
-                <p><strong>Official Email:</strong> <a href="mailto:foodninja@gmail.com" className="text-emerald-700 font-bold hover:underline">foodninja@gmail.com</a></p>
-                <p><strong>Corporate Address:</strong> FoodNinja Corporate Hub, Connaught Place, New Delhi 110001, India</p>
+                <p><strong>Entity:</strong> {settings.restaurantName || "Food Ninja"}</p>
+                <p><strong>Official Email:</strong> <a href={`mailto:${settings.storeEmail || "support@foodninja.com"}`} className="text-emerald-700 font-bold hover:underline">{settings.storeEmail || "support@foodninja.com"}</a></p>
+                <p><strong>Corporate Address:</strong> {settings.storeAddress || "Food Ninja Central Kitchen, Delhi NCR, India"}</p>
                 <p><strong>Turnaround Time:</strong> Formal response within 48 business hours.</p>
               </div>
             </div>

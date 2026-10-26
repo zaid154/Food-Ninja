@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../utils/Constants";
 
 const METRICS = [
   { val: "38+", label: "Signature Dishes" },
@@ -27,12 +28,21 @@ const KITCHEN_STEPS = [
   {
     num: "04",
     title: "Direct Express Delivery",
-    desc: "Dispatched directly from our Connaught Place kitchen via our dedicated delivery fleet within 25–30 minutes flat."
+    desc: "Dispatched directly from our central kitchen via our dedicated delivery fleet within 25–30 minutes flat."
   }
 ];
 
 const AboutPage = () => {
   const [profile, setProfile] = useState(null);
+  const [settings, setSettings] = useState({
+    restaurantName: "Food Ninja",
+    fssaiNumber: "10020011000123",
+    gstinNumber: "07AAAAF1234A1Z5",
+    storePhone: "+91 98765 43210",
+    storeEmail: "support@foodninja.com",
+    storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
+    operatingHoursText: "6:00 AM – 8:00 PM",
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -40,7 +50,27 @@ const AboutPage = () => {
       .then((res) => res.json())
       .then((data) => setProfile(data))
       .catch(() => {});
+
+    const loadSettings = () => {
+      if (typeof fetch === "undefined") return;
+      fetch(`${API_BASE_URL}/settings`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.settings) {
+            setSettings((prev) => ({ ...prev, ...data.settings }));
+          }
+        })
+        .catch(() => {});
+    };
+
+    loadSettings();
+    window.addEventListener("store_settings_updated", loadSettings);
+    return () => {
+      window.removeEventListener("store_settings_updated", loadSettings);
+    };
   }, []);
+
+  const brandName = settings.restaurantName || "Food Ninja";
 
   return (
     <div className="bg-white pt-2 sm:pt-4 text-slate-800">
@@ -53,7 +83,7 @@ const AboutPage = () => {
               <span className="text-emerald-700">Crafted on Order, Delivered Fast.</span>
             </h1>
             <p className="mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
-              FoodNinja is our flagship artisanal restaurant and dedicated cloud kitchen based in Connaught Place, New Delhi. Unlike third-party marketplace aggregators, we don&apos;t outsource your food. Every meal on our menu is prepared in-house by our master chefs using fresh morning produce, cold-pressed oils, and authentic regional spice blends.
+              {brandName} is our flagship artisanal restaurant and dedicated cloud kitchen based in {settings.storeAddress ? settings.storeAddress : "Delhi NCR"}. Unlike third-party marketplace aggregators, we don&apos;t outsource your food. Every meal on our menu is prepared in-house by our master chefs using fresh morning produce, cold-pressed oils, and authentic regional spice blends.
             </p>
             <p className="mt-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
               We maintain strictly segregated, hygienic preparation zones for Vegetarian, Non-Vegetarian, and Vegan dishes. No frozen pre-cooked gravies — only piping hot food delivered within 25–30 minutes flat.
@@ -85,7 +115,7 @@ const AboutPage = () => {
             <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white">
               <img
                 src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80"
-                alt="FoodNinja Master Chefs in Kitchen"
+                alt={`${brandName} Master Chefs in Kitchen`}
                 className="h-72 sm:h-80 w-full object-cover"
                 loading="lazy"
               />
@@ -93,7 +123,7 @@ const AboutPage = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700">Culinary Standard</span>
-                    <h3 className="text-sm font-black text-slate-900">Connaught Place Central Kitchen</h3>
+                    <h3 className="text-sm font-black text-slate-900">{brandName} Central Kitchen</h3>
                   </div>
                   <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">FSSAI Verified</span>
                 </div>
@@ -109,7 +139,7 @@ const AboutPage = () => {
         <div className="mb-10">
           <div className="mb-4">
             <span className="text-xs font-black uppercase tracking-widest text-emerald-700">Kitchen Philosophy</span>
-            <h2 className="mt-1 text-xl sm:text-2xl font-black text-slate-900 tracking-tight">How FoodNinja Prepares Your Meal</h2>
+            <h2 className="mt-1 text-xl sm:text-2xl font-black text-slate-900 tracking-tight">How {brandName} Prepares Your Meal</h2>
             <p className="text-xs text-slate-500 mt-0.5">From morning farm sourcing to hot, tamper-evident doorstep dispatch.</p>
           </div>
 
@@ -135,16 +165,26 @@ const AboutPage = () => {
             <div className="space-y-3 text-xs text-slate-600 border-t border-slate-100 pt-3.5">
               <div>
                 <strong className="text-slate-900 block font-bold">FSSAI Central Kitchen Registration:</strong>
-                <span className="text-slate-500">License No. 13324001000452 (Single Commercial Restaurant & Cloud Kitchen)</span>
+                <span className="text-slate-500 font-mono">License No. {settings.fssaiNumber || "10020011000123"} (Single Commercial Restaurant & Cloud Kitchen)</span>
               </div>
+              {settings.gstinNumber && (
+                <div>
+                  <strong className="text-slate-900 block font-bold">GSTIN Registration:</strong>
+                  <span className="text-slate-500 font-mono">{settings.gstinNumber}</span>
+                </div>
+              )}
               <div>
                 <strong className="text-slate-900 block font-bold">Registered Office & Kitchen Address:</strong>
-                <span className="text-slate-500">FoodNinja Central Kitchen, Connaught Place, New Delhi 110001, India</span>
+                <span className="text-slate-500">{settings.storeAddress || "Shop 12, Food Street, Sector 62, Delhi NCR"}</span>
               </div>
               <div>
                 <strong className="text-slate-900 block font-bold">Direct Customer & Order Support:</strong>
-                <a href="mailto:foodninja@gmail.com" className="text-emerald-700 font-semibold hover:underline">foodninja@gmail.com</a>
-                <span className="text-slate-400 block mt-0.5">Helpline: +91 98765 43210 (Mon–Sun, 9:00 AM – 11:30 PM)</span>
+                <a href={`mailto:${settings.storeEmail || "support@foodninja.com"}`} className="text-emerald-700 font-semibold hover:underline">
+                  {settings.storeEmail || "support@foodninja.com"}
+                </a>
+                <span className="text-slate-400 block mt-0.5">
+                  Helpline: <a href={`tel:${(settings.storePhone || "+919876543210").replace(/\s/g, "")}`} className="hover:underline text-slate-600 font-semibold">{settings.storePhone || "+91 98765 43210"}</a> ({settings.operatingHoursText ? `Operating Hours: ${settings.operatingHoursText}` : "Mon–Sun, 9:00 AM – 11:30 PM"})
+                </span>
               </div>
             </div>
           </div>
@@ -162,7 +202,7 @@ const AboutPage = () => {
               </div>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed italic border-t border-slate-200/60 pt-3.5">
-              &quot;We founded FoodNinja with a simple commitment: exceptional, chef-crafted meals without compromising on kitchen hygiene, authentic ingredients, or speed. Every line of code on this web platform and every recipe cooked in our kitchen is crafted with genuine passion.&quot;
+              &quot;We founded {brandName} with a simple commitment: exceptional, chef-crafted meals without compromising on kitchen hygiene, authentic ingredients, or speed. Every line of code on this web platform and every recipe cooked in our kitchen is crafted with genuine passion.&quot;
             </p>
             <div className="mt-4 flex items-center justify-between text-[11px] text-slate-400">
               <span>Full-Stack Architecture (MERN)</span>

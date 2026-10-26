@@ -12,14 +12,19 @@ const Footer = () => {
   });
 
   useEffect(() => {
-    if (typeof fetch !== "undefined") {
-      fetch(`${API_BASE_URL}/settings`)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d && d.settings) setSettings(d.settings);
-        })
-        .catch(() => {});
-    }
+    const loadSettings = () => {
+      if (typeof fetch !== "undefined") {
+        fetch(`${API_BASE_URL}/settings`)
+          .then((r) => r.json())
+          .then((d) => {
+            if (d && d.settings) setSettings(d.settings);
+          })
+          .catch(() => {});
+      }
+    };
+    loadSettings();
+    window.addEventListener("store_settings_updated", loadSettings);
+    return () => window.removeEventListener("store_settings_updated", loadSettings);
   }, []);
 
   return (
@@ -29,8 +34,24 @@ const Footer = () => {
           {/* Col 1: Brand Info */}
           <div>
             <Link to="/" className="inline-flex items-center gap-2.5 group">
-              <img src={LOGO} alt="Food Ninja" className="h-10 w-10 rounded-full object-cover p-0.5 bg-white shadow-xs" />
-              <span className="font-black text-xl tracking-tight text-white">Food<span className="text-emerald-400">Ninja</span></span>
+              <img src={LOGO} alt={settings.restaurantName || "Food Ninja"} className="h-10 w-10 rounded-full object-cover p-0.5 bg-white shadow-xs" />
+              <span className="font-black text-xl tracking-tight text-white">
+                {settings.restaurantName ? (
+                  (() => {
+                    const parts = settings.restaurantName.trim().split(/\s+/);
+                    if (parts.length > 1) {
+                      return (
+                        <>
+                          {parts[0]} <span className="text-emerald-400">{parts.slice(1).join(" ")}</span>
+                        </>
+                      );
+                    }
+                    return settings.restaurantName;
+                  })()
+                ) : (
+                  <>Food<span className="text-emerald-400">Ninja</span></>
+                )}
+              </span>
             </Link>
             <p className="mt-4 text-xs text-slate-400 leading-relaxed max-w-xs">
               Delicious meals crafted with fresh ingredients, delivered hot and fresh directly to your doorstep.
