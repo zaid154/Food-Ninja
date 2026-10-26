@@ -160,9 +160,6 @@ const MenuPage = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-xs text-xs">
-                  🥷
-                </span>
                 <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
                   Explore Food<span className="text-emerald-600">Ninja</span> Menu
                 </h1>
@@ -170,35 +167,9 @@ const MenuPage = () => {
                   {pagination.totalItems || dishes.length} Dishes
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-500 mt-1">
+              <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
                 Select one or multiple cuisines to mix & match dishes, or sort by preferences
               </p>
-
-              {/* Multi-category tags */}
-              {selectedCategories.length > 0 && (
-                <div className="flex flex-wrap items-center gap-1.5 mt-2.5 pt-2 border-t border-emerald-100/70">
-                  <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Active Filters:</span>
-                  {selectedCategories.map((catName) => (
-                    <button
-                      key={catName}
-                      type="button"
-                      onClick={() => handleToggleCategory(catName)}
-                      className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-900 px-2 py-0.5 text-[10px] font-bold border border-emerald-200 shadow-2xs hover:bg-emerald-200 transition cursor-pointer"
-                      title={`Remove ${catName}`}
-                    >
-                      <span>{catName}</span>
-                      <span className="text-emerald-700 hover:text-emerald-950 font-black">✕</span>
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => updateQuery({ category: "All", page: 1 })}
-                    className="text-[10px] text-slate-400 hover:text-emerald-700 font-semibold underline ml-1 cursor-pointer"
-                  >
-                    Clear All
-                  </button>
-                </div>
-              )}
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
