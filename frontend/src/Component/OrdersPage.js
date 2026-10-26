@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { cancelOrder } from "../utils/ordersSlice";
+import { cancelOrder, clearOrders } from "../utils/ordersSlice";
 import UserContext from "./Usercontext";
 import { API_BASE_URL } from "../utils/Constants";
 import { useAppDialog } from "./AppDialog";
@@ -58,8 +58,12 @@ const OrdersPage = () => {
             const userEmailParam = user && user.email ? user.email : "foodninja@gmail.com";
             const res = await fetch(`${API_BASE_URL}/orders?email=${userEmailParam}`);
             const data = await res.json();
-            if (data.orders && data.orders.length > 0) {
+            if (res.ok && Array.isArray(data.orders)) {
                 setOrders(data.orders);
+                // When backend confirms 0 orders, sync and clean stale localStorage orders
+                if (data.orders.length === 0 && localOrders.length > 0) {
+                    dispatch(clearOrders());
+                }
             } else {
                 setOrders(localOrders);
             }
@@ -72,7 +76,7 @@ const OrdersPage = () => {
 
     useEffect(() => {
         fetchOrders();
-    }, [user, localOrders]);
+    }, [user]);
 
     const handleCancel = async (e, id) => {
         e.stopPropagation();
