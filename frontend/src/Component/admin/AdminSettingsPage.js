@@ -319,7 +319,7 @@ const AdminSettingsPage = (props) => {
                 />
               </div>
 
-              <div className="sm:col-span-2">
+              <div>
                 <label className="block font-bold text-slate-700 mb-1">Support Email Address</label>
                 <input
                   type="email"
@@ -408,135 +408,156 @@ const AdminSettingsPage = (props) => {
           <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
             <div className="border-b border-slate-100 pb-3">
               <h2 className="font-bold text-slate-900 text-sm">Store Operations & Announcement Banner</h2>
-              <p className="text-xs text-slate-400 mt-0.5">Control live order intake and customer announcements</p>
+              <p className="text-xs text-slate-400 mt-0.5">Control live order intake, kitchen schedule, and storefront announcements</p>
             </div>
 
-            <div className="space-y-3.5 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1.5">Manual Store Status</label>
-                <div className="grid grid-cols-2 gap-3 max-w-md">
-                  <button
-                    type="button"
-                    onClick={() => setSettings({ ...settings, restaurantOpen: true })}
-                    className={`rounded-xl border py-2.5 px-3 font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                      settings.restaurantOpen
-                        ? "border-emerald-600 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-500/20"
-                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    <span className="h-2 w-2 rounded-full bg-emerald-600" />
-                    <span>Open for Orders</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSettings({ ...settings, restaurantOpen: false })}
-                    className={`rounded-xl border py-2.5 px-3 font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                      !settings.restaurantOpen
-                        ? "border-rose-600 bg-rose-50 text-rose-800 ring-2 ring-rose-500/20"
-                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    <span className="h-2 w-2 rounded-full bg-rose-600" />
-                    <span>Closed (Pause)</span>
-                  </button>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 text-xs">
+              {/* Left Column: Store Status & Operating Schedule */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1.5">Manual Store Status</label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setSettings({ ...settings, restaurantOpen: true })}
+                      className={`rounded-xl border py-2 px-3 font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                        settings.restaurantOpen
+                          ? "border-emerald-600 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-500/20"
+                          : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                      }`}
+                    >
+                      <span className="h-2 w-2 rounded-full bg-emerald-600" />
+                      <span>Open for Orders</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSettings({ ...settings, restaurantOpen: false })}
+                      className={`rounded-xl border py-2 px-3 font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                        !settings.restaurantOpen
+                          ? "border-rose-600 bg-rose-50 text-rose-800 ring-2 ring-rose-500/20"
+                          : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                      }`}
+                    >
+                      <span className="h-2 w-2 rounded-full bg-rose-600" />
+                      <span>Closed (Pause)</span>
+                    </button>
+                  </div>
+                  <p className="mt-1 text-[10px] text-slate-400">
+                    Open clears the manual pause. If auto-close is enabled, orders still stop outside kitchen hours.
+                  </p>
                 </div>
-                <p className="mt-2 max-w-md text-[10px] text-slate-400">
-                  Open clears the manual pause. If auto-close is enabled, orders still stop outside kitchen hours.
-                </p>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold text-slate-700">Kitchen Operating Hours</label>
+                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                      {settings.operatingHoursText || "6:00 AM – 8:00 PM"}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <OperatingTimePicker
+                      label="Opening Time"
+                      value={settings.openingTime || "06:00"}
+                      onChange={(value) => updateHours(value, undefined)}
+                    />
+                    <OperatingTimePicker
+                      label="Closing Time"
+                      value={settings.closingTime || "20:00"}
+                      onChange={(value) => updateHours(undefined, value)}
+                    />
+                  </div>
+                  <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={settings.autoScheduleEnabled !== false}
+                      onChange={(e) => setSettings({ ...settings, autoScheduleEnabled: e.target.checked })}
+                      className="h-3.5 w-3.5 rounded border-slate-300 text-emerald-600 accent-emerald-600 cursor-pointer"
+                    />
+                    <span className="text-[11px] font-semibold text-slate-700">
+                      Auto-close outside kitchen hours
+                    </span>
+                  </label>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">
+                    When enabled, orders are automatically blocked before opening time and after closing time
+                  </span>
+                </div>
+
+                {showClosedNoticeEditor && (
+                  <div className="rounded-xl border border-rose-200 bg-rose-50/40 p-3 space-y-2">
+                    <label className="block font-bold text-rose-900 text-xs">Custom Pause / Closed Notice <span className="text-slate-400 font-normal">(Optional)</span></label>
+                    <textarea
+                      rows={2}
+                      value={settings.closedNoticeMessage || ""}
+                      onChange={(e) => setSettings({ ...settings, closedNoticeMessage: e.target.value })}
+                      placeholder="Leave empty for default notice, or type a custom reason..."
+                      className="w-full rounded-xl border border-rose-200 px-3 py-2 outline-none focus:border-rose-400 resize-none bg-white text-xs"
+                    />
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        "Heavy Kitchen Rush — Resuming soon",
+                        "Temporary Kitchen Maintenance",
+                        "Special Event / Private Catering",
+                      ].map((chip) => (
+                        <button
+                          key={chip}
+                          type="button"
+                          onClick={() => setSettings({ ...settings, closedNoticeMessage: chip })}
+                          className="text-[10px] font-semibold text-rose-700 bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded-full px-2 py-0.5 transition cursor-pointer"
+                        >
+                          {chip}
+                        </button>
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-slate-400 block">Shown on the storefront header, cart, and checkout whenever the store is closed</span>
+                  </div>
+                )}
               </div>
 
-              {showClosedNoticeEditor && (
-                <div className="max-w-md space-y-2">
-                  <label className="block font-bold text-slate-700">Custom Pause / Closed Notice <span className="text-slate-400 font-normal">(Optional)</span></label>
+              {/* Right Column: Minimum Order Value & Announcement Banner */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Minimum Order Value (₹) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    value={settings.minOrderValue}
+                    onChange={(e) => setSettings({ ...settings, minOrderValue: Number(e.target.value) })}
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono"
+                  />
+                  <span className="text-[10px] text-slate-400">Checkout is blocked if total is below this amount</span>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Storefront Announcement Banner</label>
                   <textarea
                     rows={2}
-                    value={settings.closedNoticeMessage || ""}
-                    onChange={(e) => setSettings({ ...settings, closedNoticeMessage: e.target.value })}
-                    placeholder="Leave empty for default notice, or type a custom reason..."
-                    className="w-full rounded-xl border border-rose-200 px-3 py-2 outline-none focus:border-rose-400 resize-none bg-rose-50/30 text-xs"
+                    value={settings.announcement}
+                    onChange={(e) => setSettings({ ...settings, announcement: e.target.value })}
+                    placeholder="e.g. Free delivery on orders above ₹499! Enjoy freshly cooked authentic meals."
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 resize-none"
                   />
-                  <div className="flex flex-wrap gap-1.5">
-                    {[
-                      "Heavy Kitchen Rush — Resuming soon",
-                      "Temporary Kitchen Maintenance",
-                      "Special Event / Private Catering",
-                    ].map((chip) => (
-                      <button
-                        key={chip}
-                        type="button"
-                        onClick={() => setSettings({ ...settings, closedNoticeMessage: chip })}
-                        className="text-[10px] font-semibold text-rose-700 bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded-full px-2.5 py-1 transition cursor-pointer"
-                      >
-                        {chip}
-                      </button>
-                    ))}
+                  <span className="text-[10px] text-slate-400">Broadcasted across customer store top notice bar</span>
+                </div>
+
+                {/* Live Customer Notice Preview Card */}
+                <div className="rounded-xl border border-slate-200/90 bg-slate-50/70 p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Storefront Notice Live Preview</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      isPreviewOpen ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
+                    }`}>
+                      {isPreviewOpen ? "Active Banner" : "Closed Notice"}
+                    </span>
                   </div>
-                  <span className="text-[10px] text-slate-400 block">Shown on the storefront header, cart, and checkout whenever the store is closed</span>
+                  <div className={`p-2.5 rounded-lg text-xs font-semibold ${
+                    isPreviewOpen
+                      ? "bg-emerald-700 text-white shadow-2xs"
+                      : "bg-rose-600 text-white shadow-2xs"
+                  }`}>
+                    <p className="line-clamp-2">{isPreviewOpen ? (settings.announcement || "No announcement set") : previewBannerText}</p>
+                  </div>
                 </div>
-              )}
-
-              <div className="max-w-md">
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block font-bold text-slate-700">Kitchen Operating Hours</label>
-                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                    {settings.operatingHoursText || "6:00 AM – 8:00 PM"}
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <OperatingTimePicker
-                    label="Opening Time"
-                    value={settings.openingTime || "06:00"}
-                    onChange={(value) => updateHours(value, undefined)}
-                  />
-                  <OperatingTimePicker
-                    label="Closing Time"
-                    value={settings.closingTime || "20:00"}
-                    onChange={(value) => updateHours(undefined, value)}
-                  />
-                </div>
-                <span className="text-[10px] text-slate-400 mt-1 block">
-                  Displayed to customers on the header and during closed hours. Schedule uses India Standard Time (IST).
-                </span>
-
-                <label className="flex items-center gap-2.5 mt-2.5 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={settings.autoScheduleEnabled !== false}
-                    onChange={(e) => setSettings({ ...settings, autoScheduleEnabled: e.target.checked })}
-                    className="h-4 w-4 rounded border-slate-300 text-emerald-600 accent-emerald-600 cursor-pointer"
-                  />
-                  <span className="text-[11px] font-semibold text-slate-700">
-                    Auto-close outside kitchen hours
-                  </span>
-                </label>
-                <span className="text-[10px] text-slate-400 block mt-0.5">
-                  When enabled, orders are automatically blocked before opening time and after closing time
-                </span>
-              </div>
-
-              <div className="max-w-md">
-                <label className="block font-bold text-slate-700 mb-1">Minimum Order Value (₹) *</label>
-                <input
-                  type="number"
-                  required
-                  min="0"
-                  value={settings.minOrderValue}
-                  onChange={(e) => setSettings({ ...settings, minOrderValue: Number(e.target.value) })}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 font-mono"
-                />
-                <span className="text-[10px] text-slate-400">Checkout is blocked if total is below this amount</span>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Storefront Announcement Banner</label>
-                <textarea
-                  rows={2}
-                  value={settings.announcement}
-                  onChange={(e) => setSettings({ ...settings, announcement: e.target.value })}
-                  placeholder="e.g. Free delivery on orders above ₹499! Enjoy freshly cooked authentic meals."
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-emerald-500 resize-none"
-                />
-                <span className="text-[10px] text-slate-400">Broadcasted across customer store notice bar</span>
               </div>
             </div>
           </div>

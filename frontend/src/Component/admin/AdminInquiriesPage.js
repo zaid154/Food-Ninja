@@ -5,31 +5,36 @@ import { useAppDialog } from "../AppDialog";
 
 const CustomerInfo = ({ name, email, phone, orderId }) => (
   <div className="space-y-1">
-    {orderId && (
-      <Link
-        to={`/orders/${orderId}`}
-        target="_blank"
-        className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
-        title="Open Order in new tab"
-      >
-        <span>Order #{orderId}</span>
-        <span className="text-[9px]">↗</span>
-      </Link>
-    )}
-    <div>
-      <p className="font-bold text-slate-900 text-xs leading-tight tracking-tight">{name || "Customer"}</p>
+    <div className="flex items-center gap-1.5 flex-wrap">
+      <span className="font-bold text-slate-900 text-xs tracking-tight">{name || "Customer"}</span>
+      {orderId && (
+        <Link
+          to={`/orders/${orderId}`}
+          target="_blank"
+          className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 bg-emerald-50 border border-emerald-200/80 font-mono text-[10px] font-bold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
+          title="Open Order in new tab"
+        >
+          <span>#{orderId}</span>
+          <span className="text-[9px]">↗</span>
+        </Link>
+      )}
+    </div>
+    <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono flex-wrap">
       {email && (
-        <p className="text-[11px] text-slate-500 font-mono truncate select-all mt-0.5" title={email}>
+        <span className="truncate max-w-[140px] select-all" title={email}>
           {email}
-        </p>
+        </span>
       )}
       {phone && (
-        <p className="text-[11px] text-slate-600 font-mono mt-0.5 flex items-center gap-1">
-          <svg className="h-2.5 w-2.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-          </svg>
-          <span>{phone}</span>
-        </p>
+        <>
+          {email && <span className="text-slate-300">•</span>}
+          <span className="flex items-center gap-1 text-slate-600 select-all whitespace-nowrap">
+            <svg className="h-2.5 w-2.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+            <span>{phone}</span>
+          </span>
+        </>
       )}
     </div>
   </div>
@@ -277,15 +282,15 @@ const AdminInquiriesPage = (props) => {
 
                 return (
                   <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/60 text-slate-500" : "hover:bg-slate-50/70 text-slate-800"}`}>
-                    <td className="py-4 pl-5 pr-3 align-top">
+                    <td className="py-2.5 pl-5 pr-3 align-top">
                       <CustomerInfo name={inq.name} email={inq.email} phone={phone} orderId={inq.orderId} />
                     </td>
 
-                    <td className="py-4 px-3 align-top space-y-1.5">
-                      <span className="inline-block rounded-md bg-slate-100 border border-slate-200/80 px-2 py-0.5 text-[10px] font-bold text-slate-800">
-                        {inq.issueCategory || inq.subject || "Order Issue"}
-                      </span>
-                      <div className="flex items-center gap-1">
+                    <td className="py-2.5 px-3 align-top space-y-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="inline-block rounded-md bg-slate-100 border border-slate-200/80 px-2 py-0.5 text-[10px] font-bold text-slate-800">
+                          {inq.issueCategory || inq.subject || "Order Issue"}
+                        </span>
                         <span className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                           isUrgent ? "bg-rose-100 text-rose-800 border border-rose-200" : "bg-slate-100 text-slate-600 border border-slate-200"
                         }`}>
@@ -294,44 +299,42 @@ const AdminInquiriesPage = (props) => {
                         </span>
                       </div>
                       {currentStatus && (
-                        <div className="text-[10px] space-y-0.5">
-                          <p className="text-slate-500 flex items-center gap-1">
-                            <span className="text-slate-400">Live Stage:</span>
-                            <span className={`font-bold px-1.5 py-0.2 rounded text-[10px] ${
-                              currentStatus === "Preparing"
-                                ? "bg-amber-50 text-amber-800 border border-amber-200"
-                                : currentStatus === "Delivered"
-                                ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                                : currentStatus === "Out for Delivery"
-                                ? "bg-sky-50 text-sky-800 border border-sky-200"
-                                : currentStatus === "Cancelled"
-                                ? "bg-rose-50 text-rose-800 border border-rose-200"
-                                : "bg-purple-50 text-purple-800 border border-purple-200"
-                            }`}>
-                              {currentStatus}
-                            </span>
-                          </p>
+                        <div className="flex items-center gap-1 text-[10px] text-slate-500 flex-wrap">
+                          <span className="text-slate-400">Live:</span>
+                          <span className={`font-bold px-1.5 py-0.2 rounded text-[10px] ${
+                            currentStatus === "Preparing"
+                              ? "bg-amber-50 text-amber-800 border border-amber-200"
+                              : currentStatus === "Delivered"
+                              ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                              : currentStatus === "Out for Delivery"
+                              ? "bg-sky-50 text-sky-800 border border-sky-200"
+                              : currentStatus === "Cancelled"
+                              ? "bg-rose-50 text-rose-800 border border-rose-200"
+                              : "bg-purple-50 text-purple-800 border border-purple-200"
+                          }`}>
+                            {currentStatus}
+                          </span>
                           {inq.orderStatus && liveOrder?.status && inq.orderStatus !== liveOrder.status && (
-                            <p className="text-[9px] text-slate-400">
-                              (Filed when: <span className="font-medium text-slate-500">{inq.orderStatus}</span>)
-                            </p>
+                            <span className="text-[9px] text-slate-400">
+                              (was <span className="font-medium text-slate-500">{inq.orderStatus}</span>)
+                            </span>
                           )}
                         </div>
                       )}
                     </td>
 
-                    <td className="py-4 px-3 align-top max-w-sm">
+                    <td className="py-2.5 px-3 align-top max-w-sm">
                       <ExpandableMessage text={inq.message} time={timeStr} />
                     </td>
 
-                    <td className="py-4 px-3 align-top whitespace-nowrap">
+                    <td className="py-2.5 px-3 align-top whitespace-nowrap">
                       <ResolutionToggle
                         isResolved={inq.isResolved}
                         onClick={() => handleToggleResolve(inq._id || inq.id, inq.isResolved)}
                       />
                     </td>
 
-                    <td className="py-4 pl-3 pr-5 align-top text-right whitespace-nowrap">
+                    <td className="py-2.5 pl-3 pr-5 align-top text-right whitespace-nowrap">
                       <InquiryActions
                         email={inq.email}
                         phone={phone}
@@ -366,27 +369,27 @@ const AdminInquiriesPage = (props) => {
 
                 return (
                   <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/60 text-slate-500" : "hover:bg-slate-50/60 text-slate-700"}`}>
-                    <td className="py-4 pl-5 pr-3 align-top">
+                    <td className="py-2.5 pl-5 pr-3 align-top">
                       <CustomerInfo name={inq.name} email={inq.email} phone={phone} />
                     </td>
-                    <td className="py-4 px-3 align-top">
+                    <td className="py-2.5 px-3 align-top">
                       <span className="inline-block rounded bg-slate-100 border border-slate-200/60 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
                         {inq.subject || "General"}
                       </span>
                     </td>
-                    <td className="py-4 px-3 align-top max-w-sm">
+                    <td className="py-2.5 px-3 align-top max-w-sm">
                       <ExpandableMessage text={inq.message} />
                     </td>
-                    <td className="py-4 px-3 align-top whitespace-nowrap">
+                    <td className="py-2.5 px-3 align-top whitespace-nowrap">
                       <ResolutionToggle
                         isResolved={inq.isResolved}
                         onClick={() => handleToggleResolve(inq._id || inq.id, inq.isResolved)}
                       />
                     </td>
-                    <td className="py-4 px-3 align-top text-[11px] text-slate-400 whitespace-nowrap">
+                    <td className="py-2.5 px-3 align-top text-[11px] text-slate-400 whitespace-nowrap">
                       {timeStr || "Recent"}
                     </td>
-                    <td className="py-4 pl-3 pr-5 align-top text-right whitespace-nowrap">
+                    <td className="py-2.5 pl-3 pr-5 align-top text-right whitespace-nowrap">
                       <InquiryActions
                         email={inq.email}
                         phone={phone}
