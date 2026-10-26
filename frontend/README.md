@@ -4,7 +4,7 @@ React 18 storefront and admin dashboard, built with React Router v6, Redux Toolk
 
 ## Main Features
 
-- **Storefront & Menu:** Browse and search 120+ authentic dishes across 24 categories with dietary markers (`Veg`, `Non-Veg`, `Vegan`) and smart truncated pagination.
+- **Storefront & Menu:** Browse and search 128 authentic dishes across 11 categories with dietary markers (`Veg`, `Non-Veg`, `Vegan`) and smart truncated pagination.
 - **Portion Selection & Nutrition:** Full, Half, and Quarter plate pricing, nutrition information (calories, protein, carbs, fat), ingredients, and delivery estimates.
 - **Cart & Persistence:** Redux Toolkit cart with `localStorage` persistence, portion pricing math, and delivery fee calculation.
 - **Verified Reviews:** Verified buyer review submission unlocked only after order delivery.

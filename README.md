@@ -15,7 +15,7 @@ Food Ninja is a high-performance, production-ready full-stack food ordering plat
 ## Features
 
 ### Customer Experience
-- **Extensive Authentic Catalog (120+ Dishes):** Explore 120+ authentic dishes across 24 regional Indian and world culinary categories (Biryani, North Indian, South Indian, Tandoori, Chinese, Momos, Italian, Desserts, Beverages) with verified photos, live search, and dietary badges (`Veg`, `Non-Veg`, `Vegan`).
+- **Extensive Authentic Catalog (128 Dishes):** Explore 128 authentic dishes across 11 culinary categories (Biryani, Pizza, Burgers, Chinese, Indian, Rolls, Momos, Desserts, Beverages, Snacks, Healthy) with verified photos, live search, and dietary badges (`Veg`, `Non-Veg`, `Vegan`).
 - **Smart Truncated Pagination:** Clean, responsive pagination with ellipsis (`•••`) and smooth navigation arrows across 10+ pages (12 dishes per page).
 - **Dish Details & Portion Pricing:** Real-time portion selector (Full, Half, Quarter plates) with automatic price calculations, calories, macro nutrients (protein, carbs, fat), ingredients, delivery estimates, and strikethrough MRP discounts.
 - **Verified Buyer Reviews & Badges:** Verified customer reviews unlocked strictly after order delivery, backed by server-side delivery validation.
