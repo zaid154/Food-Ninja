@@ -3,42 +3,66 @@ import { Link, useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
 import { useAppDialog } from "../AppDialog";
 
-const CustomerInfo = ({ name, email, phone, orderId }) => (
-  <div className="space-y-1">
-    <div className="flex items-center gap-1.5 flex-wrap">
-      <span className="font-bold text-slate-900 text-xs tracking-tight">{name || "Customer"}</span>
-      {orderId && (
-        <Link
-          to={`/orders/${orderId}`}
-          target="_blank"
-          className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 bg-emerald-50 border border-emerald-200/80 font-mono text-[10px] font-bold text-emerald-800 hover:bg-emerald-100 transition shadow-2xs"
-          title="Open Order in new tab"
-        >
-          <span>#{orderId}</span>
-          <span className="text-[9px]">↗</span>
-        </Link>
-      )}
-    </div>
-    <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono flex-wrap">
+const CustomerInfo = ({ name, email, phone }) => (
+  <div className="space-y-0.5">
+    <p className="font-bold text-slate-900 text-xs tracking-tight">{name || "Customer"}</p>
+    <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-mono flex-wrap">
       {email && (
-        <span className="truncate max-w-[140px] select-all" title={email}>
+        <a href={`mailto:${email}`} className="truncate max-w-[140px] hover:text-emerald-700 hover:underline select-all" title={email}>
           {email}
-        </span>
+        </a>
       )}
       {phone && (
         <>
           {email && <span className="text-slate-300">•</span>}
-          <span className="flex items-center gap-1 text-slate-600 select-all whitespace-nowrap">
-            <svg className="h-2.5 w-2.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
-            <span>{phone}</span>
-          </span>
+          <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-slate-600 hover:text-emerald-700 select-all whitespace-nowrap">
+            {phone}
+          </a>
         </>
       )}
     </div>
   </div>
 );
+
+const OrderTopicCell = ({ inq, liveOrder }) => {
+  const isUrgent = (inq.priority === "urgent" || inq.priority === "high") && !inq.isResolved;
+  const currentStatus = liveOrder?.status || inq.orderStatus;
+  const issueName = inq.issueCategory || inq.subject || "Order Issue";
+
+  return (
+    <div className="space-y-0.5">
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span className="font-bold text-slate-900 text-xs">{issueName}</span>
+        {isUrgent && (
+          <span className="inline-flex items-center gap-1 rounded bg-rose-50 border border-rose-200 px-1.5 py-0.2 text-[9px] font-bold text-rose-700 uppercase tracking-wide">
+            <span className="h-1.5 w-1.5 rounded-full bg-rose-600" />
+            <span>Urgent</span>
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-mono flex-wrap">
+        {inq.orderId && (
+          <Link
+            to={`/orders/${inq.orderId}`}
+            target="_blank"
+            className="text-emerald-700 hover:text-emerald-800 font-semibold hover:underline inline-flex items-center gap-0.5"
+            title="Open Order in new tab"
+          >
+            <span>Order #{inq.orderId}</span>
+            <span className="text-[9px]">↗</span>
+          </Link>
+        )}
+        {inq.orderId && currentStatus && <span className="text-slate-300 font-sans">•</span>}
+        {currentStatus && (
+          <span className="text-slate-600 font-sans font-medium text-[11px]">
+            {currentStatus}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const ExpandableMessage = ({ text, time, limit = 110 }) => {
   const [expanded, setExpanded] = useState(false);
@@ -67,36 +91,42 @@ const ResolutionToggle = ({ isResolved, onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer border ${
+    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold transition cursor-pointer border ${
       isResolved
         ? "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
         : "bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100"
     }`}
-    title={`Mark as ${isResolved ? "Open" : "Resolved"}`}
+    title={`Click to mark as ${isResolved ? "Open" : "Resolved"}`}
   >
     <span className={`h-1.5 w-1.5 rounded-full ${isResolved ? "bg-emerald-600" : "bg-amber-600"}`} />
-    <span>{isResolved ? "Resolved" : "Open / Active"}</span>
+    <span>{isResolved ? "Resolved" : "Open"}</span>
   </button>
 );
 
 const InquiryActions = ({ email, phone, subject, id, onDelete }) => (
   <div className="flex items-center justify-end gap-1.5">
-    <a
-      href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}`}
-      target="_blank"
-      rel="noreferrer"
-      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50"
-      title="Reply via Gmail"
-    >
-      <svg className="h-3 w-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-      <span>Mail</span>
-    </a>
+    {email && (
+      <a
+        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}`}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-slate-900 transition"
+        title="Reply via Gmail"
+      >
+        <svg className="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        <span>Mail</span>
+      </a>
+    )}
 
     {phone && (
-      <a href={`tel:${phone}`} className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-100" title={`Call ${phone}`}>
-        <svg className="h-3 w-3 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+      <a
+        href={`tel:${phone}`}
+        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-slate-900 transition"
+        title={`Call ${phone}`}
+      >
+        <svg className="h-3 w-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
         </svg>
         <span>Call</span>
@@ -104,7 +134,12 @@ const InquiryActions = ({ email, phone, subject, id, onDelete }) => (
     )}
 
     {onDelete && (
-      <button type="button" onClick={() => onDelete(id)} className="inline-flex items-center justify-center h-6 w-6 rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 cursor-pointer" title="Delete inquiry">
+      <button
+        type="button"
+        onClick={() => onDelete(id)}
+        className="inline-flex items-center justify-center h-6 w-6 rounded-lg border border-slate-200 bg-white text-slate-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 cursor-pointer shadow-2xs transition"
+        title="Delete inquiry"
+      >
         <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
         </svg>
@@ -264,63 +299,28 @@ const AdminInquiriesPage = (props) => {
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-2xs">
           <table className="w-full text-left text-xs min-w-[750px]">
             <thead>
-              <tr className="border-b border-slate-200/80 bg-slate-50/80 text-slate-500 font-bold uppercase text-[10px]">
-                <th className="py-3 pl-5 pr-3 min-w-[180px]">Order & Customer</th>
-                <th className="py-3 px-3 min-w-[140px]">Issue & Priority</th>
-                <th className="py-3 px-3 min-w-[270px]">Customer Message</th>
-                <th className="py-3 px-3 min-w-[120px]">Resolution</th>
-                <th className="py-3 pl-3 pr-5 text-right min-w-[140px]">Actions</th>
+              <tr className="border-b border-slate-200/80 bg-slate-50/80 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+                <th className="py-2.5 pl-5 pr-3 min-w-[170px]">Customer</th>
+                <th className="py-2.5 px-3 min-w-[190px]">Order & Topic</th>
+                <th className="py-2.5 px-3 min-w-[270px]">Customer Message</th>
+                <th className="py-2.5 px-3 min-w-[110px]">Resolution</th>
+                <th className="py-2.5 pl-3 pr-5 text-right min-w-[130px]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredList.map((inq) => {
                 const phone = inq.phone?.trim() || "";
-                const isUrgent = inq.priority === "urgent" || inq.priority === "high";
                 const timeStr = inq.createdAt ? new Date(inq.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "";
                 const liveOrder = orders.find((o) => String(o.id) === String(inq.orderId));
-                const currentStatus = liveOrder?.status || inq.orderStatus;
 
                 return (
-                  <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/60 text-slate-500" : "hover:bg-slate-50/70 text-slate-800"}`}>
+                  <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/50 text-slate-500" : "hover:bg-slate-50/70 text-slate-800"}`}>
                     <td className="py-2.5 pl-5 pr-3 align-top">
-                      <CustomerInfo name={inq.name} email={inq.email} phone={phone} orderId={inq.orderId} />
+                      <CustomerInfo name={inq.name} email={inq.email} phone={phone} />
                     </td>
 
-                    <td className="py-2.5 px-3 align-top space-y-1">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="inline-block rounded-md bg-slate-100 border border-slate-200/80 px-2 py-0.5 text-[10px] font-bold text-slate-800">
-                          {inq.issueCategory || inq.subject || "Order Issue"}
-                        </span>
-                        <span className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                          isUrgent ? "bg-rose-100 text-rose-800 border border-rose-200" : "bg-slate-100 text-slate-600 border border-slate-200"
-                        }`}>
-                          {isUrgent && <span className="h-1.5 w-1.5 rounded-full bg-rose-600 animate-pulse" />}
-                          <span>{inq.priority || "NORMAL"}</span>
-                        </span>
-                      </div>
-                      {currentStatus && (
-                        <div className="flex items-center gap-1 text-[10px] text-slate-500 flex-wrap">
-                          <span className="text-slate-400">Live:</span>
-                          <span className={`font-bold px-1.5 py-0.2 rounded text-[10px] ${
-                            currentStatus === "Preparing"
-                              ? "bg-amber-50 text-amber-800 border border-amber-200"
-                              : currentStatus === "Delivered"
-                              ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                              : currentStatus === "Out for Delivery"
-                              ? "bg-sky-50 text-sky-800 border border-sky-200"
-                              : currentStatus === "Cancelled"
-                              ? "bg-rose-50 text-rose-800 border border-rose-200"
-                              : "bg-purple-50 text-purple-800 border border-purple-200"
-                          }`}>
-                            {currentStatus}
-                          </span>
-                          {inq.orderStatus && liveOrder?.status && inq.orderStatus !== liveOrder.status && (
-                            <span className="text-[9px] text-slate-400">
-                              (was <span className="font-medium text-slate-500">{inq.orderStatus}</span>)
-                            </span>
-                          )}
-                        </div>
-                      )}
+                    <td className="py-2.5 px-3 align-top">
+                      <OrderTopicCell inq={inq} liveOrder={liveOrder} />
                     </td>
 
                     <td className="py-2.5 px-3 align-top max-w-sm">
@@ -353,13 +353,13 @@ const AdminInquiriesPage = (props) => {
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-2xs">
           <table className="w-full text-left text-xs min-w-[700px]">
             <thead>
-              <tr className="border-b border-slate-200/80 bg-slate-50/80 text-slate-500 font-bold uppercase text-[10px]">
-                <th className="py-3 pl-5 pr-3 min-w-[180px]">Customer</th>
-                <th className="py-3 px-3 min-w-[130px]">Subject</th>
-                <th className="py-3 px-3 min-w-[270px]">Customer Message</th>
-                <th className="py-3 px-3 min-w-[120px]">Resolution</th>
-                <th className="py-3 px-3 min-w-[80px]">Date</th>
-                <th className="py-3 pl-3 pr-5 text-right min-w-[140px]">Actions</th>
+              <tr className="border-b border-slate-200/80 bg-slate-50/80 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+                <th className="py-2.5 pl-5 pr-3 min-w-[170px]">Customer</th>
+                <th className="py-2.5 px-3 min-w-[150px]">Subject</th>
+                <th className="py-2.5 px-3 min-w-[270px]">Customer Message</th>
+                <th className="py-2.5 px-3 min-w-[110px]">Resolution</th>
+                <th className="py-2.5 px-3 min-w-[80px]">Date</th>
+                <th className="py-2.5 pl-3 pr-5 text-right min-w-[130px]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -368,13 +368,13 @@ const AdminInquiriesPage = (props) => {
                 const timeStr = inq.createdAt ? new Date(inq.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric" }) : "";
 
                 return (
-                  <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/60 text-slate-500" : "hover:bg-slate-50/60 text-slate-700"}`}>
+                  <tr key={inq._id || inq.id} className={`transition ${inq.isResolved ? "bg-slate-50/50 text-slate-500" : "hover:bg-slate-50/60 text-slate-700"}`}>
                     <td className="py-2.5 pl-5 pr-3 align-top">
                       <CustomerInfo name={inq.name} email={inq.email} phone={phone} />
                     </td>
                     <td className="py-2.5 px-3 align-top">
-                      <span className="inline-block rounded bg-slate-100 border border-slate-200/60 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
-                        {inq.subject || "General"}
+                      <span className="font-bold text-slate-900 text-xs">
+                        {inq.subject || "General Inquiry"}
                       </span>
                     </td>
                     <td className="py-2.5 px-3 align-top max-w-sm">
