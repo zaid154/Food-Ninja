@@ -47,14 +47,9 @@ const serializeSettingsWithStatus = (settings) => {
 
 const getSettings = async (req, res) => {
   try {
-    let settings = await Settings.findOne({ key: "store_settings" });
+    const settings = await Settings.findOne({ key: "store_settings" });
     if (!settings) {
-      settings = await Settings.create({ key: "store_settings" });
-    } else if (!settings.openingTime || !settings.closingTime || !settings.operatingHoursText) {
-      settings.openingTime = settings.openingTime || "06:00";
-      settings.closingTime = settings.closingTime || "20:00";
-      settings.operatingHoursText = settings.operatingHoursText || "6:00 AM – 8:00 PM";
-      await settings.save();
+      return res.status(200).json({ success: true, settings: null });
     }
     return res.status(200).json({ success: true, settings: serializeSettingsWithStatus(settings) });
   } catch (error) {
