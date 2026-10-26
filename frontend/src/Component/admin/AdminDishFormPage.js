@@ -562,18 +562,7 @@ const AdminDishFormPage = () => {
           </div>
         </div>
 
-        {/* Bottom Actions */}
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-          <button type="button" onClick={handleBack} disabled={saving} className="rounded-xl border border-slate-300 px-5 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50 transition cursor-pointer disabled:opacity-50">
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={saving || (!hasUnsavedChanges && isEditing)}
-            className="rounded-xl bg-emerald-700 hover:bg-emerald-800 px-6 py-2.5 text-xs font-bold text-white shadow-xs transition cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
-          >
-            {saving ? <span>Saving...</span> : <span>{isEditing ? "Save Changes" : "Publish Dish to Menu"}</span>}
-          </button>
+          <button type="submit" className="hidden" aria-hidden="true" tabIndex={-1} />
         </div>
       </form>
     </div>

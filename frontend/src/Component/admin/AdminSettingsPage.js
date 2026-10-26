@@ -9,6 +9,48 @@ import { useAppDialog } from "../AppDialog";
 const TIME_HOUR_OPTIONS = Array.from({ length: 24 }, (_, hour) => String(hour).padStart(2, "0"));
 const TIME_MINUTE_OPTIONS = Array.from({ length: 60 }, (_, minute) => String(minute).padStart(2, "0"));
 
+const initialSettings = {
+  restaurantName: "Food Ninja",
+  fssaiNumber: "10020011000123",
+  gstinNumber: "07AAAAF1234A1Z5",
+  storePhone: "+91 98765 43210",
+  storeEmail: "support@foodninja.com",
+  storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
+  deliveryFee: 30,
+  freeDeliveryThreshold: 499,
+  packagingFee: 15,
+  taxRate: 5,
+  minOrderValue: 99,
+  restaurantOpen: true,
+  announcement: "Free delivery on orders above ₹499! Enjoy freshly cooked authentic meals.",
+  openingTime: "06:00",
+  closingTime: "20:00",
+  operatingHoursText: "6:00 AM – 8:00 PM",
+  closedNoticeMessage: "",
+  autoScheduleEnabled: true,
+};
+
+const normalizeSettings = (s = {}) => ({
+  restaurantName: String(s.restaurantName ?? "Food Ninja").trim(),
+  fssaiNumber: String(s.fssaiNumber ?? "").trim(),
+  gstinNumber: String(s.gstinNumber ?? "").trim(),
+  storePhone: String(s.storePhone ?? "").trim(),
+  storeEmail: String(s.storeEmail ?? "").trim(),
+  storeAddress: String(s.storeAddress ?? "").trim(),
+  deliveryFee: Number(s.deliveryFee ?? 30),
+  freeDeliveryThreshold: Number(s.freeDeliveryThreshold ?? 499),
+  packagingFee: Number(s.packagingFee ?? 15),
+  taxRate: Number(s.taxRate ?? 5),
+  minOrderValue: Number(s.minOrderValue ?? 99),
+  restaurantOpen: s.restaurantOpen !== false,
+  announcement: String(s.announcement ?? "").trim(),
+  openingTime: String(s.openingTime || "06:00"),
+  closingTime: String(s.closingTime || "20:00"),
+  operatingHoursText: String(s.operatingHoursText || "6:00 AM – 8:00 PM").trim(),
+  closedNoticeMessage: String(s.closedNoticeMessage ?? "").trim(),
+  autoScheduleEnabled: s.autoScheduleEnabled !== false,
+});
+
 const OperatingTimePicker = ({ label, value = "06:00", onChange }) => {
   const [hour = "06", minute = "00"] = value.split(":");
   const triggerClassName = "!rounded-lg !border-0 !bg-transparent !px-2 !py-2.5 font-mono text-xs";
@@ -42,30 +84,14 @@ const AdminSettingsPage = (props) => {
   const { alert: showDialog } = useAppDialog();
   const showToast = props.showToast || context.showToast || showDialog;
 
-  const [settings, setSettings] = useState({
-    restaurantName: "Food Ninja",
-    fssaiNumber: "10020011000123",
-    gstinNumber: "07AAAAF1234A1Z5",
-    storePhone: "+91 98765 43210",
-    storeEmail: "support@foodninja.com",
-    storeAddress: "Shop 12, Food Street, Sector 62, Delhi NCR",
-    deliveryFee: 30,
-    freeDeliveryThreshold: 499,
-    packagingFee: 15,
-    taxRate: 5,
-    minOrderValue: 99,
-    restaurantOpen: true,
-    announcement: "Free delivery on orders above ₹499! Enjoy freshly cooked authentic meals.",
-    openingTime: "06:00",
-    closingTime: "20:00",
-    operatingHoursText: "6:00 AM – 8:00 PM",
-    closedNoticeMessage: "",
-    autoScheduleEnabled: true,
-  });
+  const [settings, setSettings] = useState(initialSettings);
+  const [savedSettings, setSavedSettings] = useState(initialSettings);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [billPreviewMode, setBillPreviewMode] = useState("customer");
   const [isBillPreviewOpen, setIsBillPreviewOpen] = useState(false);
+
+  const hasUnsavedChanges = JSON.stringify(normalizeSettings(settings)) !== JSON.stringify(normalizeSettings(savedSettings));
 
   const fetchSettings = async () => {
     try {
@@ -73,26 +99,9 @@ const AdminSettingsPage = (props) => {
       const res = await fetch(`${API_BASE_URL}/settings`);
       const data = await res.json();
       if (data.settings) {
-        setSettings({
-          restaurantName: data.settings.restaurantName || "Food Ninja",
-          fssaiNumber: data.settings.fssaiNumber || "",
-          gstinNumber: data.settings.gstinNumber || "",
-          storePhone: data.settings.storePhone || "",
-          storeEmail: data.settings.storeEmail || "",
-          storeAddress: data.settings.storeAddress || "",
-          deliveryFee: data.settings.deliveryFee ?? 30,
-          freeDeliveryThreshold: data.settings.freeDeliveryThreshold ?? 499,
-          packagingFee: data.settings.packagingFee ?? 15,
-          taxRate: data.settings.taxRate ?? 5,
-          minOrderValue: data.settings.minOrderValue ?? 99,
-          restaurantOpen: data.settings.restaurantOpen ?? true,
-          announcement: data.settings.announcement ?? "",
-          openingTime: data.settings.openingTime || "06:00",
-          closingTime: data.settings.closingTime || "20:00",
-          operatingHoursText: data.settings.operatingHoursText || "6:00 AM – 8:00 PM",
-          closedNoticeMessage: data.settings.closedNoticeMessage || "",
-          autoScheduleEnabled: data.settings.autoScheduleEnabled !== false,
-        });
+        const loaded = normalizeSettings(data.settings);
+        setSettings(loaded);
+        setSavedSettings(loaded);
       }
     } catch (err) {
       console.error("Failed to fetch settings:", err);
@@ -117,6 +126,9 @@ const AdminSettingsPage = (props) => {
       const data = await res.json();
       if (res.ok) {
         showToast("All settings & legal details saved successfully!");
+        const saved = normalizeSettings(data.settings || settings);
+        setSettings(saved);
+        setSavedSettings(saved);
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("store_settings_updated", { detail: data.settings }));
         }
@@ -192,15 +204,24 @@ const AdminSettingsPage = (props) => {
     <div className="space-y-6 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
         <div>
-          <h1 className="text-xl font-black tracking-tight text-slate-900">
-            Store & Legal Settings
-          </h1>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-xl font-black tracking-tight text-slate-900">
+              Store & Legal Settings
+            </h1>
+            <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold border transition ${
+              hasUnsavedChanges
+                ? "border-amber-200 bg-amber-50 text-amber-700"
+                : "border-emerald-200 bg-emerald-50 text-emerald-700"
+            }`}>
+              {hasUnsavedChanges ? "Unsaved changes" : "All changes saved"}
+            </span>
+          </div>
           <p className="text-xs text-slate-500 mt-0.5">
             Configure dynamic statutory compliance, restaurant branding, taxes, fees, and operational status
           </p>
         </div>
 
-        <div className="flex items-center gap-3 self-start sm:self-auto">
+        <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
           <button
             type="button"
             onClick={() => setIsBillPreviewOpen(true)}
@@ -223,8 +244,8 @@ const AdminSettingsPage = (props) => {
           <button
             type="button"
             onClick={handleSave}
-            disabled={saving || loading}
-            className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white shadow-xs transition cursor-pointer disabled:opacity-50"
+            disabled={saving || loading || !hasUnsavedChanges}
+            className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white shadow-xs transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
               <span>Saving...</span>
@@ -451,15 +472,6 @@ const AdminSettingsPage = (props) => {
                     ))}
                   </div>
                   <span className="text-[10px] text-slate-400 block">Shown on the storefront header, cart, and checkout whenever the store is closed</span>
-                  <button
-                    type="button"
-                    onClick={handleSave}
-                    disabled={saving || loading}
-                    className="rounded-lg bg-emerald-600 hover:bg-emerald-700 px-3 py-2 text-[11px] font-bold text-white shadow-sm transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {saving ? "Saving..." : "Save Store Status & Notice"}
-                  </button>
-                  <span className="ml-2 text-[10px] text-slate-500">Save to apply this notice to the storefront.</span>
                 </div>
               )}
 
@@ -529,24 +541,7 @@ const AdminSettingsPage = (props) => {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-2 pb-6">
-            <button
-              type="submit"
-              disabled={saving || loading}
-              className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-6 py-3 text-xs font-bold text-white shadow-xs transition cursor-pointer disabled:opacity-50"
-            >
-              {saving ? (
-                <span>Saving Changes...</span>
-              ) : (
-                <>
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Save All Settings</span>
-                </>
-              )}
-            </button>
-          </div>
+          <button type="submit" className="hidden" aria-hidden="true" tabIndex={-1} />
         </form>
 
         {isBillPreviewOpen && (
