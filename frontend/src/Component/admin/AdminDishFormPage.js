@@ -563,7 +563,6 @@ const AdminDishFormPage = () => {
         </div>
 
           <button type="submit" className="hidden" aria-hidden="true" tabIndex={-1} />
-        </div>
       </form>
     </div>
   );
