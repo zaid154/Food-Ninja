@@ -1,6 +1,6 @@
 # Food Ninja - Full Stack Food Delivery Web App
 
-Food Ninja is a modern, high-performance full-stack food ordering platform built using the MERN stack (MongoDB, Express, React 18, Node.js). It delivers an authentic, chef-crafted restaurant experience with real-time cart persistence, verified buyer dish reviews, kitchen operating hours scheduling, and an enterprise admin suite with POS 80mm thermal receipt printing.
+Food Ninja is a high-performance, production-ready full-stack food ordering platform built using the MERN stack (MongoDB, Express, React 18, Node.js). It delivers an authentic, chef-crafted restaurant experience with real-time cart persistence, verified buyer dish reviews, kitchen operating hours scheduling, and an enterprise admin suite with POS 80mm thermal receipt printing.
 
 ---
 
@@ -15,8 +15,8 @@ Food Ninja is a modern, high-performance full-stack food ordering platform built
 ## Features
 
 ### Customer Experience
-- **Extensive Authentic Catalog (158 Dishes):** Explore 158 authentic dishes across 24 regional Indian and world culinary categories (Biryani, North Indian, South Indian, Tandoori, Chinese, Momos, Italian, Desserts, Beverages) with verified photos, live search, and dietary badges (`Veg`, `Non-Veg`, `Vegan`).
-- **Smart Truncated Pagination:** Clean, responsive pagination with ellipsis (`•••`) and smooth navigation arrows across 14 pages (12 dishes per page).
+- **Extensive Authentic Catalog (120+ Dishes):** Explore 120+ authentic dishes across 24 regional Indian and world culinary categories (Biryani, North Indian, South Indian, Tandoori, Chinese, Momos, Italian, Desserts, Beverages) with verified photos, live search, and dietary badges (`Veg`, `Non-Veg`, `Vegan`).
+- **Smart Truncated Pagination:** Clean, responsive pagination with ellipsis (`•••`) and smooth navigation arrows across 10+ pages (12 dishes per page).
 - **Dish Details & Portion Pricing:** Real-time portion selector (Full, Half, Quarter plates) with automatic price calculations, calories, macro nutrients (protein, carbs, fat), ingredients, delivery estimates, and strikethrough MRP discounts.
 - **Verified Buyer Reviews & Badges:** Verified customer reviews unlocked strictly after order delivery, backed by server-side delivery validation.
 - **Cart & Wishlist:** Redux Toolkit-backed cart with quantity modifiers, subtotal calculations, and `localStorage` persistence across page reloads.
@@ -36,13 +36,16 @@ Food Ninja is a modern, high-performance full-stack food ordering platform built
 
 ---
 
-## Codebase Architecture & Optimization
+## Production Hardening & Reliability (Client Ready)
 
-During our recent comprehensive codebase audit:
-- **1,756 redundant lines of code** were eliminated across 11 key components through data-driven arrays and modular loops.
-- **Dead Code Removed:** Safely purged orphaned legacy components (e.g. `Shimmer.js`).
-- **Unified Print Engine:** Consolidated isolated thermal printing logic into a lightweight `printHtml` iframe utility.
-- **Zero Regressions:** 100% test coverage maintained across all 11 Jest suites with clean Parcel production bundles.
+During our comprehensive audit and delivery preparation:
+- **Search & Regex Sanitization:** Sanitized all backend regex search inputs (`recipeController.js`, `categoryController.js`) with an `escapeRegex` utility, eliminating server 500 errors when users search with symbols like `(`, `[`, `*`, or `+`.
+- **Payment Verification Security:** In `paymentController.js`, restricted `{ isDemo: true }` mock verification strictly to development environments without configured Razorpay keys. Live keys enforce cryptographic HMAC SHA256 signature verification.
+- **Order Payload & State Validation:** Added server-side validation rejecting empty orders (`items: []`) and non-positive totals. Enforced `ALLOWED_ORDER_STATUSES` enum state transitions (`Placed`, `Preparing`, `Out for Delivery`, `Delivered`, `Cancelled`).
+- **Dual-ID Compatibility (`resolveDishQuery`):** Unified handling of numeric IDs and MongoDB `_id` strings across dish and order controllers to prevent 404 lookup failures.
+- **Admin Session Security:** Synchronously clears both `localStorage` and `sessionStorage` upon admin logout in `Header.js`, eliminating unauthorized re-access vulnerabilities.
+- **Clean Customer Checkout UX:** Removed hardcoded dummy data (`"Store Administrator"`, dummy phone, placeholder address) from `CheckoutPage.js`, ensuring new customers start with clean inputs and automatic address collection.
+- **Dead Code & Package Purge:** Removed unused libraries, purged legacy dead components (`Shimmer.js`), and optimized bundle footprint.
 
 ---
 
@@ -51,7 +54,7 @@ During our recent comprehensive codebase audit:
 - **Frontend:** React 18, React Router v6, Redux Toolkit, Tailwind CSS v4, Parcel
 - **Backend:** Node.js, Express.js 5, Mongoose ODM
 - **Database:** MongoDB Atlas Cloud
-- **Testing:** Jest and React Testing Library (11 tests across 4 test suites)
+- **Testing:** Jest and React Testing Library (11 tests across 4 test suites - 100% pass)
 - **Deployment:** Vercel (Frontend), Render (Backend API)
 
 ---
@@ -65,7 +68,7 @@ Food Ninja/
 │   │   └── connectionDb.js        # MongoDB connection and reconnect handling
 │   ├── controllers/               # Recipe, category, order, inquiry, review, settings logic
 │   ├── models/                    # Mongoose schemas (Recipe, Order, Category, User, Settings)
-│   ├── routes/                    # REST routes (/recipes, /orders, /categories, /settings, etc.)
+│   ├── routes/                    # REST routes (/recipes, /orders, /categories, /settings, /payment)
 │   ├── data/                      # 120-dish authentic seed datasets (North, South, World)
 │   ├── seedData.js                # Database seeder script
 │   └── server.js                  # Express 5 application entry point
@@ -110,6 +113,8 @@ Create a `.env` file inside `backend/`:
 ```env
 PORT=5005
 MONGO_URI=your_mongodb_connection_string
+RAZORPAY_KEY_ID=your_razorpay_key_id        # Optional for local demo
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret  # Optional for local demo
 ```
 
 Seed the database with authentic dishes and default accounts:
@@ -161,8 +166,8 @@ npm run build
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/recipes` | Get paginated menu dishes (supports `?page=1&limit=12&all=true&category=...`) |
-| `GET` | `/api/recipes/:id` | Get single dish by ID |
+| `GET` | `/api/recipes` / `/api/foods` | Get paginated menu dishes (supports `?page=1&limit=12&all=true&search=...&category=...`) |
+| `GET` | `/api/recipes/:id` | Get single dish by numeric `id` or MongoDB `_id` |
 | `POST` | `/api/recipes` | Add new dish to menu (Admin) |
 | `PUT` | `/api/recipes/:id` | Update dish details and portion pricing (Admin) |
 | `DELETE`| `/api/recipes/:id` | Remove dish from catalog (Admin) |
@@ -172,18 +177,22 @@ npm run build
 | `GET` | `/api/recipes/:id/review-eligibility` | Verify review eligibility for customer email |
 | `GET` | `/api/orders` | Fetch customer orders or all orders (Admin) |
 | `GET` | `/api/orders/:id` | Fetch detailed order with saved item pricing breakdown |
-| `POST` | `/api/orders` | Place order (Strictly verified against store hours and pause status) |
-| `PUT` | `/api/orders/:id/status` | Update fulfillment state (`Placed` ➔ `Preparing` ➔ `Delivered`) |
+| `POST` | `/api/orders` | Place order (Strictly verified against store hours and payload integrity) |
+| `PUT` | `/api/orders/:id/status` | Update fulfillment state (`Placed` ➔ `Preparing` ➔ `Out for Delivery` ➔ `Delivered` ➔ `Cancelled`) |
 | `GET`, `PUT` | `/api/settings` | Retrieve or configure store hours, pause notice, and pricing fees |
 | `GET`, `POST` | `/api/categories` | List active categories or create a new category (Admin) |
 | `PUT`, `DELETE` | `/api/categories/:id` | Update category details or delete category (Admin) |
 | `POST` | `/api/contact` | Submit support ticket or order help issue |
 | `GET` | `/api/contact` | View all customer tickets (Admin) |
+| `PUT` | `/api/contact/:id/reply` | Record inquiry reply notes (Admin) |
 | `PATCH` | `/api/contact/:id/resolve` | Toggle ticket resolution state |
 | `DELETE`| `/api/contact/:id` | Delete inquiry (Admin) |
 | `POST` | `/api/users/login` | Authenticate customer or admin account |
 | `POST` | `/api/users/register` | Register new customer account |
 | `PATCH` | `/api/users/:id/block` | Block or unblock customer account |
+| `GET` | `/api/payment/key` | Retrieve Razorpay public key ID |
+| `POST` | `/api/payment/create-order`| Generate payment order |
+| `POST` | `/api/payment/verify` | Verify payment HMAC signature or mock authorization |
 
 ---
 
