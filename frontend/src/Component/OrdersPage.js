@@ -67,7 +67,7 @@ const OrdersPage = () => {
             } else {
                 setOrders(localOrders);
             }
-        } catch (err) {
+        } catch {
             setOrders(localOrders);
         } finally {
             setLoading(false);
@@ -95,7 +95,7 @@ const OrdersPage = () => {
             setOrders((prev) =>
                 prev.map((o) => (o.id === id ? { ...o, status: "Cancelled" } : o))
             );
-        } catch (err) {
+        } catch {
             dispatch(cancelOrder(id));
             setOrders((prev) =>
                 prev.map((o) => (o.id === id ? { ...o, status: "Cancelled" } : o))

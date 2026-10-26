@@ -17,7 +17,7 @@ const ordersSlice = createSlice({
             state.list.unshift(action.payload);
             try {
                 localStorage.setItem("orders", JSON.stringify(state.list));
-            } catch (e) {}
+            } catch {}
         },
 
         // cancel an order the customer just placed.
@@ -27,7 +27,7 @@ const ordersSlice = createSlice({
                 order.status = "Cancelled";
                 try {
                     localStorage.setItem("orders", JSON.stringify(state.list));
-                } catch (e) {}
+                } catch {}
             }
         },
 
@@ -36,7 +36,7 @@ const ordersSlice = createSlice({
             state.list = [];
             try {
                 localStorage.removeItem("orders");
-            } catch (e) {}
+            } catch {}
         }
     }
 });

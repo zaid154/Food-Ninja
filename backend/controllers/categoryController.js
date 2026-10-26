@@ -51,7 +51,8 @@ const createCategory = async (req, res) => {
 
 const updateCategory = async (req, res) => {
   try {
-    const { id } = req.params, { name, img, bg, description, isActive, displayOrder, isFeatured } = req.body;
+    const { id } = req.params;
+    const { name, isActive, displayOrder, isFeatured } = req.body || {};
     const updateData = {};
     if (name) {
       updateData.name = name.trim();
