@@ -48,18 +48,13 @@ const MenuPage = () => {
   const [error, setError] = useState(null);
   const [sortOpen, setSortOpen] = useState(false);
 
-  const categoryCarouselRef = useRef(null);
   const sortRef = useRef(null);
   const menuTopRef = useRef(null);
-
-  const scrollCategories = (dir) => {
-    categoryCarouselRef.current?.scrollBy({ left: dir === "left" ? -340 : 340, behavior: "smooth" });
-  };
 
   useEffect(() => {
     let mounted = true;
     fetch(`${API_BASE_URL}/categories`)
-      .then((r) => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!mounted) return;
         setMenuCategories(Array.isArray(data?.categories) ? data.categories.filter((c) => c.isActive !== false) : []);
@@ -139,13 +134,19 @@ const MenuPage = () => {
   return (
     <div className="bg-white min-h-[85vh] pt-1 sm:pt-2 pb-12" ref={menuTopRef}>
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
+        {/* Header Row */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100 mb-3">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Explore Our Menu</h1>
               <span className="rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[11px] font-bold border border-emerald-200/60">
-                {pagination.totalItems || 38} Dishes
+                {pagination.totalItems || dishes.length} Dishes
               </span>
+              {currentCategory !== "All" && (
+                <span className="rounded-full bg-emerald-100 text-emerald-800 px-2 py-0.5 text-[11px] font-bold border border-emerald-200">
+                  {currentCategory}
+                </span>
+              )}
             </div>
             <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">Select a cuisine or search below to discover freshly prepared recipes</p>
           </div>
@@ -205,95 +206,53 @@ const MenuPage = () => {
           </div>
         </div>
 
+        {/* Compact Categories Bar */}
         {categoriesLoading ? (
           <p className="mb-3 py-3 text-center text-xs text-slate-400">Loading categories…</p>
         ) : menuCategories.length > 0 ? (
-          <div className="relative mb-3 sm:mb-4 group/carousel">
-            <button
-              type="button"
-              onClick={() => scrollCategories("left")}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex h-7 w-7 items-center justify-center rounded-full bg-white/95 shadow-md border border-slate-200 text-slate-700 hover:bg-slate-900 hover:text-white transition -ml-2 sm:-ml-3.5 cursor-pointer"
-              aria-label="Scroll left"
-            >
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollCategories("right")}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex h-7 w-7 items-center justify-center rounded-full bg-white/95 shadow-md border border-slate-200 text-slate-700 hover:bg-slate-900 hover:text-white transition -mr-2 sm:-mr-3.5 cursor-pointer"
-              aria-label="Scroll right"
-            >
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
-            </button>
-
-            <div ref={categoryCarouselRef} className="flex gap-2 sm:gap-2.5 overflow-x-auto px-1 py-1 scrollbar-none scroll-smooth">
-              {menuCategories.map((cat) => {
-                const isActive = currentCategory.toLowerCase() === cat.name.toLowerCase();
-                return (
-                  <button
-                    key={cat.name}
-                    type="button"
-                    onClick={() => updateQuery({ category: isActive ? "All" : cat.name, page: 1 })}
-                    className={`group relative flex flex-col items-center justify-center p-2 sm:p-2.5 rounded-xl transition-all duration-150 border text-center cursor-pointer w-[80px] sm:w-[92px] shrink-0 ${cat.bg || "bg-slate-50"} ${
-                      isActive
-                        ? "border-emerald-600 shadow-xs bg-white/95 ring-2 ring-emerald-500/20"
-                        : "border-transparent hover:border-slate-300/80 hover:shadow-xs hover:-translate-y-0.5"
-                    }`}
-                  >
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full overflow-hidden bg-white shadow-2xs p-0.5 mb-1.5 shrink-0">
-                      {cat.img ? (
-                        <img
-                          src={cat.img}
-                          alt={cat.name}
-                          className="h-full w-full rounded-full object-cover transition duration-300 group-hover:scale-105"
-                          onError={(e) => { e.currentTarget.style.display = "none"; }}
-                        />
-                      ) : (
-                        <span className="flex h-full w-full items-center justify-center rounded-full text-xs font-bold text-emerald-700">
-                          {cat.name?.charAt(0)}
-                        </span>
-                      )}
-                    </div>
-                    <span className={`text-[11px] sm:text-xs font-bold tracking-tight truncate w-full px-0.5 ${isActive ? "text-emerald-800" : "text-slate-800"}`}>
-                      {cat.name}
-                    </span>
-                    {isActive && (
-                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xs text-[9px] font-bold">
-                        ✓
+          <div className="flex gap-2 sm:gap-2.5 overflow-x-auto py-1 mb-4 scrollbar-none">
+            {menuCategories.map((cat) => {
+              const isActive = currentCategory.toLowerCase() === cat.name.toLowerCase();
+              return (
+                <button
+                  key={cat.name}
+                  type="button"
+                  onClick={() => updateQuery({ category: isActive ? "All" : cat.name, page: 1 })}
+                  className={`group relative flex flex-col items-center justify-center p-2 sm:p-2.5 rounded-xl transition-all duration-150 border text-center cursor-pointer w-[78px] sm:w-[90px] shrink-0 ${cat.bg || "bg-slate-50"} ${
+                    isActive
+                      ? "border-emerald-600 shadow-xs bg-white/95 ring-2 ring-emerald-500/20"
+                      : "border-transparent hover:border-slate-300/80 hover:shadow-xs hover:-translate-y-0.5"
+                  }`}
+                >
+                  <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-full overflow-hidden bg-white shadow-2xs p-0.5 mb-1.5 shrink-0">
+                    {cat.img ? (
+                      <img
+                        src={cat.img}
+                        alt={cat.name}
+                        className="h-full w-full rounded-full object-cover transition duration-300 group-hover:scale-105"
+                        onError={(e) => { e.currentTarget.style.display = "none"; }}
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center rounded-full text-xs font-bold text-emerald-700">
+                        {cat.name?.charAt(0)}
                       </span>
                     )}
-                  </button>
-                );
-              })}
-            </div>
+                  </div>
+                  <span className={`text-[11px] sm:text-xs font-bold tracking-tight truncate w-full px-0.5 ${isActive ? "text-emerald-800" : "text-slate-800"}`}>
+                    {cat.name}
+                  </span>
+                  {isActive && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xs text-[9px] font-bold">
+                      ✓
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
-        ) : (
-          <p className="mb-3 py-3 text-center text-xs text-slate-400">No categories are available right now.</p>
-        )}
+        ) : null}
 
-        {(currentSearch || currentCategory !== "All") && (
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-5 p-2 px-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-bold text-slate-500">Active Filter:</span>
-              {currentCategory !== "All" && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-900 px-2.5 py-0.5 font-bold border border-emerald-200 shadow-2xs">
-                  <span>Category: <strong>{currentCategory}</strong></span>
-                  <button type="button" onClick={() => updateQuery({ category: "All", page: 1 })} className="hover:text-emerald-950 font-black text-xs cursor-pointer ml-0.5">✕</button>
-                </span>
-              )}
-              {currentSearch && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white text-slate-800 px-2.5 py-0.5 font-bold border border-slate-200 shadow-2xs">
-                  <span>Search: &quot;<strong>{currentSearch}</strong>&quot;</span>
-                  <button type="button" onClick={() => updateQuery({ search: "", page: 1 })} className="hover:text-slate-950 font-black text-xs cursor-pointer ml-0.5">✕</button>
-                </span>
-              )}
-            </div>
-            <button type="button" onClick={() => setSearchParams(new URLSearchParams())} className="font-bold text-emerald-700 hover:text-emerald-900 underline transition cursor-pointer text-xs">
-              Clear All
-            </button>
-          </div>
-        )}
-
+        {/* Dishes Content */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {Array.from({ length: 12 }).map((_, idx) => (
