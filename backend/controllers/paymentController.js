@@ -48,8 +48,8 @@ const createPaymentOrder = async (req, res) => {
 
 const verifyPaymentSignature = async (req, res) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, isDemo } = req.body;
-    if (isDemo || !isRazorpayConfigured()) {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body || {};
+    if (!isRazorpayConfigured()) {
       return res.status(200).json({
         success: true, verified: true, isDemo: true, paymentId: razorpay_payment_id || `pay_demo_${Date.now()}`,
         method: "Demo/Test", message: "Demo payment verified successfully"

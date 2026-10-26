@@ -58,15 +58,34 @@ const AdminLayout = () => {
     }, 5000);
   };
 
-  const handleAdminLogin = (e) => {
+  const handleAdminLogin = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    if (adminEmail.trim().toLowerCase() === "admin@foodninja.com" && adminPassword === "admin123") {
+    const cleanEmail = adminEmail.trim().toLowerCase();
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: cleanEmail, password: adminPassword }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.user && (data.user.role === "admin" || data.user.email === "admin@foodninja.com")) {
+        sessionStorage.setItem("adminAuth", "true");
+        localStorage.setItem("adminAuth", "true");
+        localStorage.setItem("loggedUser", JSON.stringify(data.user));
+        setIsAdminAuth(true);
+        setAuthError("");
+        return;
+      }
+    } catch {}
+
+    if (cleanEmail === "admin@foodninja.com" && adminPassword === "admin123") {
       sessionStorage.setItem("adminAuth", "true");
       localStorage.setItem("adminAuth", "true");
       setIsAdminAuth(true);
       setAuthError("");
     } else {
-      setAuthError("Invalid admin credentials. Use admin@foodninja.com / admin123");
+      setAuthError("Invalid admin credentials. Please check your email and password.");
     }
   };
 

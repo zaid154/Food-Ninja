@@ -40,7 +40,7 @@ const DishPage = () => {
   const [dishRequest, setDishRequest] = useState({ id: null, product: null, loading: true });
   const [eligibility, setEligibility] = useState({ checking: true, eligible: false, reason: "not_logged_in", message: "", orderId: null });
 
-  const rawName = user?.name || getLoggedUser().name || "Mohd Zaid";
+  const rawName = user?.name || getLoggedUser().name || "Customer";
   const displayName = rawName.includes(" ") ? rawName.trim() : rawName.replace(/([a-z])([A-Z])/g, "$1 $2").trim();
   const userEmail = (getLoggedUser().email || user?.email || "").trim().toLowerCase();
 

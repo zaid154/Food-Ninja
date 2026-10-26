@@ -111,6 +111,7 @@ const Header = () => {
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
     sessionStorage.removeItem("adminAuth");
+    localStorage.removeItem("adminAuth");
     setIsAdmin(false);
     dispatch(clearCart());
     dispatch(clearWishlist());

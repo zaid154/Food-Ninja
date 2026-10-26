@@ -320,17 +320,18 @@ const CheckoutPage = () => {
         : cartItems;
 
     // Structured address fields to ensure 100% valid delivery information
-    // Auto-fill from last saved address
+    // Auto-fill from last saved address if available
     const lastAddr = (() => { try { const arr = JSON.parse(localStorage.getItem("fn_saved_addresses") || "[]"); return Array.isArray(arr) && arr.length > 0 ? arr[arr.length - 1] : null; } catch { return null; } })();
-    const [name, setName] = useState(user?.name || lastAddr?.name || "Store Administrator");
-    const [phone, setPhone] = useState(lastAddr?.phone || "9876543210");
-    const [house, setHouse] = useState(lastAddr?.house || "Flat 402, Sunshine Heights, Tower 3");
-    const [street, setStreet] = useState(lastAddr?.street || "Sector 62, Noida");
+    const [name, setName] = useState(user?.name || lastAddr?.name || "");
+    const [phone, setPhone] = useState(user?.phone || lastAddr?.phone || "");
+    const [house, setHouse] = useState(lastAddr?.house || "");
+    const [street, setStreet] = useState(lastAddr?.street || "");
     const [landmark, setLandmark] = useState(lastAddr?.landmark || "");
-    const [city, setCity] = useState(lastAddr?.city || "Noida");
-    const [pincode, setPincode] = useState(lastAddr?.pincode || "201301");
+    const [city, setCity] = useState(lastAddr?.city || "");
+    const [pincode, setPincode] = useState(lastAddr?.pincode || "");
     const [payment, setPayment] = useState("Online Payment");
-    const [isEditingAddress, setIsEditingAddress] = useState(false);
+    const hasExistingAddress = Boolean(lastAddr?.house && lastAddr?.street && lastAddr?.city);
+    const [isEditingAddress, setIsEditingAddress] = useState(!hasExistingAddress);
     const [isChangingPayment, setIsChangingPayment] = useState(false);
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);

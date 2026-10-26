@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../utils/Constants";
 
 const METRICS = [
-  { val: "38+", label: "Signature Dishes" },
+  { val: "120+", label: "Signature Dishes" },
   { val: "100%", label: "Cooked Fresh" },
   { val: "25–30m", label: "Express Delivery" },
   { val: "Delhi NCR", label: "Central Kitchen Hub" },

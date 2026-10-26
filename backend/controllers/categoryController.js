@@ -1,7 +1,8 @@
 const Category = require("../models/categoryModel");
 const Recipe = require("../models/recipeModel");
 
-const slugify = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+const escapeRegex = (string) => (string ? String(string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : "");
+const slugify = (name) => String(name || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 const getCategories = async (req, res) => {
   try {
@@ -31,7 +32,7 @@ const createCategory = async (req, res) => {
     if (!name?.trim()) return res.status(400).json({ message: "Category name is required." });
 
     const trimmed = name.trim();
-    if (await Category.findOne({ name: new RegExp(`^${trimmed}$`, "i") })) {
+    if (await Category.findOne({ name: new RegExp(`^${escapeRegex(trimmed)}$`, "i") })) {
       return res.status(400).json({ message: `Category "${trimmed}" already exists.` });
     }
 

@@ -26,11 +26,13 @@ const getOrderById = async (req, res) => {
   }
 };
 
+const ALLOWED_ORDER_STATUSES = ["Placed", "Preparing", "Out for Delivery", "Delivered", "Cancelled"];
+
 const createOrder = async (req, res) => {
   try {
-    const { customerName, phone, address, items, total, userEmail, payment, paymentStatus, paymentMethod } = req.body;
-    if (!customerName || !phone || !address || !items || !total) {
-      return res.status(400).json({ message: "Missing required order details." });
+    const { customerName, phone, address, items, total, userEmail, payment, paymentStatus, paymentMethod } = req.body || {};
+    if (!customerName?.trim() || !phone?.trim() || !address?.trim() || !Array.isArray(items) || items.length === 0 || typeof total !== "number" || total <= 0) {
+      return res.status(400).json({ message: "Missing or invalid required order details (items, delivery address, phone, total)." });
     }
 
     const email = typeof userEmail === "string" ? userEmail.trim().toLowerCase() : "";
@@ -51,7 +53,7 @@ const createOrder = async (req, res) => {
     const newOrder = new Order({
       id: req.body.id || Date.now(),
       userEmail: email || "guest",
-      customerName, phone, address, items, total,
+      customerName: customerName.trim(), phone: phone.trim(), address: address.trim(), items, total,
       payment: payMode,
       paymentStatus: paymentStatus || (payMode === "Online Payment" ? "Paid" : "Pending"),
       paymentMethod: paymentMethod || (payMode === "Cash on Delivery" ? "Cash on Delivery" : ""),
@@ -77,7 +79,13 @@ const createOrder = async (req, res) => {
 
 const updateOrderStatus = async (req, res) => {
   try {
-    const order = await Order.findOneAndUpdate({ id: Number(req.params.id) }, { status: req.body.status }, { new: true });
+    const rawId = req.params.id;
+    const { status } = req.body || {};
+    if (!status || !ALLOWED_ORDER_STATUSES.includes(status)) {
+      return res.status(400).json({ message: `Invalid status. Must be one of: ${ALLOWED_ORDER_STATUSES.join(", ")}` });
+    }
+    const query = isNaN(Number(rawId)) ? { _id: rawId } : { id: Number(rawId) };
+    const order = await Order.findOneAndUpdate(query, { status }, { new: true, runValidators: true });
     if (!order) return res.status(404).json({ message: "Order not found." });
     return res.status(200).json({ message: "Order status updated!", order });
   } catch (error) {

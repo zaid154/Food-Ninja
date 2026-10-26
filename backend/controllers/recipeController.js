@@ -1,7 +1,9 @@
 const Recipe = require("../models/recipeModel");
 
+const escapeRegex = (string) => (string ? String(string).replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : "");
 const optionalNumber = (v) => (v === "" || v === null || v === undefined ? null : Number(v));
 const normalizeList = (v) => (Array.isArray(v) ? v.filter(Boolean) : String(v || "").split(/[\n,]/).map((s) => s.trim()).filter(Boolean));
+const resolveDishQuery = (rawId) => (!isNaN(Number(rawId)) ? { id: Number(rawId) } : { _id: rawId });
 
 const INDIAN_CUISINES = [
   "indian", "north indian", "south indian", "punjabi", "awadhi", "mughlai", "rajasthani", "kashmiri",
@@ -49,21 +51,21 @@ const getRecipes = async (req, res) => {
       if (catList.length === 1) {
         const catTrim = catList[0];
         if (catTrim.toLowerCase() === "indian") {
-          const regexes = INDIAN_CUISINES.map((c) => new RegExp(`^${c}$`, "i"));
+          const regexes = INDIAN_CUISINES.map((c) => new RegExp(`^${escapeRegex(c)}$`, "i"));
           filter.$or = [{ category: /indian/i }, { cuisine: { $in: regexes } }];
         } else {
-          const catRegex = new RegExp(`^${catTrim}$`, "i");
+          const catRegex = new RegExp(`^${escapeRegex(catTrim)}$`, "i");
           filter.$or = [{ category: catRegex }, { cuisine: catRegex }];
         }
       } else if (catList.length > 1) {
         const orConditions = [];
         catList.forEach((c) => {
           if (c.toLowerCase() === "indian") {
-            const regexes = INDIAN_CUISINES.map((cuis) => new RegExp(`^${cuis}$`, "i"));
+            const regexes = INDIAN_CUISINES.map((cuis) => new RegExp(`^${escapeRegex(cuis)}$`, "i"));
             orConditions.push({ category: /indian/i });
             orConditions.push({ cuisine: { $in: regexes } });
           } else {
-            const r = new RegExp(`^${c}$`, "i");
+            const r = new RegExp(`^${escapeRegex(c)}$`, "i");
             orConditions.push({ category: r });
             orConditions.push({ cuisine: r });
           }
@@ -73,7 +75,7 @@ const getRecipes = async (req, res) => {
     }
 
     if (search && search.trim()) {
-      const sRegex = new RegExp(search.trim(), "i");
+      const sRegex = new RegExp(escapeRegex(search.trim()), "i");
       const searchConditions = [{ name: sRegex }, { category: sRegex }, { cuisine: sRegex }, { description: sRegex }];
       if (filter.$or) {
         filter.$and = [{ $or: filter.$or }, { $or: searchConditions }];
@@ -116,10 +118,7 @@ const getRecipes = async (req, res) => {
 
 const getRecipe = async (req, res) => {
   try {
-    const rawId = req.params.id;
-    let query = { id: Number(rawId) };
-    if (isNaN(query.id)) query = { _id: rawId };
-    const recipe = await Recipe.findOne(query);
+    const recipe = await Recipe.findOne(resolveDishQuery(req.params.id));
     if (!recipe) return res.status(404).json({ message: "Food item not found." });
     return res.status(200).json(recipe);
   } catch (error) {
@@ -152,7 +151,7 @@ const addRecipe = async (req, res) => {
 const updateRecipe = async (req, res) => {
   try {
     const updateData = parseDishPayload(req.body);
-    const updated = await Recipe.findOneAndUpdate({ id: Number(req.params.id) }, { $set: updateData }, { new: true });
+    const updated = await Recipe.findOneAndUpdate(resolveDishQuery(req.params.id), { $set: updateData }, { new: true });
     if (!updated) return res.status(404).json({ message: "Dish not found" });
     return res.status(200).json({ message: "Dish updated successfully!", food: updated });
   } catch (error) {
@@ -162,8 +161,7 @@ const updateRecipe = async (req, res) => {
 
 const updateRecipeStock = async (req, res) => {
   try {
-    const dishId = Number(req.params.id);
-    const existing = await Recipe.findOne({ id: dishId });
+    const existing = await Recipe.findOne(resolveDishQuery(req.params.id));
     if (!existing) return res.status(404).json({ message: "Dish not found" });
 
     const nextStock = req.body.inStock !== undefined ? Boolean(req.body.inStock) : !existing.inStock;
@@ -181,7 +179,7 @@ const updateRecipeStock = async (req, res) => {
 
 const deleteRecipe = async (req, res) => {
   try {
-    const deleted = await Recipe.findOneAndDelete({ id: Number(req.params.id) });
+    const deleted = await Recipe.findOneAndDelete(resolveDishQuery(req.params.id));
     if (!deleted) return res.status(404).json({ message: "Dish not found" });
     return res.status(200).json({ message: "Dish deleted successfully!" });
   } catch (error) {
