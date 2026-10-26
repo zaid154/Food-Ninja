@@ -137,20 +137,20 @@ const MenuPage = () => {
   const endItem = Math.min(currentPage * pagination.limit, pagination.totalItems);
 
   return (
-    <div className="bg-white min-h-[85vh] pt-2 sm:pt-4 pb-12" ref={menuTopRef}>
+    <div className="bg-white min-h-[85vh] pt-1 sm:pt-2 pb-12" ref={menuTopRef}>
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 mb-4 sm:mb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100 mb-3">
           <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Explore Our Menu</h1>
-              <span className="rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-xs font-bold border border-emerald-200/60">
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Explore Our Menu</h1>
+              <span className="rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[11px] font-bold border border-emerald-200/60">
                 {pagination.totalItems || 38} Dishes
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Select a cuisine or search below to discover freshly prepared recipes</p>
+            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">Select a cuisine or search below to discover freshly prepared recipes</p>
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <div className="relative" ref={sortRef}>
               <button
                 type="button"
@@ -206,17 +206,27 @@ const MenuPage = () => {
         </div>
 
         {categoriesLoading ? (
-          <p className="mb-4 py-6 text-center text-xs text-slate-400">Loading categories…</p>
+          <p className="mb-3 py-3 text-center text-xs text-slate-400">Loading categories…</p>
         ) : menuCategories.length > 0 ? (
-          <div className="relative mb-4 sm:mb-5 group/carousel">
-            <button type="button" onClick={() => scrollCategories("left")} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex h-9 w-9 items-center justify-center rounded-full bg-white/95 shadow-md border border-slate-200 text-slate-700 hover:bg-slate-900 hover:text-white transition -ml-2 sm:-ml-4 cursor-pointer" aria-label="Scroll left">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
+          <div className="relative mb-3 sm:mb-4 group/carousel">
+            <button
+              type="button"
+              onClick={() => scrollCategories("left")}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex h-7 w-7 items-center justify-center rounded-full bg-white/95 shadow-md border border-slate-200 text-slate-700 hover:bg-slate-900 hover:text-white transition -ml-2 sm:-ml-3.5 cursor-pointer"
+              aria-label="Scroll left"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
             </button>
-            <button type="button" onClick={() => scrollCategories("right")} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex h-9 w-9 items-center justify-center rounded-full bg-white/95 shadow-md border border-slate-200 text-slate-700 hover:bg-slate-900 hover:text-white transition -mr-2 sm:-mr-4 cursor-pointer" aria-label="Scroll right">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
+            <button
+              type="button"
+              onClick={() => scrollCategories("right")}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden sm:flex h-7 w-7 items-center justify-center rounded-full bg-white/95 shadow-md border border-slate-200 text-slate-700 hover:bg-slate-900 hover:text-white transition -mr-2 sm:-mr-3.5 cursor-pointer"
+              aria-label="Scroll right"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6" /></svg>
             </button>
 
-            <div ref={categoryCarouselRef} className="flex gap-2.5 sm:gap-3.5 overflow-x-auto px-1 pt-2 pb-3 scrollbar-none scroll-smooth">
+            <div ref={categoryCarouselRef} className="flex gap-2 sm:gap-2.5 overflow-x-auto px-1 py-1 scrollbar-none scroll-smooth">
               {menuCategories.map((cat) => {
                 const isActive = currentCategory.toLowerCase() === cat.name.toLowerCase();
                 return (
@@ -224,32 +234,41 @@ const MenuPage = () => {
                     key={cat.name}
                     type="button"
                     onClick={() => updateQuery({ category: isActive ? "All" : cat.name, page: 1 })}
-                    className={`group relative flex flex-col items-center justify-between p-3.5 sm:p-4 rounded-2xl transition-all duration-200 border-2 text-center cursor-pointer w-[120px] sm:w-[140px] shrink-0 ${cat.bg || "bg-slate-50"} ${
-                      isActive ? "border-emerald-600 shadow-md bg-white/95 ring-2 ring-emerald-500/20" : "border-transparent hover:border-slate-300/80 hover:shadow-md hover:-translate-y-0.5"
+                    className={`group relative flex flex-col items-center justify-center p-2 sm:p-2.5 rounded-xl transition-all duration-150 border text-center cursor-pointer w-[80px] sm:w-[92px] shrink-0 ${cat.bg || "bg-slate-50"} ${
+                      isActive
+                        ? "border-emerald-600 shadow-xs bg-white/95 ring-2 ring-emerald-500/20"
+                        : "border-transparent hover:border-slate-300/80 hover:shadow-xs hover:-translate-y-0.5"
                     }`}
                   >
-                    <div className="h-16 w-16 sm:h-18 sm:w-18 rounded-full overflow-hidden bg-white shadow-xs p-1 mb-2.5 shrink-0">
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full overflow-hidden bg-white shadow-2xs p-0.5 mb-1.5 shrink-0">
                       {cat.img ? (
-                        <img src={cat.img} alt={cat.name} className="h-full w-full rounded-full object-cover transition duration-300 group-hover:scale-105" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                        <img
+                          src={cat.img}
+                          alt={cat.name}
+                          className="h-full w-full rounded-full object-cover transition duration-300 group-hover:scale-105"
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                        />
                       ) : (
-                        <span className="flex h-full w-full items-center justify-center rounded-full text-lg font-bold text-emerald-700">{cat.name?.charAt(0)}</span>
+                        <span className="flex h-full w-full items-center justify-center rounded-full text-xs font-bold text-emerald-700">
+                          {cat.name?.charAt(0)}
+                        </span>
                       )}
                     </div>
-                    <span className="text-xs font-extrabold text-slate-800 mb-1.5 tracking-tight truncate w-full px-1">{cat.name}</span>
-                    <div className={`flex h-5 w-5 items-center justify-center rounded-full shadow-xs transition duration-200 ${isActive ? "bg-emerald-700 text-white" : "bg-white text-slate-600 group-hover:bg-emerald-700 group-hover:text-white"}`}>
-                      {isActive ? (
-                        <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
-                      ) : (
-                        <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                      )}
-                    </div>
+                    <span className={`text-[11px] sm:text-xs font-bold tracking-tight truncate w-full px-0.5 ${isActive ? "text-emerald-800" : "text-slate-800"}`}>
+                      {cat.name}
+                    </span>
+                    {isActive && (
+                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xs text-[9px] font-bold">
+                        ✓
+                      </span>
+                    )}
                   </button>
                 );
               })}
             </div>
           </div>
         ) : (
-          <p className="mb-4 py-6 text-center text-xs text-slate-400">No categories are available right now.</p>
+          <p className="mb-3 py-3 text-center text-xs text-slate-400">No categories are available right now.</p>
         )}
 
         {(currentSearch || currentCategory !== "All") && (
