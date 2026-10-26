@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import DishCard from "./DishCard";
 import { API_BASE_URL } from "../utils/Constants";
@@ -35,10 +35,15 @@ const SortIcon = ({ value, isSelected }) => {
 
 const MenuPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentCategory = searchParams.get("category") || "All";
+  const categoryParam = searchParams.get("category") || "All";
   const currentSort = searchParams.get("sort") || "recommended";
   const currentSearch = searchParams.get("search") || "";
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
+
+  const selectedCategories = useMemo(() => {
+    if (!categoryParam || categoryParam.toLowerCase() === "all") return [];
+    return categoryParam.split(",").map((c) => c.trim()).filter(Boolean);
+  }, [categoryParam]);
 
   const [dishes, setDishes] = useState([]);
   const [menuCategories, setMenuCategories] = useState([]);
@@ -84,12 +89,28 @@ const MenuPage = () => {
     setSearchParams(newParams);
   }, [searchParams, setSearchParams]);
 
+  const handleToggleCategory = (catName) => {
+    const exists = selectedCategories.some((c) => c.toLowerCase() === catName.toLowerCase());
+    let next;
+    if (exists) {
+      next = selectedCategories.filter((c) => c.toLowerCase() !== catName.toLowerCase());
+    } else {
+      next = [...selectedCategories, catName];
+    }
+    updateQuery({
+      category: next.length > 0 ? next.join(",") : "All",
+      page: 1,
+    });
+  };
+
   const fetchDishes = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const queryParts = [`page=${currentPage}`, "limit=12"];
-      if (currentCategory && currentCategory !== "All") queryParts.push(`category=${encodeURIComponent(currentCategory)}`);
+      if (selectedCategories.length > 0) {
+        queryParts.push(`category=${encodeURIComponent(selectedCategories.join(","))}`);
+      }
       if (currentSearch) queryParts.push(`search=${encodeURIComponent(currentSearch)}`);
       if (currentSort && currentSort !== "recommended") queryParts.push(`sort=${encodeURIComponent(currentSort)}`);
 
@@ -108,7 +129,7 @@ const MenuPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, currentCategory, currentSearch, currentSort]);
+  }, [currentPage, selectedCategories, currentSearch, currentSort]);
 
   useEffect(() => {
     fetchDishes();
@@ -132,97 +153,136 @@ const MenuPage = () => {
   const endItem = Math.min(currentPage * pagination.limit, pagination.totalItems);
 
   return (
-    <div className="bg-white min-h-[85vh] pt-1 sm:pt-2 pb-12" ref={menuTopRef}>
+    <div className="bg-white min-h-[85vh] pt-2 pb-12" ref={menuTopRef}>
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
-        {/* Header Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100 mb-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Explore Our Menu</h1>
-              <span className="rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[11px] font-bold border border-emerald-200/60">
-                {pagination.totalItems || dishes.length} Dishes
-              </span>
-              {currentCategory !== "All" && (
-                <span className="rounded-full bg-emerald-100 text-emerald-800 px-2 py-0.5 text-[11px] font-bold border border-emerald-200">
-                  {currentCategory}
+        {/* Themed Food Ninja Header Banner */}
+        <div className="rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50/70 via-white to-amber-50/40 p-3.5 sm:p-4 mb-3.5 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-xs text-xs">
+                  🥷
                 </span>
-              )}
-            </div>
-            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">Select a cuisine or search below to discover freshly prepared recipes</p>
-          </div>
+                <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                  Explore Food<span className="text-emerald-600">Ninja</span> Menu
+                </h1>
+                <span className="rounded-full bg-emerald-600 text-white px-2.5 py-0.5 text-[11px] font-bold shadow-xs">
+                  {pagination.totalItems || dishes.length} Dishes
+                </span>
+              </div>
+              <p className="text-[11px] sm:text-xs text-slate-500 mt-1">
+                Select one or multiple cuisines to mix & match dishes, or sort by preferences
+              </p>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="relative" ref={sortRef}>
-              <button
-                type="button"
-                onClick={() => setSortOpen((p) => !p)}
-                className={`group flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs transition-all duration-150 cursor-pointer shadow-xs ${
-                  sortOpen ? "border-emerald-600 bg-white ring-2 ring-emerald-500/15 text-slate-900" : currentSort !== "recommended" ? "border-emerald-500/70 bg-emerald-50/60 text-emerald-950 font-semibold" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                }`}
-                title="Sort dishes"
-              >
-                <SortIcon value={currentSort} isSelected={sortOpen || currentSort !== "recommended"} />
-                <span className="text-slate-400 font-normal hidden sm:inline">Sort:</span>
-                <span className="font-semibold text-slate-800 tracking-tight">{SORT_OPTIONS.find((o) => o.value === currentSort)?.label || "Recommended"}</span>
-                <svg className={`h-3 w-3 text-slate-400 transition-transform duration-200 ${sortOpen ? "rotate-180 text-emerald-600" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
-              </button>
-
-              {sortOpen && (
-                <div className="absolute right-0 top-full mt-1.5 w-52 rounded-xl border border-slate-200 bg-white p-1 shadow-lg shadow-slate-900/10 z-50 overflow-hidden">
-                  <div className="space-y-0.5" role="listbox">
-                    {SORT_OPTIONS.map((opt) => {
-                      const isSelected = currentSort === opt.value;
-                      return (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() => { updateQuery({ sort: opt.value, page: 1 }); setSortOpen(false); }}
-                          className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-xs transition cursor-pointer text-left ${isSelected ? "bg-emerald-50 text-emerald-950 font-semibold" : "text-slate-700 hover:bg-slate-50 font-medium"}`}
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <SortIcon value={opt.value} isSelected={isSelected} />
-                            <span>{opt.label}</span>
-                          </div>
-                          {isSelected && <svg className="h-3.5 w-3.5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>}
-                        </button>
-                      );
-                    })}
-                  </div>
+              {/* Multi-category tags */}
+              {selectedCategories.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5 mt-2.5 pt-2 border-t border-emerald-100/70">
+                  <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Active Filters:</span>
+                  {selectedCategories.map((catName) => (
+                    <button
+                      key={catName}
+                      type="button"
+                      onClick={() => handleToggleCategory(catName)}
+                      className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-900 px-2 py-0.5 text-[10px] font-bold border border-emerald-200 shadow-2xs hover:bg-emerald-200 transition cursor-pointer"
+                      title={`Remove ${catName}`}
+                    >
+                      <span>{catName}</span>
+                      <span className="text-emerald-700 hover:text-emerald-950 font-black">✕</span>
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => updateQuery({ category: "All", page: 1 })}
+                    className="text-[10px] text-slate-400 hover:text-emerald-700 font-semibold underline ml-1 cursor-pointer"
+                  >
+                    Clear All
+                  </button>
                 </div>
               )}
             </div>
 
-            {(currentCategory !== "All" || currentSearch || currentSort !== "recommended") && (
-              <button
-                type="button"
-                onClick={() => setSearchParams(new URLSearchParams())}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/70 px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-700 transition cursor-pointer shadow-xs"
-                title="Reset all filters"
-              >
-                <svg className="h-3 w-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
-                <span>Reset</span>
-              </button>
-            )}
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="relative" ref={sortRef}>
+                <button
+                  type="button"
+                  onClick={() => setSortOpen((p) => !p)}
+                  className={`group flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs transition-all duration-150 cursor-pointer shadow-xs ${
+                    sortOpen
+                      ? "border-emerald-600 bg-white ring-2 ring-emerald-500/15 text-slate-900"
+                      : currentSort !== "recommended"
+                      ? "border-emerald-500/70 bg-emerald-50/60 text-emerald-950 font-semibold"
+                      : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                  }`}
+                  title="Sort dishes"
+                >
+                  <SortIcon value={currentSort} isSelected={sortOpen || currentSort !== "recommended"} />
+                  <span className="text-slate-400 font-normal hidden sm:inline">Sort:</span>
+                  <span className="font-semibold text-slate-800 tracking-tight">
+                    {SORT_OPTIONS.find((o) => o.value === currentSort)?.label || "Recommended"}
+                  </span>
+                  <svg className={`h-3 w-3 text-slate-400 transition-transform duration-200 ${sortOpen ? "rotate-180 text-emerald-600" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
+                </button>
+
+                {sortOpen && (
+                  <div className="absolute right-0 top-full mt-1.5 w-52 rounded-xl border border-slate-200 bg-white p-1 shadow-lg shadow-slate-900/10 z-50 overflow-hidden">
+                    <div className="space-y-0.5" role="listbox">
+                      {SORT_OPTIONS.map((opt) => {
+                        const isSelected = currentSort === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => { updateQuery({ sort: opt.value, page: 1 }); setSortOpen(false); }}
+                            className={`group flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-xs transition cursor-pointer text-left ${
+                              isSelected ? "bg-emerald-50 text-emerald-950 font-semibold" : "text-slate-700 hover:bg-slate-50 font-medium"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <SortIcon value={opt.value} isSelected={isSelected} />
+                              <span>{opt.label}</span>
+                            </div>
+                            {isSelected && <svg className="h-3.5 w-3.5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {(selectedCategories.length > 0 || currentSearch || currentSort !== "recommended") && (
+                <button
+                  type="button"
+                  onClick={() => setSearchParams(new URLSearchParams())}
+                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/70 px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-700 transition cursor-pointer shadow-xs"
+                  title="Reset all filters"
+                >
+                  <svg className="h-3 w-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
+                  <span>Reset</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Compact Categories Bar */}
+        {/* Compact Categories Selection Bar */}
         {categoriesLoading ? (
           <p className="mb-3 py-3 text-center text-xs text-slate-400">Loading categories…</p>
         ) : menuCategories.length > 0 ? (
           <div className="flex gap-2 sm:gap-2.5 overflow-x-auto py-1 mb-4 scrollbar-none">
             {menuCategories.map((cat) => {
-              const isActive = currentCategory.toLowerCase() === cat.name.toLowerCase();
+              const isActive = selectedCategories.some((c) => c.toLowerCase() === cat.name.toLowerCase());
               return (
                 <button
                   key={cat.name}
                   type="button"
-                  onClick={() => updateQuery({ category: isActive ? "All" : cat.name, page: 1 })}
+                  onClick={() => handleToggleCategory(cat.name)}
                   className={`group relative flex flex-col items-center justify-center p-2 sm:p-2.5 rounded-xl transition-all duration-150 border text-center cursor-pointer w-[78px] sm:w-[90px] shrink-0 ${cat.bg || "bg-slate-50"} ${
                     isActive
                       ? "border-emerald-600 shadow-xs bg-white/95 ring-2 ring-emerald-500/20"
                       : "border-transparent hover:border-slate-300/80 hover:shadow-xs hover:-translate-y-0.5"
                   }`}
+                  title={isActive ? `Deselect ${cat.name}` : `Select ${cat.name}`}
                 >
                   <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-full overflow-hidden bg-white shadow-2xs p-0.5 mb-1.5 shrink-0">
                     {cat.img ? (
@@ -252,7 +312,7 @@ const MenuPage = () => {
           </div>
         ) : null}
 
-        {/* Dishes Content */}
+        {/* Dishes Grid */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {Array.from({ length: 12 }).map((_, idx) => (
@@ -280,7 +340,7 @@ const MenuPage = () => {
         ) : dishes.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-16 text-center my-6">
             <h3 className="text-base font-bold text-slate-800">No Dishes Found</h3>
-            <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">We couldn&apos;t find any dishes matching your current search or category filter.</p>
+            <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">We couldn&apos;t find any dishes matching your current selection.</p>
             <button type="button" onClick={() => setSearchParams(new URLSearchParams())} className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-800 transition">
               Reset All Filters
             </button>

@@ -45,13 +45,30 @@ const getRecipes = async (req, res) => {
     const filter = {};
 
     if (category && category.trim() && category.toLowerCase() !== "all") {
-      const catTrim = category.trim();
-      if (catTrim.toLowerCase() === "indian") {
-        const regexes = INDIAN_CUISINES.map((c) => new RegExp(`^${c}$`, "i"));
-        filter.$or = [{ category: /indian/i }, { cuisine: { $in: regexes } }];
-      } else {
-        const catRegex = new RegExp(`^${catTrim}$`, "i");
-        filter.$or = [{ category: catRegex }, { cuisine: catRegex }];
+      const catList = category.split(",").map((c) => c.trim()).filter(Boolean);
+      if (catList.length === 1) {
+        const catTrim = catList[0];
+        if (catTrim.toLowerCase() === "indian") {
+          const regexes = INDIAN_CUISINES.map((c) => new RegExp(`^${c}$`, "i"));
+          filter.$or = [{ category: /indian/i }, { cuisine: { $in: regexes } }];
+        } else {
+          const catRegex = new RegExp(`^${catTrim}$`, "i");
+          filter.$or = [{ category: catRegex }, { cuisine: catRegex }];
+        }
+      } else if (catList.length > 1) {
+        const orConditions = [];
+        catList.forEach((c) => {
+          if (c.toLowerCase() === "indian") {
+            const regexes = INDIAN_CUISINES.map((cuis) => new RegExp(`^${cuis}$`, "i"));
+            orConditions.push({ category: /indian/i });
+            orConditions.push({ cuisine: { $in: regexes } });
+          } else {
+            const r = new RegExp(`^${c}$`, "i");
+            orConditions.push({ category: r });
+            orConditions.push({ cuisine: r });
+          }
+        });
+        filter.$or = orConditions;
       }
     }
 
