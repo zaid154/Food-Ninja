@@ -27,7 +27,7 @@ const defaultCategories = [
 ];
 
 const realisticUsers = [
-  { name: "Store Administrator", email: "admin@foodninja.com", password: "admin123", role: "admin", phone: "9988776655", address: "Food Ninja HQ, Connaught Place, New Delhi - 110001" },
+  { name: "Mohd Zaid (Admin)", email: "zaidm1323@gmail.com", password: "Zaid@9999201255", role: "admin", phone: "9999201255", address: "Food Ninja HQ, Connaught Place, New Delhi - 110001" },
   { name: "Mohd Zaid", email: "zaid@foodninja.com", password: "password123", role: "user", phone: "9999201255", address: "B-13/2, Street No-07, Delhi NCR - 110094" },
   { name: "Sara Khan", email: "sara@foodninja.com", password: "password123", role: "user", phone: "9876543210", address: "Flat 204, Lotus Heights, Indirapuram, Ghaziabad - 201014" },
   { name: "Aarav Sharma", email: "aarav@gmail.com", password: "password123", role: "user", phone: "9811223344", address: "House 42, Block C, Green Park, New Delhi - 110016" },

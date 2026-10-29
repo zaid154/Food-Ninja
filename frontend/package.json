@@ -6,6 +6,7 @@
     "start": "parcel index.html",
     "dev": "parcel index.html",
     "build": "parcel build index.html --dist-dir dist",
+    "postbuild": "node -e \"const fs=require('fs'); if(fs.existsSync('favicon.ico')){fs.copyFileSync('favicon.ico','dist/favicon.ico');}\"",
     "test": "jest",
     "watch-jest": "jest --watch"
   },
