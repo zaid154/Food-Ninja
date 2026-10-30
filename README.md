@@ -6,9 +6,9 @@ Food Ninja is a high-performance, production-ready full-stack food ordering plat
 
 ## Live Demo & Links
 
-- **Frontend:** [food-ninja.vercel.app](https://portfolio-zeta-drab-97.vercel.app/)
-- **Backend API:** [food-ninja-api.onrender.com](https://food-ninja-backend.onrender.com)
-- **Author:** Mohd Zaid ([GitHub](https://github.com/zaid154) | [LinkedIn](https://www.linkedin.com/in/mohd-zaid-794090231/))
+- **Live Storefront:** [https://foodninja-pro.vercel.app](https://foodninja-pro.vercel.app)
+- **Author Portfolio:** [https://zaid-pro.vercel.app](https://zaid-pro.vercel.app)
+- **Author Profile:** Mohd Zaid ([GitHub](https://github.com/zaid154) | [LinkedIn](https://www.linkedin.com/in/mohd-zaid-794090231/))
 
 ---
 
