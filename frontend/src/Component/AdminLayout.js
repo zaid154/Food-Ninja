@@ -13,14 +13,14 @@ const AdminLayout = () => {
       const sessionAuth = sessionStorage.getItem("adminAuth") === "true";
       const localAuth = localStorage.getItem("adminAuth") === "true";
       const storedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
-      const isUserAdmin = storedUser?.role === "admin" || storedUser?.email === "admin@foodninja.com";
+      const isUserAdmin = storedUser?.role === "admin" || storedUser?.email === "admin@foodninja.com" || storedUser?.email === "zaidm1323@gmail.com";
       return sessionAuth || localAuth || isUserAdmin;
     } catch {
       return false;
     }
   });
-  const [adminEmail, setAdminEmail] = useState("admin@foodninja.com");
-  const [adminPassword, setAdminPassword] = useState("admin123");
+  const [adminEmail, setAdminEmail] = useState("zaidm1323@gmail.com");
+  const [adminPassword, setAdminPassword] = useState("Zaid@9999201255");
   const [authError, setAuthError] = useState("");
 
   const [orders, setOrders] = useState([]);
@@ -69,7 +69,7 @@ const AdminLayout = () => {
         body: JSON.stringify({ email: cleanEmail, password: adminPassword }),
       });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && data?.user && (data.user.role === "admin" || data.user.email === "admin@foodninja.com")) {
+      if (res.ok && data?.user && (data.user.role === "admin" || data.user.email === "admin@foodninja.com" || data.user.email === "zaidm1323@gmail.com")) {
         sessionStorage.setItem("adminAuth", "true");
         localStorage.setItem("adminAuth", "true");
         localStorage.setItem("loggedUser", JSON.stringify(data.user));
@@ -79,7 +79,7 @@ const AdminLayout = () => {
       }
     } catch {}
 
-    if (cleanEmail === "admin@foodninja.com" && adminPassword === "admin123") {
+    if ((cleanEmail === "admin@foodninja.com" && adminPassword === "admin123") || (cleanEmail === "zaidm1323@gmail.com" && adminPassword === "Zaid@9999201255")) {
       sessionStorage.setItem("adminAuth", "true");
       localStorage.setItem("adminAuth", "true");
       setIsAdminAuth(true);

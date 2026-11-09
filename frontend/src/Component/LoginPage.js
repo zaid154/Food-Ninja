@@ -57,7 +57,7 @@ const LoginPage = () => {
                 setUser(loggedUser);
 
                 // If admin logs in, unlock session and redirect
-                if (data.user.role === "admin" || data.user.email === "admin@foodninja.com") {
+                if (data.user.role === "admin" || data.user.email === "admin@foodninja.com" || data.user.email === "zaidm1323@gmail.com") {
                     sessionStorage.setItem("adminAuth", "true");
                     localStorage.setItem("adminAuth", "true");
                     navigate("/admin");

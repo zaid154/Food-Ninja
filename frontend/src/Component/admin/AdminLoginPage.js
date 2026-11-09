@@ -32,7 +32,7 @@ const AdminLoginPage = ({ adminEmail, setAdminEmail, adminPassword, setAdminPass
               value={adminEmail}
               onChange={(e) => setAdminEmail(e.target.value)}
               className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 outline-none focus:border-emerald-500 transition"
-              placeholder="admin@foodninja.com"
+              placeholder="zaidm1323@gmail.com"
             />
           </div>
 
@@ -45,7 +45,7 @@ const AdminLoginPage = ({ adminEmail, setAdminEmail, adminPassword, setAdminPass
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
                 className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 pr-10 outline-none focus:border-emerald-500 transition"
-                placeholder="admin123"
+                placeholder="Zaid@9999201255"
               />
               <button
                 type="button"
@@ -66,14 +66,14 @@ const AdminLoginPage = ({ adminEmail, setAdminEmail, adminPassword, setAdminPass
           {/* Quick Demo Credentials Box */}
           <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-lg p-2.5">
             <div className="text-[11px] text-slate-500">
-              <p className="font-semibold text-slate-700">Demo Credentials</p>
-              <p className="font-mono text-slate-500">admin@foodninja.com / admin123</p>
+              <p className="font-semibold text-slate-700">Admin Credentials</p>
+              <p className="font-mono text-slate-500">zaidm1323@gmail.com / Zaid@9999201255</p>
             </div>
             <button
               type="button"
               onClick={() => {
-                setAdminEmail("admin@foodninja.com");
-                setAdminPassword("admin123");
+                setAdminEmail("zaidm1323@gmail.com");
+                setAdminPassword("Zaid@9999201255");
               }}
               className="text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-md px-2 py-1 text-[11px] font-bold transition cursor-pointer"
             >

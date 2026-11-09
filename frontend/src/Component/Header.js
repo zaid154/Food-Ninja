@@ -56,7 +56,7 @@ const Header = () => {
 
   useEffect(() => {
     const adminSession = sessionStorage.getItem("adminAuth") === "true";
-    const isUserAdmin = user && user.email === "admin@foodninja.com";
+    const isUserAdmin = user && (user.role === "admin" || user.email === "admin@foodninja.com" || user.email === "zaidm1323@gmail.com");
     setIsAdmin(adminSession || isUserAdmin);
   }, [user, location.pathname]);
 

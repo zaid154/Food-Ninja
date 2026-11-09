@@ -12,7 +12,7 @@ const register = async (req, res) => {
 
     const newUser = new User({
       name: name.trim(), email: cleanEmail, password,
-      role: cleanEmail === "admin@foodninja.com" ? "admin" : "user"
+      role: (cleanEmail === "admin@foodninja.com" || cleanEmail === "zaidm1323@gmail.com") ? "admin" : "user"
     });
     await newUser.save();
 

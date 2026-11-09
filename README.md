@@ -156,7 +156,8 @@ npm run build
 
 | Role | Email | Password | Permissions |
 |---|---|---|---|
-| **Admin** | `admin@foodninja.com` | `admin123` | Full access to menu editor, inventory, orders, KOT/Bill printer, store hours & settings |
+| **Admin** | `zaidm1323@gmail.com` | `Zaid@9999201255` | Full access to menu editor, inventory, orders, KOT/Bill printer, store hours & settings |
+| **Admin (Backup)** | `admin@foodninja.com` | `admin123` | Secondary administrative access |
 | **Customer 1** | `zaid@foodninja.com` | `password123` | Customer profile with delivered orders and verified review privileges |
 | **Customer 2** | `sara@foodninja.com` | `password123` | Customer profile with order history and favorites |
 
