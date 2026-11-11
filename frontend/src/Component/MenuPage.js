@@ -153,23 +153,18 @@ const MenuPage = () => {
   const endItem = Math.min(currentPage * pagination.limit, pagination.totalItems);
 
   return (
-    <div className="bg-white min-h-[85vh] pt-2 pb-12" ref={menuTopRef}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-8">
-        {/* Themed Food Ninja Header Banner */}
-        <div className="rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50/70 via-white to-amber-50/40 p-3.5 sm:p-4 mb-3.5 shadow-2xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                  Explore Food<span className="text-emerald-600">Ninja</span> Menu
-                </h1>
-                <span className="rounded-full bg-emerald-600 text-white px-2.5 py-0.5 text-[11px] font-bold shadow-xs">
-                  {pagination.totalItems || dishes.length} Dishes
-                </span>
-              </div>
-              <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
-                Select one or multiple cuisines to mix & match dishes, or sort by preferences
-              </p>
+    <div className="bg-white min-h-[85vh] pt-1 pb-8" ref={menuTopRef}>
+      <div className="mx-auto max-w-7xl px-3 sm:px-6">
+        {/* Sleek Compact Header Bar */}
+        <div className="rounded-xl border border-emerald-100/90 bg-gradient-to-r from-emerald-50/70 via-white to-amber-50/40 px-3 py-1.5 sm:px-4 sm:py-2 mb-2 shadow-2xs">
+          <div className="flex items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2">
+              <h1 className="text-sm sm:text-base font-black text-slate-900 tracking-tight">
+                Explore Food<span className="text-emerald-600">Ninja</span> Menu
+              </h1>
+              <span className="rounded-full bg-emerald-600 text-white px-2 py-0.5 text-[10px] sm:text-[11px] font-bold shadow-xs">
+                {pagination.totalItems || dishes.length} Dishes
+              </span>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
@@ -177,7 +172,7 @@ const MenuPage = () => {
                 <button
                   type="button"
                   onClick={() => setSortOpen((p) => !p)}
-                  className={`group flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs transition-all duration-150 cursor-pointer shadow-xs ${
+                  className={`group flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs transition-all duration-150 cursor-pointer shadow-xs ${
                     sortOpen
                       ? "border-emerald-600 bg-white ring-2 ring-emerald-500/15 text-slate-900"
                       : currentSort !== "recommended"
@@ -187,8 +182,8 @@ const MenuPage = () => {
                   title="Sort dishes"
                 >
                   <SortIcon value={currentSort} isSelected={sortOpen || currentSort !== "recommended"} />
-                  <span className="text-slate-400 font-normal hidden sm:inline">Sort:</span>
-                  <span className="font-semibold text-slate-800 tracking-tight">
+                  <span className="text-slate-400 font-normal hidden md:inline">Sort:</span>
+                  <span className="font-semibold text-slate-800 tracking-tight text-[11px] sm:text-xs">
                     {SORT_OPTIONS.find((o) => o.value === currentSort)?.label || "Recommended"}
                   </span>
                   <svg className={`h-3 w-3 text-slate-400 transition-transform duration-200 ${sortOpen ? "rotate-180 text-emerald-600" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
@@ -225,7 +220,7 @@ const MenuPage = () => {
                 <button
                   type="button"
                   onClick={() => setSearchParams(new URLSearchParams())}
-                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/70 px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-rose-700 transition cursor-pointer shadow-xs"
+                  className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white hover:border-rose-200 hover:bg-rose-50/70 px-2 py-1 text-[11px] font-semibold text-slate-600 hover:text-rose-700 transition cursor-pointer shadow-xs"
                   title="Reset all filters"
                 >
                   <svg className="h-3 w-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
@@ -238,9 +233,9 @@ const MenuPage = () => {
 
         {/* Compact Categories Selection Bar */}
         {categoriesLoading ? (
-          <p className="mb-3 py-3 text-center text-xs text-slate-400">Loading categories…</p>
+          <p className="mb-2 py-2 text-center text-xs text-slate-400">Loading categories…</p>
         ) : menuCategories.length > 0 ? (
-          <div className="flex gap-2 sm:gap-2.5 overflow-x-auto py-1 mb-4 scrollbar-none">
+          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto py-0.5 mb-2.5 scrollbar-none">
             {menuCategories.map((cat) => {
               const isActive = selectedCategories.some((c) => c.toLowerCase() === cat.name.toLowerCase());
               return (
@@ -248,20 +243,23 @@ const MenuPage = () => {
                   key={cat.name}
                   type="button"
                   onClick={() => handleToggleCategory(cat.name)}
-                  className={`group relative flex flex-col items-center justify-center p-2 sm:p-2.5 rounded-xl transition-all duration-150 border text-center cursor-pointer w-[78px] sm:w-[90px] shrink-0 ${cat.bg || "bg-slate-50"} ${
+                  className={`group relative flex flex-col items-center justify-center p-1 sm:p-1.5 rounded-lg transition-all duration-150 border text-center cursor-pointer w-[66px] sm:w-[74px] shrink-0 ${cat.bg || "bg-slate-50"} ${
                     isActive
                       ? "border-emerald-600 shadow-xs bg-white/95 ring-2 ring-emerald-500/20"
                       : "border-transparent hover:border-slate-300/80 hover:shadow-xs hover:-translate-y-0.5"
                   }`}
                   title={isActive ? `Deselect ${cat.name}` : `Select ${cat.name}`}
                 >
-                  <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-full overflow-hidden bg-white shadow-2xs p-0.5 mb-1.5 shrink-0">
+                  <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full overflow-hidden bg-white shadow-2xs p-0.5 mb-1 shrink-0">
                     {cat.img ? (
                       <img
                         src={cat.img}
                         alt={cat.name}
                         className="h-full w-full rounded-full object-cover transition duration-300 group-hover:scale-105"
-                        onError={(e) => { e.currentTarget.style.display = "none"; }}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.style.display = "none";
+                        }}
                       />
                     ) : (
                       <span className="flex h-full w-full items-center justify-center rounded-full text-xs font-bold text-emerald-700">
@@ -269,11 +267,11 @@ const MenuPage = () => {
                       </span>
                     )}
                   </div>
-                  <span className={`text-[11px] sm:text-xs font-bold tracking-tight truncate w-full px-0.5 ${isActive ? "text-emerald-800" : "text-slate-800"}`}>
+                  <span className={`text-[10px] sm:text-[11px] font-bold tracking-tight truncate w-full px-0.5 ${isActive ? "text-emerald-800" : "text-slate-800"}`}>
                     {cat.name}
                   </span>
                   {isActive && (
-                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xs text-[9px] font-bold">
+                    <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-600 text-white shadow-xs text-[8px] font-bold">
                       ✓
                     </span>
                   )}
@@ -285,7 +283,7 @@ const MenuPage = () => {
 
         {/* Dishes Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
             {Array.from({ length: 12 }).map((_, idx) => (
               <div key={idx} className="h-80 rounded-2xl bg-slate-100 animate-pulse border border-slate-100 p-4 flex flex-col justify-between">
                 <div className="h-44 w-full rounded-xl bg-slate-200" />
@@ -318,7 +316,7 @@ const MenuPage = () => {
           </div>
         ) : (
           <div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
               {dishes.map((dish) => (
                 <DishCard key={dish.id} data={dish} />
               ))}
