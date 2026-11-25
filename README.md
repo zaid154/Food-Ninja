@@ -63,7 +63,7 @@ During our comprehensive audit and delivery preparation:
 
 ```
 Food Ninja/
-├── backend/
+├── server/
 │   ├── config/
 │   │   └── connectionDb.js        # MongoDB connection and reconnect handling
 │   ├── controllers/               # Recipe, category, order, inquiry, review, settings logic
@@ -72,7 +72,7 @@ Food Ninja/
 │   ├── data/                      # 120-dish authentic seed datasets (North, South, World)
 │   ├── seedData.js                # Database seeder script
 │   └── server.js                  # Express 5 application entry point
-├── frontend/
+├── client/
 │   ├── src/
 │   │   ├── Component/             # UI views, route pages, and customer dialogs
 │   │   │   ├── admin/             # Admin management suite
@@ -105,11 +105,11 @@ Food Ninja/
 
 ### 1. Backend Setup
 ```bash
-cd backend
+cd server
 npm install
 ```
 
-Create a `.env` file inside `backend/`:
+Create a `.env` file inside `server/`:
 ```env
 PORT=5005
 MONGO_URI=your_mongodb_connection_string
@@ -131,7 +131,7 @@ npm start
 ### 2. Frontend Setup
 In a separate terminal window:
 ```bash
-cd frontend
+cd client
 npm install
 npm start
 # Application running at http://localhost:1234
@@ -140,13 +140,13 @@ npm start
 ### 3. Running Automated Tests
 To run the automated Jest test suite:
 ```bash
-cd frontend
+cd client
 npm test
 ```
 
 ### 4. Production Build
 ```bash
-cd frontend
+cd client
 npm run build
 ```
 
