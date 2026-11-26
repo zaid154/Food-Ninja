@@ -3,9 +3,12 @@ import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../utils/cartSlice";
 import { clearWishlist } from "../utils/wishlistSlice";
+import { clearOrders } from "../utils/ordersSlice";
 import UserContext from "./Usercontext";
 import { API_BASE_URL, LOGO } from "../utils/Constants";
 import { getClosedStoreNotice } from "../utils/storeNotices";
+import { logoutFromServer } from "../utils/authClient";
+import { fetchStoreSettings } from "../utils/settingsClient";
 
 const Header = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -36,28 +39,23 @@ const Header = () => {
   const [storeSettings, setStoreSettings] = useState(null);
 
   useEffect(() => {
-    const refreshSettings = () => {
-      if (typeof fetch === "undefined") return;
-      fetch(`${API_BASE_URL}/settings`)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d && d.settings) setStoreSettings(d.settings);
-        })
-        .catch(() => {});
+    const refreshSettings = (force = false) => {
+      fetchStoreSettings({ force }).then((s) => {
+        if (s) setStoreSettings(s);
+      });
     };
-    refreshSettings();
-    const interval = setInterval(refreshSettings, 60_000);
-    window.addEventListener("store_settings_updated", refreshSettings);
+    const handleUpdated = () => refreshSettings(true);
+    refreshSettings(false);
+    const interval = setInterval(() => refreshSettings(false), 60_000);
+    window.addEventListener("store_settings_updated", handleUpdated);
     return () => {
       clearInterval(interval);
-      window.removeEventListener("store_settings_updated", refreshSettings);
+      window.removeEventListener("store_settings_updated", handleUpdated);
     };
   }, [location.pathname]);
 
   useEffect(() => {
-    const adminSession = sessionStorage.getItem("adminAuth") === "true";
-    const isUserAdmin = user && (user.role === "admin" || user.email === "admin@foodninja.com" || user.email === "zaidm1323@gmail.com");
-    setIsAdmin(adminSession || isUserAdmin);
+    setIsAdmin(Boolean(user && user.role === "admin"));
   }, [user, location.pathname]);
 
   // Close dropdown & search on outside click
@@ -108,13 +106,12 @@ const Header = () => {
     setSearchOpen(false);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("loggedUser");
-    sessionStorage.removeItem("adminAuth");
-    localStorage.removeItem("adminAuth");
+  const handleLogout = async () => {
+    await logoutFromServer();
     setIsAdmin(false);
     dispatch(clearCart());
     dispatch(clearWishlist());
+    dispatch(clearOrders());
     setUser(null);
     setUserDropdown(false);
     navigate("/login");

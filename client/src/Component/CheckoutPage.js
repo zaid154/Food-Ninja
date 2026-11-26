@@ -5,8 +5,10 @@ import { clearCart } from "../utils/cartSlice";
 import { addOrder } from "../utils/ordersSlice";
 import UserContext from "./Usercontext";
 import { API_BASE_URL } from "../utils/Constants";
+import { authFetch } from "../utils/authClient";
 import { getClosedStoreNotice } from "../utils/storeNotices";
 import { calculateOrderPricing } from "../utils/orderPricing";
+import { fetchStoreSettings } from "../utils/settingsClient";
 
 const FIELD_LABEL_CLASS = "text-[10px] font-bold uppercase text-slate-600";
 const FIELD_INPUT_CLASS = "mt-0.5 w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-emerald-500";
@@ -358,13 +360,9 @@ const CheckoutPage = () => {
 
     useEffect(() => {
         const refreshSettings = () => {
-            if (typeof fetch === "undefined") return;
-            fetch(`${API_BASE_URL}/settings`)
-                .then((r) => r.json())
-                .then((d) => {
-                    if (d && d.settings) setSettings(d.settings);
-                })
-                .catch(() => {});
+            fetchStoreSettings().then((s) => {
+                if (s) setSettings(s);
+            });
         };
         refreshSettings();
         const interval = setInterval(refreshSettings, 60_000);
@@ -441,31 +439,16 @@ const CheckoutPage = () => {
         const estDelivery = totalItems > 4 ? "40–50 mins" : "25–30 mins";
 
         const baseOrder = {
-            id: Date.now(),
-            userEmail: user ? user.email : "foodninja@gmail.com",
             customerName: name.trim(),
             address: fullAddress,
             phone: cleanPhone,
             payment: payment,
-            items: items,
-            subtotal: subtotal,
-            deliveryFee: deliveryFee,
-            packagingFee: packagingFee,
-            taxes: taxes,
-            discount: discountAmount,
-            total: grandTotal,
-            estDelivery: estDelivery,
-            status: "Placed",
-            paymentStatus: payment === "Cash on Delivery" ? "Pending" : "Paid",
-            paymentMethod: payment === "Cash on Delivery" ? "Cash on Delivery" : "",
-            date: new Date().toLocaleString("en-US", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-                hour12: true
-            })
+            items: items.map((it) => ({
+                id: it.id,
+                _id: it._id,
+                portionSize: it.portionSize || "",
+                quantity: Number(it.quantity || 1),
+            })),
         };
 
         const saveAddress = () => {
@@ -492,28 +475,25 @@ const CheckoutPage = () => {
 
         const finalizeOrder = async (orderToSave) => {
             try {
-                // Save to Backend MongoDB Atlas
-                const response = await fetch(`${API_BASE_URL}/orders`, {
+                // Save to Backend MongoDB Atlas (prices, taxes, and payment verification enforced server-side)
+                const response = await authFetch(`${API_BASE_URL}/orders`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(orderToSave),
                 });
+                const result = await response.json().catch(() => ({}));
                 if (!response.ok) {
-                    const result = await response.json().catch(() => ({}));
-                    const error = new Error(result.message || "Unable to place your order.");
-                    error.status = response.status;
-                    throw error;
-                }
-                const savedResult = await response.json().catch(() => ({}));
-                const savedOrder = savedResult.order || orderToSave;
-                completeOrder(savedOrder);
-            } catch (err) {
-                console.error("Order error:", err);
-                if (err.status === 403) {
-                    setError(err.message || settings.effectiveClosedReason || "The restaurant is currently closed for orders.");
+                    setError(result.message || "Unable to place your order. Please verify your cart and login session.");
                     return;
                 }
-                completeOrder(orderToSave);
+                if (result.order) {
+                    completeOrder(result.order);
+                } else {
+                    setError("Unexpected response from server while placing order.");
+                }
+            } catch (err) {
+                console.error("Order error:", err);
+                setError("Unable to reach server to place your order. Please try again.");
             } finally {
                 setSubmitting(false);
             }
@@ -529,14 +509,14 @@ const CheckoutPage = () => {
         // 2. Online Payment via Razorpay
         try {
             setSubmitting(true);
-            const orderRes = await fetch(`${API_BASE_URL}/payment/create-order`, {
+            const orderRes = await authFetch(`${API_BASE_URL}/payment/create-order`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: grandTotal, userEmail: baseOrder.userEmail }),
+                body: JSON.stringify({ items: baseOrder.items, currency: "INR" }),
             });
-            const data = await orderRes.json();
+            const data = await orderRes.json().catch(() => ({}));
 
-            if (!data.success) {
+            if (!orderRes.ok || !data.success) {
                 setError(data.message || "Failed to initialize payment gateway.");
                 setSubmitting(false);
                 return;
@@ -549,44 +529,38 @@ const CheckoutPage = () => {
                     amount: data.order.amount,
                     currency: data.order.currency || "INR",
                     name: settings.restaurantName || "Food Ninja",
-                    description: `Order Payment #${baseOrder.id}`,
+                    description: "Food Ninja Order Payment",
                     order_id: data.order.id,
                     prefill: {
                         name: name.trim(),
                         contact: cleanPhone,
-                        email: user?.email || "customer@foodninja.com",
+                        email: user?.email || "",
                     },
                     theme: {
                         color: "#0c5936",
                     },
                     handler: async function (response) {
                         try {
-                            const verifyRes = await fetch(`${API_BASE_URL}/payment/verify`, {
+                            const verifyRes = await authFetch(`${API_BASE_URL}/payment/verify`, {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify(response),
+                                body: JSON.stringify({ ...response, items: baseOrder.items }),
                             });
-                            const verifyData = await verifyRes.json();
-                            if (verifyData.success) {
+                            const verifyData = await verifyRes.json().catch(() => ({}));
+                            if (verifyRes.ok && verifyData.success) {
                                 await finalizeOrder({
                                     ...baseOrder,
-                                    paymentStatus: "Paid",
                                     razorpayOrderId: response.razorpay_order_id,
                                     razorpayPaymentId: response.razorpay_payment_id,
                                     razorpaySignature: response.razorpay_signature,
-                                    paymentMethod: verifyData.method || "",
                                 });
                             } else {
-                                setError("Payment signature verification failed.");
+                                setError(verifyData.message || "Payment signature verification failed.");
                                 setSubmitting(false);
                             }
                         } catch {
-                            await finalizeOrder({
-                                ...baseOrder,
-                                paymentStatus: "Paid",
-                                razorpayPaymentId: response.razorpay_payment_id,
-                                paymentMethod: "",
-                            });
+                            setError("Unable to verify payment with server. Your order was not confirmed.");
+                            setSubmitting(false);
                         }
                     },
                     modal: {
@@ -601,22 +575,27 @@ const CheckoutPage = () => {
                     setSubmitting(false);
                 });
                 rzp.open();
-            } else {
-                // Demo / Test mode (when live/test keys are not yet configured in backend/.env)
-                // Seamlessly simulate verification so the user can test the full flow
-                const verifyRes = await fetch(`${API_BASE_URL}/payment/verify`, {
+            } else if (data.isDemo) {
+                // Local non-production demo mode when gateway keys are absent
+                const verifyRes = await authFetch(`${API_BASE_URL}/payment/verify`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ isDemo: true, razorpay_payment_id: `pay_demo_${Date.now()}` }),
                 });
-                const verifyData = await verifyRes.json();
+                const verifyData = await verifyRes.json().catch(() => ({}));
+                if (!verifyRes.ok || !verifyData.success) {
+                    setError(verifyData.message || "Demo payment verification failed.");
+                    setSubmitting(false);
+                    return;
+                }
                 await finalizeOrder({
                     ...baseOrder,
-                    paymentStatus: "Paid",
                     razorpayOrderId: data.order?.id || `order_demo_${Date.now()}`,
                     razorpayPaymentId: verifyData.paymentId || `pay_demo_${Date.now()}`,
-                    paymentMethod: verifyData.method || "Demo/Test",
                 });
+            } else {
+                setError("Razorpay checkout library failed to load. Please refresh and try again.");
+                setSubmitting(false);
             }
         } catch (err) {
             console.error("Razorpay error:", err);

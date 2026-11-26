@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { API_BASE_URL } from "../utils/Constants";
+import { fetchStoreSettings } from "../utils/settingsClient";
 
 const METRICS = [
   { val: "120+", label: "Signature Dishes" },
@@ -51,22 +51,17 @@ const AboutPage = () => {
       .then((data) => setProfile(data))
       .catch(() => {});
 
-    const loadSettings = () => {
-      if (typeof fetch === "undefined") return;
-      fetch(`${API_BASE_URL}/settings`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data && data.settings) {
-            setSettings((prev) => ({ ...prev, ...data.settings }));
-          }
-        })
-        .catch(() => {});
+    const loadSettings = (force = false) => {
+      fetchStoreSettings({ force }).then((s) => {
+        if (s) setSettings((prev) => ({ ...prev, ...s }));
+      });
     };
+    const handleUpdated = () => loadSettings(true);
 
-    loadSettings();
-    window.addEventListener("store_settings_updated", loadSettings);
+    loadSettings(false);
+    window.addEventListener("store_settings_updated", handleUpdated);
     return () => {
-      window.removeEventListener("store_settings_updated", loadSettings);
+      window.removeEventListener("store_settings_updated", handleUpdated);
     };
   }, []);
 

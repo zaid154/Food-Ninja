@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { cancelOrder } from "../utils/ordersSlice";
 import { API_BASE_URL } from "../utils/Constants";
+import { authFetch } from "../utils/authClient";
 import UserContext from "./Usercontext";
 import OrderHelpModal from "./OrderHelpModal";
 import { getSavedOrderPricing } from "../utils/orderPricing";
@@ -107,8 +108,7 @@ const OrderDetailsPage = () => {
 
         const loadOrder = async () => {
             try {
-                // 1. Try single order endpoint
-                const res = await fetch(`${API_BASE_URL}/orders/${id}`);
+                const res = await authFetch(`${API_BASE_URL}/orders/${id}`);
                 if (res.ok) {
                     const data = await res.json();
                     if (isMounted && data.order) {
@@ -117,33 +117,14 @@ const OrderDetailsPage = () => {
                         return;
                     }
                 }
-
-                // 2. Try all orders endpoint (without email restriction for guest/local orders)
-                const listRes = await fetch(`${API_BASE_URL}/orders`);
-                if (listRes.ok) {
-                    const listData = await listRes.json();
-                    const matched = (listData.orders || []).find((o) => String(o.id) === String(id));
-                    if (isMounted && matched) {
-                        setOrder(matched);
-                        setLoading(false);
-                        return;
-                    }
-                }
             } catch (err) {
                 console.warn("Could not fetch remote order:", err);
             }
 
-            // 3. Fallback: Local Redux & localStorage
             if (isMounted) {
                 const reduxMatch = localOrders.find((o) => String(o.id) === String(id));
-                if (reduxMatch) {
+                if (reduxMatch && user && reduxMatch.userEmail === user.email) {
                     setOrder(reduxMatch);
-                } else {
-                    try {
-                        const saved = JSON.parse(localStorage.getItem("orders") || "[]");
-                        const storageMatch = saved.find((o) => String(o.id) === String(id));
-                        if (storageMatch) setOrder(storageMatch);
-                    } catch {}
                 }
                 setLoading(false);
             }
@@ -165,17 +146,16 @@ const OrderDetailsPage = () => {
 
         try {
             setCancelling(true);
-            await fetch(`${API_BASE_URL}/orders/${order.id}/status`, {
+            const res = await authFetch(`${API_BASE_URL}/orders/${order.id}/status`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: "Cancelled" }),
             });
+            if (!res.ok) return;
             dispatch(cancelOrder(order.id));
             setOrder((prev) => (prev ? { ...prev, status: "Cancelled" } : null));
         } catch (err) {
             console.error("Failed to cancel order:", err);
-            dispatch(cancelOrder(order.id));
-            setOrder((prev) => (prev ? { ...prev, status: "Cancelled" } : null));
         } finally {
             setCancelling(false);
         }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { API_BASE_URL, LOGO } from "../utils/Constants";
+import { LOGO } from "../utils/Constants";
+import { fetchStoreSettings } from "../utils/settingsClient";
 
 const Footer = () => {
   const [settings, setSettings] = useState({
@@ -12,19 +13,15 @@ const Footer = () => {
   });
 
   useEffect(() => {
-    const loadSettings = () => {
-      if (typeof fetch !== "undefined") {
-        fetch(`${API_BASE_URL}/settings`)
-          .then((r) => r.json())
-          .then((d) => {
-            if (d && d.settings) setSettings(d.settings);
-          })
-          .catch(() => {});
-      }
+    const loadSettings = (force = false) => {
+      fetchStoreSettings({ force }).then((s) => {
+        if (s) setSettings(s);
+      });
     };
-    loadSettings();
-    window.addEventListener("store_settings_updated", loadSettings);
-    return () => window.removeEventListener("store_settings_updated", loadSettings);
+    const handleUpdated = () => loadSettings(true);
+    loadSettings(false);
+    window.addEventListener("store_settings_updated", handleUpdated);
+    return () => window.removeEventListener("store_settings_updated", handleUpdated);
   }, []);
 
   return (

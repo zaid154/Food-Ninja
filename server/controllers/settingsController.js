@@ -1,4 +1,14 @@
 const Settings = require("../models/settingsModel");
+const { createCache } = require("../utils/cacheManager");
+
+const settingsCache = createCache({
+  name: "settings",
+  maxEntries: 8,
+  defaultTtlMs: 120_000,
+  defaultRefreshAheadRatio: 0.75,
+  defaultStaleGraceMs: 60_000,
+});
+const SETTINGS_CACHE_KEY = "settings:store";
 
 const STORE_TIME_ZONE = "Asia/Kolkata";
 const TEXT_FIELDS = "restaurantName fssaiNumber gstinNumber storePhone storeEmail storeAddress announcement openingTime closingTime operatingHoursText closedNoticeMessage".split(" ");
@@ -6,7 +16,12 @@ const NUMBER_FIELDS = "deliveryFee freeDeliveryThreshold packagingFee taxRate mi
 const BOOLEAN_FIELDS = "restaurantOpen autoScheduleEnabled".split(" ");
 
 const getStoreCurrentMinutes = (now = new Date()) => {
-  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: STORE_TIME_ZONE, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(now);
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: STORE_TIME_ZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(now);
   const p = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
   return Number(p.hour) * 60 + Number(p.minute);
 };
@@ -19,7 +34,9 @@ const parseTime = (v) => {
 
 const isWithinHours = (openTime, closeTime, now = new Date()) => {
   if (!openTime || !closeTime) return true;
-  const current = getStoreCurrentMinutes(now), open = parseTime(openTime), close = parseTime(closeTime);
+  const current = getStoreCurrentMinutes(now);
+  const open = parseTime(openTime);
+  const close = parseTime(closeTime);
   if (open === null || close === null || open === close) return true;
   return close > open ? current >= open && current < close : current >= open || current < close;
 };
@@ -37,7 +54,11 @@ const getStoreStatus = (settings, now = new Date()) => {
   const withinHours = isWithinHours(settings.openingTime, settings.closingTime, now);
   const autoSchedule = settings.autoScheduleEnabled !== false;
   const isEffectiveOpen = settings.restaurantOpen !== false && (!autoSchedule || withinHours);
-  return { isWithinHours: withinHours, isEffectiveOpen, effectiveClosedReason: isEffectiveOpen ? "" : buildClosedReason(settings, withinHours) };
+  return {
+    isWithinHours: withinHours,
+    isEffectiveOpen,
+    effectiveClosedReason: isEffectiveOpen ? "" : buildClosedReason(settings, withinHours),
+  };
 };
 
 const serializeSettingsWithStatus = (settings) => {
@@ -45,9 +66,15 @@ const serializeSettingsWithStatus = (settings) => {
   return { ...obj, ...getStoreStatus(obj) };
 };
 
-const getSettings = async (req, res) => {
+const getCachedRawSettings = () =>
+  settingsCache.getOrLoad(
+    SETTINGS_CACHE_KEY,
+    () => Settings.findOne({ key: "store_settings" }).lean()
+  );
+
+const getSettings = async (_req, res) => {
   try {
-    const settings = await Settings.findOne({ key: "store_settings" });
+    const settings = await getCachedRawSettings();
     if (!settings) {
       return res.status(200).json({ success: true, settings: null });
     }
@@ -59,14 +86,49 @@ const getSettings = async (req, res) => {
 
 const updateSettings = async (req, res) => {
   try {
-    const body = req.body || {}, updateData = {};
-    TEXT_FIELDS.forEach((f) => { if (body[f] !== undefined) updateData[f] = String(body[f]).trim(); });
-    NUMBER_FIELDS.forEach((f) => { if (body[f] !== undefined) updateData[f] = Number(body[f]); });
-    BOOLEAN_FIELDS.forEach((f) => { if (body[f] !== undefined) updateData[f] = Boolean(body[f]); });
+    const body = req.body || {};
+    const updateData = {};
 
-    const settings = await Settings.findOneAndUpdate({ key: "store_settings" }, { $set: updateData }, { new: true, upsert: true });
+    for (const f of TEXT_FIELDS) {
+      if (body[f] !== undefined) {
+        if (typeof body[f] !== "string") {
+          return res.status(400).json({ success: false, message: `${f} must be a string.` });
+        }
+        const trimmed = body[f].trim().slice(0, 300);
+        if ((f === "openingTime" || f === "closingTime") && trimmed && parseTime(trimmed) === null) {
+          return res.status(400).json({ success: false, message: `${f} must be in HH:MM 24-hour format.` });
+        }
+        updateData[f] = trimmed;
+      }
+    }
+
+    for (const f of NUMBER_FIELDS) {
+      if (body[f] !== undefined) {
+        const num = Number(body[f]);
+        if (!Number.isFinite(num) || num < 0) {
+          return res.status(400).json({ success: false, message: `${f} must be a non-negative number.` });
+        }
+        if (f === "taxRate" && num > 30) {
+          return res.status(400).json({ success: false, message: "taxRate cannot exceed 30%." });
+        }
+        updateData[f] = num;
+      }
+    }
+
+    BOOLEAN_FIELDS.forEach((f) => {
+      if (body[f] !== undefined) updateData[f] = Boolean(body[f]);
+    });
+
+    const settings = await Settings.findOneAndUpdate(
+      { key: "store_settings" },
+      { $set: updateData },
+      { returnDocument: "after", upsert: true }
+    );
+    settingsCache.invalidate(SETTINGS_CACHE_KEY);
+
     return res.status(200).json({
-      success: true, message: "Store charges and operational settings updated successfully!",
+      success: true,
+      message: "Store charges and operational settings updated successfully!",
       settings: serializeSettingsWithStatus(settings),
     });
   } catch (error) {
@@ -74,4 +136,4 @@ const updateSettings = async (req, res) => {
   }
 };
 
-module.exports = { getSettings, updateSettings, getStoreStatus };
+module.exports = { getSettings, updateSettings, getStoreStatus, getCachedRawSettings, settingsCache };

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
+import { authFetch } from "../../utils/authClient";
 import { useAppDialog } from "../AppDialog";
 
 const CustomerInfo = ({ name, email, phone, subject = "Inquiry" }) => {
@@ -178,7 +179,7 @@ const AdminInquiriesPage = (props) => {
     );
 
     try {
-      const res = await fetch(`${API_BASE_URL}/contact/${inquiryId}/resolve`, {
+      const res = await authFetch(`${API_BASE_URL}/contact/${inquiryId}/resolve`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isResolved: !currentResolved }),

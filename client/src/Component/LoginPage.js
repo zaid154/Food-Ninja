@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import UserContext from "./Usercontext";
 import { API_BASE_URL, LOGO } from "../utils/Constants";
+import { setAuthSession } from "../utils/authClient";
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -40,6 +41,7 @@ const LoginPage = () => {
             const res = await fetch(`${API_BASE_URL}/users/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify({ email: email.trim(), password }),
             });
 
@@ -53,13 +55,10 @@ const LoginPage = () => {
                     role: data.user.role
                 };
 
-                localStorage.setItem("loggedUser", JSON.stringify(loggedUser));
+                setAuthSession(data.token, loggedUser);
                 setUser(loggedUser);
 
-                // If admin logs in, unlock session and redirect
-                if (data.user.role === "admin" || data.user.email === "admin@foodninja.com" || data.user.email === "zaidm1323@gmail.com") {
-                    sessionStorage.setItem("adminAuth", "true");
-                    localStorage.setItem("adminAuth", "true");
+                if (data.user.role === "admin") {
                     navigate("/admin");
                 } else {
                     navigate(from, { replace: true });

@@ -1,4 +1,17 @@
+const dns = require("dns");
 const mongoose = require("mongoose");
+
+const connectMongoUri = async (uri, options = { serverSelectionTimeoutMS: 8000 }) => {
+  try {
+    return await mongoose.connect(uri, options);
+  } catch (error) {
+    if (error && (error.code === "EREFUSED" || String(error.message || "").includes("querySrv"))) {
+      dns.setServers(["8.8.8.8", "1.1.1.1"]);
+      return await mongoose.connect(uri, options);
+    }
+    throw error;
+  }
+};
 
 global.dbStatus = {
   connected: false,
@@ -7,7 +20,20 @@ global.dbStatus = {
   hasUri: false,
 };
 
+let reconnectHookRegistered = false;
+const ensureReconnectHook = () => {
+  if (reconnectHookRegistered) return;
+  reconnectHookRegistered = true;
+  mongoose.connection.on("disconnected", () => {
+    global.dbStatus.connected = false;
+    console.log("MongoDB disconnected, attempting reconnect in 5s...");
+    const timer = setTimeout(connectDb, 5000);
+    if (typeof timer.unref === "function") timer.unref();
+  });
+};
+
 const connectDb = async () => {
+  ensureReconnectHook();
   try {
     const uri = (process.env.MONGO_URI || "").trim();
 
@@ -21,7 +47,7 @@ const connectDb = async () => {
     global.dbStatus.connecting = true;
     console.log("Connecting to MongoDB Atlas...");
 
-    await mongoose.connect(uri, {
+    await connectMongoUri(uri, {
       serverSelectionTimeoutMS: 8000,
     });
 
@@ -37,10 +63,5 @@ const connectDb = async () => {
   }
 };
 
-mongoose.connection.on("disconnected", () => {
-  global.dbStatus.connected = false;
-  console.log("MongoDB disconnected, attempting reconnect in 5s...");
-  setTimeout(connectDb, 5000);
-});
-
+connectDb.connectMongoUri = connectMongoUri;
 module.exports = connectDb;

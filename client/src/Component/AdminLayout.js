@@ -1,26 +1,22 @@
-import { useState, useEffect, useRef } from "react";
-import { NavLink, Link, Outlet, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef, useContext } from "react";
+import { NavLink, Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import AdminLoginPage from "./admin/AdminLoginPage";
 import Header from "./Header";
 import Footer from "./Footer";
+import UserContext from "./Usercontext";
 import { API_BASE_URL, LOGO } from "../utils/Constants";
+import { authFetch, setAuthSession, fetchCurrentSessionUser, logoutFromServer } from "../utils/authClient";
 import { useAppDialog } from "./AppDialog";
 
 const AdminLayout = () => {
   const { confirm, alert: showDialog } = useAppDialog();
-  const [isAdminAuth, setIsAdminAuth] = useState(() => {
-    try {
-      const sessionAuth = sessionStorage.getItem("adminAuth") === "true";
-      const localAuth = localStorage.getItem("adminAuth") === "true";
-      const storedUser = JSON.parse(localStorage.getItem("loggedUser") || "{}");
-      const isUserAdmin = storedUser?.role === "admin" || storedUser?.email === "admin@foodninja.com" || storedUser?.email === "zaidm1323@gmail.com";
-      return sessionAuth || localAuth || isUserAdmin;
-    } catch {
-      return false;
-    }
-  });
-  const [adminEmail, setAdminEmail] = useState("zaidm1323@gmail.com");
-  const [adminPassword, setAdminPassword] = useState("Zaid@9999201255");
+  const { setUser } = useContext(UserContext);
+  const location = useLocation();
+  const [isAdminAuth, setIsAdminAuth] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [adminUser, setAdminUser] = useState(null);
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
   const [authError, setAuthError] = useState("");
 
   const [orders, setOrders] = useState([]);
@@ -58,41 +54,68 @@ const AdminLayout = () => {
     }, 5000);
   };
 
+  useEffect(() => {
+    let active = true;
+    fetchCurrentSessionUser()
+      .then((me) => {
+        if (!active) return;
+        if (me && me.role === "admin") {
+          setAdminUser(me);
+          setUser(me);
+          setIsAdminAuth(true);
+        } else {
+          setAdminUser(null);
+          setIsAdminAuth(false);
+        }
+      })
+      .catch(() => {
+        if (active) setIsAdminAuth(false);
+      })
+      .finally(() => {
+        if (active) setCheckingAuth(false);
+      });
+    return () => { active = false; };
+  }, []);
+
   const handleAdminLogin = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     const cleanEmail = adminEmail.trim().toLowerCase();
+    if (!cleanEmail || !adminPassword) {
+      setAuthError("Please enter both admin email and password.");
+      return;
+    }
 
     try {
       const res = await fetch(`${API_BASE_URL}/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email: cleanEmail, password: adminPassword }),
       });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && data?.user && (data.user.role === "admin" || data.user.email === "admin@foodninja.com" || data.user.email === "zaidm1323@gmail.com")) {
-        sessionStorage.setItem("adminAuth", "true");
-        localStorage.setItem("adminAuth", "true");
-        localStorage.setItem("loggedUser", JSON.stringify(data.user));
+      if (res.ok && data?.user) {
+        if (data.user.role !== "admin") {
+          setAuthError("Access denied: this account does not have administrator privileges.");
+          return;
+        }
+        setAuthSession(data.token, data.user);
+        setAdminUser(data.user);
+        setUser(data.user);
         setIsAdminAuth(true);
+        setAdminPassword("");
         setAuthError("");
         return;
       }
-    } catch {}
-
-    if ((cleanEmail === "admin@foodninja.com" && adminPassword === "admin123") || (cleanEmail === "zaidm1323@gmail.com" && adminPassword === "Zaid@9999201255")) {
-      sessionStorage.setItem("adminAuth", "true");
-      localStorage.setItem("adminAuth", "true");
-      setIsAdminAuth(true);
-      setAuthError("");
-    } else {
-      setAuthError("Invalid admin credentials. Please check your email and password.");
+      setAuthError(data.message || "Invalid admin credentials. Please check your email and password.");
+    } catch {
+      setAuthError("Unable to verify credentials with server. Please try again.");
     }
   };
 
-  const handleAdminLogout = () => {
-    sessionStorage.removeItem("adminAuth");
-    localStorage.removeItem("adminAuth");
-    localStorage.removeItem("loggedUser");
+  const handleAdminLogout = async () => {
+    await logoutFromServer();
+    setAdminUser(null);
+    setUser(null);
     setIsAdminAuth(false);
     navigate("/");
   };
@@ -101,11 +124,15 @@ const AdminLayout = () => {
     try {
       setLoading(true);
       const [ordRes, foodRes, inqRes, catRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/orders`).then((r) => r.json()).catch(() => ({ orders: [] })),
+        authFetch(`${API_BASE_URL}/orders`).then((r) => (r.status === 401 || r.status === 403 ? { _unauthorized: true } : r.json())).catch(() => ({ orders: [] })),
         fetch(`${API_BASE_URL}/recipes?all=true`).then((r) => r.json()).catch(() => ({ recipes: [] })),
-        fetch(`${API_BASE_URL}/contact`).then((r) => r.json()).catch(() => ({ inquiries: [] })),
+        authFetch(`${API_BASE_URL}/contact`).then((r) => (r.status === 401 || r.status === 403 ? { _unauthorized: true } : r.json())).catch(() => ({ inquiries: [] })),
         fetch(`${API_BASE_URL}/categories?includeInactive=true`).then((r) => r.json()).catch(() => ({ categories: [] })),
       ]);
+      if (ordRes?._unauthorized || inqRes?._unauthorized) {
+        await handleAdminLogout();
+        return;
+      }
       setOrders(ordRes.orders || []);
       setFoods(foodRes.recipes || []);
       setInquiries(inqRes.inquiries || []);
@@ -127,7 +154,7 @@ const AdminLayout = () => {
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
+      const res = await authFetch(`${API_BASE_URL}/orders/${orderId}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -148,7 +175,7 @@ const AdminLayout = () => {
       confirmLabel: "Delete Inquiry",
     })) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/contact/${id}`, { method: "DELETE" });
+      const res = await authFetch(`${API_BASE_URL}/contact/${id}`, { method: "DELETE" });
       if (res.ok) {
         showToast("Customer inquiry deleted successfully");
         setInquiries((prev) => prev.filter((i) => (i._id || i.id) !== id));
@@ -157,6 +184,14 @@ const AdminLayout = () => {
       showDialog("Failed to delete customer inquiry.", { title: "Could not delete inquiry", variant: "error" });
     }
   };
+
+  if (checkingAuth) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent" />
+      </div>
+    );
+  }
 
   if (!isAdminAuth) {
     return (
@@ -318,12 +353,12 @@ const AdminLayout = () => {
               <div className="absolute right-0 mt-2.5 w-56 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl z-50">
                 <div className="px-4 py-2.5 border-b border-slate-100">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold text-slate-900 truncate">Store Administrator</p>
+                    <p className="text-xs font-bold text-slate-900 truncate">{adminUser?.name || "Store Administrator"}</p>
                     <span className="rounded bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 text-[9px] font-bold uppercase">
                       Admin
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 truncate mt-0.5">admin@foodninja.com</p>
+                  <p className="text-[11px] text-slate-400 truncate mt-0.5">{adminUser?.email || "Administrator"}</p>
                 </div>
                 <Link
                   to="/"

@@ -37,17 +37,30 @@ import { createBrowserRouter, RouterProvider, Outlet, useLocation } from "react-
 import { Provider } from "react-redux";
 import appStore from "./utils/Store";
 import { AppDialogProvider } from "./Component/AppDialog";
+import { getAuthToken, getStoredUser, fetchCurrentSessionUser, clearAuthSession } from "./utils/authClient";
 
 const App = () => {
-  const [user, setUser] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("loggedUser")) || null;
-    } catch {
-      return null;
-    }
-  });
+  const [user, setUser] = useState(() => getStoredUser());
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
+
+  useEffect(() => {
+    if (!getAuthToken() && !getStoredUser()) return;
+    let active = true;
+    fetchCurrentSessionUser()
+      .then((me) => {
+        if (!active) return;
+        if (me) {
+          localStorage.setItem("loggedUser", JSON.stringify(me));
+          setUser(me);
+        } else {
+          clearAuthSession();
+          setUser(null);
+        }
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -93,13 +106,13 @@ const appRouter = createBrowserRouter([
           </ProtectedRoute>
         )
       },
-      { path: "/orders", element: <OrdersPage /> },
-      { path: "/order-confirmation/:id", element: <OrderConfirmationPage /> },
-      { path: "/orders/:id", element: <OrderDetailsPage /> },
-      { path: "/orders/:id/resolution", element: <OrderResolutionPage /> },
-      { path: "/order/:id", element: <OrderDetailsPage /> },
-      { path: "/order/:id/resolution", element: <OrderResolutionPage /> },
-      { path: "/order-resolution/:id", element: <OrderResolutionPage /> },
+      { path: "/orders", element: <ProtectedRoute><OrdersPage /></ProtectedRoute> },
+      { path: "/order-confirmation/:id", element: <ProtectedRoute><OrderConfirmationPage /></ProtectedRoute> },
+      { path: "/orders/:id", element: <ProtectedRoute><OrderDetailsPage /></ProtectedRoute> },
+      { path: "/orders/:id/resolution", element: <ProtectedRoute><OrderResolutionPage /></ProtectedRoute> },
+      { path: "/order/:id", element: <ProtectedRoute><OrderDetailsPage /></ProtectedRoute> },
+      { path: "/order/:id/resolution", element: <ProtectedRoute><OrderResolutionPage /></ProtectedRoute> },
+      { path: "/order-resolution/:id", element: <ProtectedRoute><OrderResolutionPage /></ProtectedRoute> },
       {
         path: "/admin",
         element: <AdminLayout />,

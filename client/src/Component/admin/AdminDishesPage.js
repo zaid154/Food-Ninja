@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
+import { authFetch } from "../../utils/authClient";
 import { useAppDialog } from "../AppDialog";
 
 export const FOOD_CUISINES = [
@@ -40,7 +41,7 @@ const AdminDishesPage = (props) => {
   const handleToggleStock = async (food) => {
     try {
       const newStock = food.inStock === false;
-      const res = await fetch(`${API_BASE_URL}/recipes/${food.id}/stock`, {
+      const res = await authFetch(`${API_BASE_URL}/recipes/${food.id}/stock`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ inStock: newStock }),
@@ -63,7 +64,7 @@ const AdminDishesPage = (props) => {
       confirmLabel: "Delete Dish",
     })) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/recipes/${id}`, { method: "DELETE" });
+      const res = await authFetch(`${API_BASE_URL}/recipes/${id}`, { method: "DELETE" });
       if (res.ok) {
         showToast("Dish removed from menu");
         if (onRefresh) onRefresh();

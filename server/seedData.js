@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const path = require("path");
+const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
+const connectDb = require("./config/connectionDb");
 
 const Recipe = require("./models/recipeModel");
 const User = require("./models/userModel");
@@ -26,13 +29,35 @@ const defaultCategories = [
   { name: "Healthy", slug: "healthy", bg: "bg-[#ecfdf5]", img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&auto=format&fit=crop&q=80", description: "Fresh garden salads, grain bowls, detox smoothies, and protein meals.", displayOrder: 11, isActive: true, isFeatured: false },
 ];
 
-const realisticUsers = [
-  { name: "Mohd Zaid (Admin)", email: "zaidm1323@gmail.com", password: "Zaid@9999201255", role: "admin", phone: "9999201255", address: "Food Ninja HQ, Connaught Place, New Delhi - 110001" },
-  { name: "Mohd Zaid", email: "zaid@foodninja.com", password: "password123", role: "user", phone: "9999201255", address: "B-13/2, Street No-07, Delhi NCR - 110094" },
-  { name: "Sara Khan", email: "sara@foodninja.com", password: "password123", role: "user", phone: "9876543210", address: "Flat 204, Lotus Heights, Indirapuram, Ghaziabad - 201014" },
-  { name: "Aarav Sharma", email: "aarav@gmail.com", password: "password123", role: "user", phone: "9811223344", address: "House 42, Block C, Green Park, New Delhi - 110016" },
-  { name: "Priya Verma", email: "priya.verma@gmail.com", password: "password123", role: "user", phone: "9871100223", address: "Tower B-502, Ace City, Sector 1, Greater Noida West - 201306" }
-];
+const buildSeedUsers = async () => {
+  const adminEmail = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD || "";
+  const demoCustomerPassword = process.env.SEED_USER_PASSWORD || crypto.randomBytes(16).toString("hex");
+  const hashedDemoPassword = await bcrypt.hash(demoCustomerPassword, 12);
+
+  const users = [
+    { name: "Mohd Zaid", email: "zaid@foodninja.com", password: hashedDemoPassword, role: "user", phone: "9999201255", address: "B-13/2, Street No-07, Delhi NCR - 110094" },
+    { name: "Sara Khan", email: "sara@foodninja.com", password: hashedDemoPassword, role: "user", phone: "9876543210", address: "Flat 204, Lotus Heights, Indirapuram, Ghaziabad - 201014" },
+    { name: "Aarav Sharma", email: "aarav@gmail.com", password: hashedDemoPassword, role: "user", phone: "9811223344", address: "House 42, Block C, Green Park, New Delhi - 110016" },
+    { name: "Priya Verma", email: "priya.verma@gmail.com", password: hashedDemoPassword, role: "user", phone: "9871100223", address: "Tower B-502, Ace City, Sector 1, Greater Noida West - 201306" },
+  ];
+
+  if (adminEmail && adminPassword) {
+    const hashedAdminPassword = await bcrypt.hash(adminPassword, 12);
+    users.unshift({
+      name: "Store Administrator",
+      email: adminEmail,
+      password: hashedAdminPassword,
+      role: "admin",
+      phone: "9999201255",
+      address: "Food Ninja HQ, Connaught Place, New Delhi - 110001",
+    });
+  } else {
+    console.warn("WARNING: ADMIN_EMAIL or ADMIN_PASSWORD not set in environment; skipping admin account creation.");
+  }
+
+  return users;
+};
 
 const ourSignatureDishes = [
   {
@@ -163,13 +188,14 @@ const seed = async () => {
     if (!mongoUri) throw new Error("No MongoDB connection string found in process.env.CONNECTION_STRING or MONGO_URI");
 
     console.log("Connecting to MongoDB Atlas...");
-    await mongoose.connect(mongoUri);
+    await connectDb.connectMongoUri(mongoUri);
 
     const allFoods = loadAllFoods();
 
-    // 1. Users
+    // 1. Users (all passwords bcrypt-hashed; admin read strictly from env vars)
+    const seedUsers = await buildSeedUsers();
     await User.deleteMany({});
-    await User.insertMany(realisticUsers);
+    await User.insertMany(seedUsers);
 
     // 2. Categories
     await Category.deleteMany({});
@@ -202,7 +228,7 @@ const seed = async () => {
     console.log(`DATABASE SEEDED SUCCESSFULLY!`);
     console.log(`- Dishes: ${allFoods.length} (${allFoods.filter(f => f.hasPortions).length} with Full/Half/Quarter Portions)`);
     console.log(`- Categories: ${defaultCategories.length}`);
-    console.log(`- Users: ${realisticUsers.length}`);
+    console.log(`- Users: ${seedUsers.length}`);
     console.log(`- Reviews: ${realisticReviews.length} Authentic Customer Reviews across products`);
     console.log(`- Orders: ${realisticOrders.length} Realistic Orders in Order History`);
     console.log(`=======================================================`);
@@ -215,4 +241,4 @@ const seed = async () => {
 
 if (require.main === module) seed();
 
-module.exports = { defaultCategories, realisticUsers, ourSignatureDishes, loadAllFoods };
+module.exports = { defaultCategories, buildSeedUsers, ourSignatureDishes, loadAllFoods };

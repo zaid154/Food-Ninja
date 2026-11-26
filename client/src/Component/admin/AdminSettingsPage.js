@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
+import { authFetch } from "../../utils/authClient";
 import { getKitchenHoursClosedNotice, getStoreCurrentMinutes } from "../../utils/storeNotices";
 import { calculateOrderPricing } from "../../utils/orderPricing";
 import AdminDropdown from "./AdminDropdown";
@@ -118,7 +119,7 @@ const AdminSettingsPage = (props) => {
     if (e && e.preventDefault) e.preventDefault();
     try {
       setSaving(true);
-      const res = await fetch(`${API_BASE_URL}/settings`, {
+      const res = await authFetch(`${API_BASE_URL}/settings`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),

@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import UserContext from "./Usercontext";
 import { API_BASE_URL } from "../utils/Constants";
+import { authFetch } from "../utils/authClient";
 
 const ISSUES = [
   { id: "Delivery Delayed", hint: "Tell us how long you've been waiting..." },
@@ -41,7 +42,7 @@ const OrderResolutionPage = () => {
 
   useEffect(() => {
     let active = true;
-    fetch(`${API_BASE_URL}/orders/${id}`)
+    authFetch(`${API_BASE_URL}/orders/${id}`)
       .then((r) => r.json())
       .then((d) => {
         if (active && d?.order) {

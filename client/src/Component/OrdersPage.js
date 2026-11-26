@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { cancelOrder, clearOrders } from "../utils/ordersSlice";
 import UserContext from "./Usercontext";
 import { API_BASE_URL } from "../utils/Constants";
+import { authFetch } from "../utils/authClient";
 import { useAppDialog } from "./AppDialog";
 
 // Clean, realistic status configuration (No random AI rainbow colors)
@@ -55,17 +56,19 @@ const OrdersPage = () => {
     const fetchOrders = async () => {
         try {
             setLoading(true);
-            const userEmailParam = user && user.email ? user.email : "foodninja@gmail.com";
-            const res = await fetch(`${API_BASE_URL}/orders?email=${userEmailParam}`);
-            const data = await res.json();
+            if (!user) {
+                setOrders([]);
+                return;
+            }
+            const res = await authFetch(`${API_BASE_URL}/orders`);
+            const data = await res.json().catch(() => ({}));
             if (res.ok && Array.isArray(data.orders)) {
                 setOrders(data.orders);
-                // When backend confirms 0 orders, sync and clean stale localStorage orders
                 if (data.orders.length === 0 && localOrders.length > 0) {
                     dispatch(clearOrders());
                 }
             } else {
-                setOrders(localOrders);
+                setOrders([]);
             }
         } catch {
             setOrders(localOrders);
@@ -86,21 +89,17 @@ const OrdersPage = () => {
             confirmLabel: "Cancel Order",
         })) return;
         try {
-            await fetch(`${API_BASE_URL}/orders/${id}/status`, {
+            const res = await authFetch(`${API_BASE_URL}/orders/${id}/status`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: "Cancelled" }),
             });
+            if (!res.ok) return;
             dispatch(cancelOrder(id));
             setOrders((prev) =>
                 prev.map((o) => (o.id === id ? { ...o, status: "Cancelled" } : o))
             );
-        } catch {
-            dispatch(cancelOrder(id));
-            setOrders((prev) =>
-                prev.map((o) => (o.id === id ? { ...o, status: "Cancelled" } : o))
-            );
-        }
+        } catch {}
     };
 
     const filteredOrders = orders.filter((o) => {

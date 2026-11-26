@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addCart, clearCart, removeCart } from "../utils/cartSlice";
-import { API_BASE_URL } from "../utils/Constants";
 import { getClosedStoreNotice } from "../utils/storeNotices";
 import { calculateOrderPricing } from "../utils/orderPricing";
+import { fetchStoreSettings } from "../utils/settingsClient";
 
 const CartPage = () => {
   const cartItems = useSelector((store) => store.cart.item);
@@ -22,13 +22,9 @@ const CartPage = () => {
 
   useEffect(() => {
     const refreshSettings = () => {
-      if (typeof fetch === "undefined") return;
-      fetch(`${API_BASE_URL}/settings`)
-        .then((r) => r.json())
-        .then((d) => {
-          if (d && d.settings) setSettings(d.settings);
-        })
-        .catch(() => {});
+      fetchStoreSettings().then((s) => {
+        if (s) setSettings(s);
+      });
     };
     refreshSettings();
     const interval = setInterval(refreshSettings, 60_000);

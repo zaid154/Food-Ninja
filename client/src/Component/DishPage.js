@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addCart, removeCart } from "../utils/cartSlice";
 import { addWishlist, removeWishlist } from "../utils/wishlistSlice";
 import { API_BASE_URL } from "../utils/Constants";
+import { authFetch, getAuthToken } from "../utils/authClient";
 import UserContext from "./Usercontext";
 
 const getLoggedUser = () => {
@@ -105,14 +106,8 @@ const DishPage = () => {
   const checkEligibility = async () => {
     if (!product?.id) return;
     try {
-      try {
-        const savedOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-        const delivered = savedOrders.find((o) => o.status === "Delivered" && Array.isArray(o.items) && o.items.some((it) => String(it.id) === String(product.id)));
-        if (delivered) return setEligibility({ checking: false, eligible: true, orderId: delivered.id, message: "Verified Buyer: Order delivered! You can write a review." });
-      } catch {}
-
-      if (userEmail) {
-        const res = await fetch(`${API_BASE_URL}/recipes/${product.id}/review-eligibility?email=${encodeURIComponent(userEmail)}`);
+      if (userEmail || getAuthToken()) {
+        const res = await authFetch(`${API_BASE_URL}/recipes/${product.id}/review-eligibility`);
         if (res.ok) {
           const json = await res.json();
           if (json.success) return setEligibility({ checking: false, eligible: json.eligible, reason: json.reason || (json.eligible ? "" : "not_ordered"), message: json.message, orderId: json.orderId || null });
@@ -211,10 +206,10 @@ const DishPage = () => {
     if (!reviewComment.trim()) return setReviewError("Please enter your review comment.");
     try {
       setSubmittingReview(true);
-      const res = await fetch(`${API_BASE_URL}/recipes/${product.id}/reviews`, {
+      const res = await authFetch(`${API_BASE_URL}/recipes/${product.id}/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userName: displayName, userEmail: userEmail || user?.email || "", orderId: eligibility.orderId || null, rating: reviewRating, comment: reviewComment.trim() }),
+        body: JSON.stringify({ rating: reviewRating, comment: reviewComment.trim() }),
       });
       const data = await res.json();
       if (res.ok && data.success) {

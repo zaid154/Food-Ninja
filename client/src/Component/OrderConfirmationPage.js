@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { API_BASE_URL } from "../utils/Constants";
+import { authFetch } from "../utils/authClient";
 import { getSavedOrderPricing } from "../utils/orderPricing";
 
 const OrderConfirmationView = ({ order, supportPhone }) => {
@@ -192,7 +193,7 @@ const OrderConfirmationPage = () => {
 
     const loadConfirmation = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/orders/${id}`);
+        const response = await authFetch(`${API_BASE_URL}/orders/${id}`);
         const result = response.ok ? await response.json().catch(() => ({})) : {};
         if (isMounted && result.order) setOrder(result.order);
       } catch {

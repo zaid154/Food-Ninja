@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
+import { authFetch } from "../../utils/authClient";
 import { useAppDialog } from "../AppDialog";
 
 const AdminCustomersPage = (props) => {
@@ -17,7 +18,7 @@ const AdminCustomersPage = (props) => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/users`);
+      const res = await authFetch(`${API_BASE_URL}/users`);
       const data = await res.json();
       if (data.users) {
         setUsers(data.users);
@@ -50,7 +51,7 @@ const AdminCustomersPage = (props) => {
 
     setUpdatingUserId(user._id);
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${encodeURIComponent(user._id)}/block`, {
+      const response = await authFetch(`${API_BASE_URL}/users/${encodeURIComponent(user._id)}/block`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isBlocked }),

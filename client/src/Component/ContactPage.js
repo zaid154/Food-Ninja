@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "../utils/Constants";
+import { fetchStoreSettings } from "../utils/settingsClient";
 
 const FAQS = [
   {
@@ -56,17 +57,15 @@ const ContactPage = () => {
   });
 
   useEffect(() => {
-    const loadSettings = () => {
-      if (typeof fetch !== "undefined") {
-        fetch(`${API_BASE_URL}/settings`)
-          .then((r) => r.json())
-          .then((d) => { if (d?.settings) setStoreSettings((prev) => ({ ...prev, ...d.settings })); })
-          .catch(() => {});
-      }
+    const loadSettings = (force = false) => {
+      fetchStoreSettings({ force }).then((s) => {
+        if (s) setStoreSettings((prev) => ({ ...prev, ...s }));
+      });
     };
-    loadSettings();
-    window.addEventListener("store_settings_updated", loadSettings);
-    return () => window.removeEventListener("store_settings_updated", loadSettings);
+    const handleUpdated = () => loadSettings(true);
+    loadSettings(false);
+    window.addEventListener("store_settings_updated", handleUpdated);
+    return () => window.removeEventListener("store_settings_updated", handleUpdated);
   }, []);
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/Constants";
+import { authFetch } from "../../utils/authClient";
 import { useAppDialog } from "../AppDialog";
 
 const COLOR_PRESETS = [
@@ -35,7 +36,7 @@ const AdminCategoriesPage = (props) => {
     try {
       setSaving(true);
       const url = editingId ? `${API_BASE_URL}/categories/${editingId}` : `${API_BASE_URL}/categories`;
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -72,7 +73,7 @@ const AdminCategoriesPage = (props) => {
     if (!ok) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/categories/${id}`, { method: "DELETE" });
+      const res = await authFetch(`${API_BASE_URL}/categories/${id}`, { method: "DELETE" });
       if (res.ok) {
         showToast(`Category "${name}" deleted.`);
         if (onRefresh) onRefresh();
@@ -87,7 +88,7 @@ const AdminCategoriesPage = (props) => {
   const handleToggle = async (cat, field, labelTrue, labelFalse) => {
     try {
       const newVal = !cat[field];
-      const res = await fetch(`${API_BASE_URL}/categories/${cat._id}`, {
+      const res = await authFetch(`${API_BASE_URL}/categories/${cat._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [field]: newVal }),

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import AdminDropdown from "./AdminDropdown";
 import { API_BASE_URL } from "../../utils/Constants";
+import { authFetch } from "../../utils/authClient";
 import { useAppDialog } from "../AppDialog";
 import { FOOD_CUISINES } from "./AdminDishesPage";
 
@@ -161,7 +162,7 @@ const AdminDishFormPage = () => {
       setSaving(true);
       setSaveError("");
       const url = isEditing ? `${API_BASE_URL}/recipes/${id}` : `${API_BASE_URL}/recipes`;
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method: isEditing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

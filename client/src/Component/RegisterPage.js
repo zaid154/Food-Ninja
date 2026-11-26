@@ -23,8 +23,8 @@ const RegisterPage = () => {
             return;
         }
 
-        if (password.length < 4) {
-            setError("Password must be at least 4 characters long.");
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters long.");
             return;
         }
 
@@ -35,6 +35,7 @@ const RegisterPage = () => {
             const res = await fetch(`${API_BASE_URL}/users/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify({
                     name: name.trim(),
                     email: email.trim(),

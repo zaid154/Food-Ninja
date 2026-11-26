@@ -109,12 +109,16 @@ cd server
 npm install
 ```
 
-Create a `.env` file inside `server/`:
+Create a `.env` file inside `server/` (see `server/.env.example`):
 ```env
 PORT=5005
 MONGO_URI=your_mongodb_connection_string
-RAZORPAY_KEY_ID=your_razorpay_key_id        # Optional for local demo
-RAZORPAY_KEY_SECRET=your_razorpay_key_secret  # Optional for local demo
+JWT_SECRET=your_64_char_random_hex_secret
+CLIENT_URL=http://localhost:1234,https://your-frontend.vercel.app
+RAZORPAY_KEY_ID=your_razorpay_key_id        # Optional in non-production demo mode
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+ADMIN_EMAIL=your_admin_email@example.com
+ADMIN_PASSWORD=your_strong_admin_password
 ```
 
 Seed the database with authentic dishes and default accounts:
@@ -152,14 +156,10 @@ npm run build
 
 ---
 
-## Default Demo Accounts
+## Authentication & Roles
 
-| Role | Email | Password | Permissions |
-|---|---|---|---|
-| **Admin** | `zaidm1323@gmail.com` | `Zaid@9999201255` | Full access to menu editor, inventory, orders, KOT/Bill printer, store hours & settings |
-| **Admin (Backup)** | `admin@foodninja.com` | `admin123` | Secondary administrative access |
-| **Customer 1** | `zaid@foodninja.com` | `password123` | Customer profile with delivered orders and verified review privileges |
-| **Customer 2** | `sara@foodninja.com` | `password123` | Customer profile with order history and favorites |
+- **Customer & Admin Sessions:** Passwords are hashed with `bcryptjs` and authenticated via HS256 JWT tokens (`httpOnly` cookie + `Authorization: Bearer` header).
+- **Seeding Accounts:** Configure `ADMIN_EMAIL` and `ADMIN_PASSWORD` inside `server/.env` before running `npm run seed`. Never commit real credentials or plaintext passwords to version control.
 
 ---
 

@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
-import { API_BASE_URL } from "../../utils/Constants";
 import { getSavedOrderPricing } from "../../utils/orderPricing";
+import { fetchStoreSettings } from "../../utils/settingsClient";
+
+const escapeHtml = (value) =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 
 const printHtml = (html) => {
   const iframe = document.createElement("iframe");
@@ -30,12 +38,9 @@ const OrderInvoiceModal = ({ order, onClose, initialMode = "kot" }) => {
   useEffect(() => setPrintMode(initialMode), [initialMode, order?.id]);
 
   useEffect(() => {
-    if (typeof fetch !== "undefined") {
-      fetch(`${API_BASE_URL}/settings`)
-        .then((r) => r.json())
-        .then((d) => { if (d?.settings) setSettings(d.settings); })
-        .catch(() => {});
-    }
+    fetchStoreSettings().then((s) => {
+      if (s) setSettings(s);
+    });
   }, []);
 
   if (!order) return null;
@@ -59,25 +64,42 @@ const OrderInvoiceModal = ({ order, onClose, initialMode = "kot" }) => {
     || String(order.razorpayPaymentId || "").startsWith("pay_demo_");
 
   const handlePrint = () => {
-    const resName = (settings.restaurantName || "FOOD NINJA").toUpperCase();
+    const resName = escapeHtml((settings.restaurantName || "FOOD NINJA").toUpperCase());
+    const safeOrderId = escapeHtml(order.id);
+    const safeOrderDate = escapeHtml(order.date || "Today");
+    const safeStatus = escapeHtml(order.status || "Placed");
+    const safeCustomer = escapeHtml(order.customerName || "Customer");
+    const safePhone = escapeHtml(order.phone || "");
+    const safeAddress = escapeHtml(order.address || "");
+    const safeNote = escapeHtml(order.specialInstructions || order.notes || "No special instructions");
+    const safePaymentStatus = escapeHtml(order.paymentStatus || "Paid");
+    const safePaymentMethod = escapeHtml(order.paymentMethod || "Online");
+    const safePaymentId = escapeHtml(order.razorpayPaymentId || "Not available");
+    const safeStoreAddress = escapeHtml((settings.storeAddress || "AUTHENTIC RESTAURANT & FAST KITCHEN").toUpperCase());
+    const safeFssai = escapeHtml(settings.fssaiNumber || "10020011000123");
+    const safeGstin = escapeHtml(settings.gstinNumber || "07AAAAF1234A1Z5");
+    const safeStorePhone = escapeHtml(settings.storePhone || "");
+
     if (printMode === "kot") {
       const kotItems = items.map((item) => {
         const qty = Number(item.quantity || 1);
-        return `<tr><td>${item.name || item.title}${item.portionSize ? `<br><small>${item.portionSize} Plate</small>` : ""}</td><td class="qty">${qty}</td></tr>`;
+        const safeItemName = escapeHtml(item.name || item.title);
+        const safePortion = item.portionSize ? escapeHtml(item.portionSize) : "";
+        return `<tr><td>${safeItemName}${safePortion ? `<br><small>${safePortion} Plate</small>` : ""}</td><td class="qty">${qty}</td></tr>`;
       }).join("");
 
-      return printHtml(`<!doctype html><html><head><meta charset="utf-8"><title>KOT_${order.id}</title><style>
+      return printHtml(`<!doctype html><html><head><meta charset="utf-8"><title>KOT_${safeOrderId}</title><style>
         @page{size:80mm auto;margin:0}body{width:74mm;margin:0 auto;padding:4mm 2mm;font:12px/1.4 'Courier New',monospace;color:#000}
         h2,p{margin:0}.center{text-align:center}.row{display:flex;justify-content:space-between;margin:4px 0}.line{border-top:1px dashed #000;margin:7px 0}
         table{width:100%;border-collapse:collapse;margin-top:6px}th,td{padding:5px 2px;border-bottom:1px dashed #aaa;text-align:left}th{font-size:10px}.qty{text-align:right;font-size:15px;font-weight:bold;width:30px}small{font-size:10px}
       </style></head><body>
         <div class="center"><h2>${resName}</h2><p><b>KITCHEN ORDER TICKET</b></p></div><div class="line"></div>
-        <div class="row"><b>ORDER #${order.id}</b><span>${order.date || "Today"}</span></div>
-        <div class="row"><b>STATUS</b><span>${order.status || "Placed"}</span></div>
-        <p><b>TYPE:</b> HOME DELIVERY</p><p><b>CUSTOMER:</b> ${order.customerName || "Customer"}</p>
-        <p><b>PHONE:</b> +91 ${order.phone || ""}</p><p><b>DELIVERY:</b> ${order.address || ""}</p>
+        <div class="row"><b>ORDER #${safeOrderId}</b><span>${safeOrderDate}</span></div>
+        <div class="row"><b>STATUS</b><span>${safeStatus}</span></div>
+        <p><b>TYPE:</b> HOME DELIVERY</p><p><b>CUSTOMER:</b> ${safeCustomer}</p>
+        <p><b>PHONE:</b> +91 ${safePhone}</p><p><b>DELIVERY:</b> ${safeAddress}</p>
         <div class="line"></div><table><thead><tr><th>ITEM</th><th class="qty">QTY</th></tr></thead><tbody>${kotItems}</tbody></table>
-        <div class="line"></div><p><b>NOTE:</b> ${order.specialInstructions || order.notes || "No special instructions"}</p>
+        <div class="line"></div><p><b>NOTE:</b> ${safeNote}</p>
       </body></html>`);
     }
 
@@ -85,10 +107,14 @@ const OrderInvoiceModal = ({ order, onClose, initialMode = "kot" }) => {
     const billItems = items.map((it) => {
       const price = Number(it.price ?? it.caloriesPerServing ?? 0);
       const qty = Number(it.quantity || 1);
-      return `<tr><td class="text-left font-bold">${it.name || it.title}${it.portionSize ? `<br><span style="font-size:9px;font-weight:normal">${it.portionSize} Plate</span>` : ""}</td><td class="text-center">${qty}</td><td class="text-right">₹${price}</td><td class="text-right font-bold">₹${price * qty}</td></tr>`;
+      const safeItemName = escapeHtml(it.name || it.title);
+      const safePortion = it.portionSize ? escapeHtml(it.portionSize) : "";
+      return `<tr><td class="text-left font-bold">${safeItemName}${safePortion ? `<br><span style="font-size:9px;font-weight:normal">${safePortion} Plate</span>` : ""}</td><td class="text-center">${qty}</td><td class="text-right">₹${price}</td><td class="text-right font-bold">₹${price * qty}</td></tr>`;
     }).join("");
 
-    printHtml(`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Bill_${order.id}</title><style>
+    const billDate = escapeHtml(order.date || new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }));
+
+    printHtml(`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Bill_${safeOrderId}</title><style>
       @page{size:80mm auto;margin:0mm}@media print{html,body{width:80mm;margin:0!important;padding:0!important;background:#fff!important;color:#000!important}}
       body{font-family:'Courier New',Courier,monospace;width:74mm;margin:0 auto;padding:4mm 2mm;font-size:11px;line-height:1.35;color:#000}
       .text-center{text-align:center}.text-right{text-align:right}.text-left{text-align:left}.font-bold{font-weight:bold}.divider{border-top:1px dashed #000;margin:6px 0}.double-divider{border-top:2px dashed #000;margin:6px 0}.row{display:flex;justify-content:space-between;margin:2px 0}
@@ -96,24 +122,24 @@ const OrderInvoiceModal = ({ order, onClose, initialMode = "kot" }) => {
     </style></head><body>
       <div class="text-center">
         <h2 style="margin:0;font-size:18px;font-weight:900;">${resName}</h2>
-        <div style="font-size:9px;margin-top:2px;">${(settings.storeAddress || "AUTHENTIC RESTAURANT & FAST KITCHEN").toUpperCase()}</div>
-        <div style="font-size:9px;color:#333;margin-top:2px;">FSSAI: ${settings.fssaiNumber || "10020011000123"} • GSTIN: ${settings.gstinNumber || "07AAAAF1234A1Z5"}</div>
-        ${settings.storePhone ? `<div style="font-size:9px;color:#444;margin-top:1px;">PHONE: ${settings.storePhone}</div>` : ""}
+        <div style="font-size:9px;margin-top:2px;">${safeStoreAddress}</div>
+        <div style="font-size:9px;color:#333;margin-top:2px;">FSSAI: ${safeFssai} • GSTIN: ${safeGstin}</div>
+        ${safeStorePhone ? `<div style="font-size:9px;color:#444;margin-top:1px;">PHONE: ${safeStorePhone}</div>` : ""}
         <div class="double-divider"></div><div style="font-size:11px;font-weight:bold;">TAX INVOICE & DELIVERY BILL</div><div class="divider"></div>
       </div>
       <div style="font-size:10.5px;margin:4px 0;">
-        <div class="row"><span class="font-bold">ORDER ID: #${order.id}</span><span>${order.date || new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span></div>
+        <div class="row"><span class="font-bold">ORDER ID: #${safeOrderId}</span><span>${billDate}</span></div>
         <div class="row" style="margin-top:3px;align-items:center;">
           <span>TYPE: HOME DELIVERY</span>
           <span style="border:1.5px solid #000;padding:1px 6px;font-weight:bold;font-size:10px;">${isCod ? `COD: COLLECT ₹${grandTotal}` : (isDemoPayment ? "DEMO / TEST PAYMENT" : "PAID ONLINE (₹0 DUE)")}</span>
         </div>
         <div class="divider"></div>
-        <div><span class="font-bold">CUSTOMER:</span> ${order.customerName}</div>
-        <div><span class="font-bold">PHONE:</span> +91 ${order.phone}</div>
-        <div><span class="font-bold">ADDRESS:</span> ${order.address}</div>
+        <div><span class="font-bold">CUSTOMER:</span> ${safeCustomer}</div>
+        <div><span class="font-bold">PHONE:</span> +91 ${safePhone}</div>
+        <div><span class="font-bold">ADDRESS:</span> ${safeAddress}</div>
         ${isPaidOnline ? `
-          <div><span class="font-bold">PAYMENT:</span> ${isDemoPayment ? "PAID (DEMO / TEST)" : (order.paymentStatus || "Paid")} (${isDemoPayment ? "Demo" : (order.paymentMethod || "Online")})</div>
-          <div style="overflow-wrap:anywhere;"><span class="font-bold">ID:</span> ${order.razorpayPaymentId || "Not available"}</div>
+          <div><span class="font-bold">PAYMENT:</span> ${isDemoPayment ? "PAID (DEMO / TEST)" : safePaymentStatus} (${isDemoPayment ? "Demo" : safePaymentMethod})</div>
+          <div style="overflow-wrap:anywhere;"><span class="font-bold">ID:</span> ${safePaymentId}</div>
         ` : ""}
       </div>
       <div class="divider"></div>
